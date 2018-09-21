@@ -19,4 +19,4 @@ WORKDIR /app
 
 ENTRYPOINT ["python"]
 
-CMD ["hello.py"]
+CMD ["jasper.py"]

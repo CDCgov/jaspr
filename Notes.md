@@ -1,11 +1,40 @@
-To create container:
+---
+title: Developer Notes
+---
+
+Creating HTML Version of this file
+----------------------------------
+
+To create the HTML version of these notes install pandoc from https://pandoc.org and then use the batch file _createhtmldocs.bat_ to generate an HTML file
+
+Creating and Running the Jasper project container for development
+-----------------------------------------------------------------
+
+__Using provided Python tooling__
+
+This project is designed to be developed using a Docker container as a running environment.  The python file to create this container is _jasperbuild.py_.  Here are the instructions to use this tool:
+
+	jasperbuild.py
+
+	This will build and run the Jasper software within	
+	a docker container
+
+	-b(--build) to build the container
+	-r(--run) to run the container
+
+if you want to run things manually, here are the commands that will get you stgarted:
+
+__To create container__
+
 docker-compose build
 
-to run container
+__to run container__
+
 docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app --rm cdcflu/jasper:v1
 
+Other Notes/random stuff
+------------------------
 
-===============================================================================
 1.) Download miniconda docker package and run bash shell
 	a.) docker pull conda/miniconda3
 	b.) docker run -i -t conda/miniconda3 /bin/bash --allow-rootbokeh
