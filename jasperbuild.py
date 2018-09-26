@@ -2,7 +2,7 @@
 #coding: utf-8 
 import glob, subprocess, argparse, sys
 
-RUN_STRING="docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app  --rm cdcflu/jasper:v1 "
+RUN_STRING="docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -w /app  --rm cdcflu/jasper:v1 "
 
 BUILD_STRING="cd DockerBuild && docker-compose build && cd .."
 

@@ -32,6 +32,18 @@ __to run container__
 
 docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app --rm cdcflu/jasper:v1
 
+Next Steps
+-----------
+
+1. [x] Set up a basic template for the main page
+1. [x] Add bootstrap and break out basic page layout
+1. [ ] Add basic color scheme so it isn't ugly
+1. [ ] Set up a graph page using Bokeh
+1. [ ] Add configuration (yaml)
+1. [ ] Add file upload function (flask-uploads)
+1. [ ] Add pdf file creation functionality 
+
+
 Other Notes/random stuff
 ------------------------
 

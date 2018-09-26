@@ -1,8 +1,13 @@
 from flask import Flask
+from flask import render_template
+
 app = Flask(__name__)
 @app.route("/")
-def hello():
-    return "Hello World, I am now Working In place! No really, I am!"
+def main():
+    return render_template('main.html')
+
+@app.route("/datagrid")
+    return render_template('grid.html')
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', port='5000', debug=True)
