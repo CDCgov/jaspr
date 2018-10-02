@@ -1,8 +1,8 @@
----
 title: Developer Notes
 ---
 
 Creating HTML Version of this file
+---
 ----------------------------------
 
 To create the HTML version of these notes install pandoc from https://pandoc.org and then use the batch file _createhtmldocs.bat_ to generate an HTML file
@@ -16,7 +16,7 @@ This project is designed to be developed using a Docker container as a running e
 
 	jasperbuild.py
 
-	This will build and run the Jasper software within	
+	This will build and run the Jasper software within
 	a docker container
 
 	-b(--build) to build the container
@@ -37,11 +37,18 @@ Next Steps
 
 1. [x] Set up a basic template for the main page
 1. [x] Add bootstrap and break out basic page layout
-1. [ ] Add basic color scheme so it isn't ugly
-1. [ ] Set up a graph page using Bokeh
+1. [x] Add basic color scheme so it isn't ugly
+1. [x] Add file upload function (flask-uploads)
+1. [x] Remove CDN from graphing
+1. [x] Load data into Pandas
+1. [x] Set up a graph page using Bokeh
+1. [x] Put data table into tab (temporary)
+1. [ ] Finish settings form
 1. [ ] Add configuration (yaml)
-1. [ ] Add file upload function (flask-uploads)
-1. [ ] Add pdf file creation functionality 
+1. [ ] Add pdf file creation functionality
+1. [ ] Connect data grid to graph
+1. [ ] Add validation so that only xslx files can be uploaded
+1. [ ] Convert to Vue.js components
 
 
 Other Notes/random stuff
@@ -49,7 +56,7 @@ Other Notes/random stuff
 
 1.) Download miniconda docker package and run bash shell
 	a.) docker pull conda/miniconda3
-	b.) docker run -i -t conda/miniconda3 /bin/bash --allow-rootbokeh
+	b.) docker run -i -t conda/miniconda3 /bin/bash --allow-root bokeh
 
 2.) Install Flask, Bokeh, plugin framework (James will tell me the name), YAML
 or JASN config
@@ -65,7 +72,7 @@ interactive Y/N Question)
 [PROBLEM]
 If this doesn't work to run Jupyter:
 
-docker run -i -t -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"
+docker run -i -t  -v c:/frunk:/frunk -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*'  --no-browser --allow-root
 
 I get the error:
 docker: Error response from daemon: driver failed programming external connectivity on endpoint flamboyant_kepler (caadd7788899e6a680608e91274e185cd29a077a0c85f016a209ad2c125669e0): Error starting userland proxy: mkdir /port/tcp:0.0.0.0:8888:tcp:172.17.0.2:8888: input/output error.
@@ -73,6 +80,3 @@ docker: Error response from daemon: driver failed programming external connectiv
 
 [PROBLEM]  cannot run Jupyter by using container name as host
 [SOLVED] You need to specify localhost:8888
-
-
-
