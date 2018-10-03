@@ -32,9 +32,9 @@ def create_chart(df):
     creating the results chart
     """
     # Create the figure: p
-    p = figure(x_axis_label='date', x_axis_type="datetime", y_axis_label='result',title='Jasper Data')
+    p = figure(x_axis_label='titer', y_axis_type="log", y_axis_label='result',title='Jasper Data')
     # Plot result by date
-    p.circle(df['date'], df['result'], size=10)
+    p.circle(df['titer'], df['result'], size=10)
     return components(p)
 
 def create_table(df):
