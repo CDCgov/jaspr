@@ -4,17 +4,13 @@ from werkzeug import secure_filename
 from pandas import pandas as pd
 from bokeh.plotting import figure
 from bokeh.embed import components
+from bokeh.layouts import widgetbox
+from bokeh.models import ColumnDataSource
+from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
 
 """
 merge these in after the table is done
 """
-from datetime import date
-from random import randint
-
-from bokeh.io import output_file, show
-from bokeh.layouts import widgetbox
-from bokeh.models import ColumnDataSource
-from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
 
 UPLOAD_FOLDER = '/app/uploads'
 CURRENT_DATA_FILE = 'currentdata.xlsx'
@@ -28,7 +24,7 @@ def gather_data():
     """
 
     xlsx = pd.ExcelFile(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
-    df = pd.read_excel(xlsx, 'Sheet1')
+    df = pd.read_excel(xlsx, 'Sheet1',na_filter=False)
     return df
 
 def create_chart(df):
@@ -45,12 +41,14 @@ def create_table(df):
     """
     creating the data table
     """
-    output_file("data_table.html")
 
     source = ColumnDataSource(df)
 
     bcols = [TableColumn(field=Ci, title=Ci) for Ci in df.columns] # bokeh columns
-    data_table = DataTable(source=source, columns=bcols, width=600, height=580)
+    for col in bcols:
+        if col.field =="date":
+            col.formatter = DateFormatter()
+    data_table = DataTable(source=source, columns=bcols, height=580)
 
     # Plot result by date
     return components(widgetbox(data_table))
