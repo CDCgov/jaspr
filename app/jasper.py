@@ -42,8 +42,6 @@ def create_chart(df):
     y = np.linspace(1,df['result'].max(), df.shape[0]*2)
     y = np.flip(y) #add twice the points of what we are plotting
     x = list(map(lambda n: df['titer'].max()-math.log2(n), y))
-    print(y)
-    print(x)
 
     lsource = ColumnDataSource(dict(x=x, y=y))
 
