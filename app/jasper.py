@@ -1,4 +1,6 @@
 import os
+import math
+import numpy as np
 from flask import Flask, render_template, request,redirect
 from werkzeug import secure_filename
 from pandas import pandas as pd
@@ -6,6 +8,7 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
+from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
 
 """
@@ -31,11 +34,28 @@ def create_chart(df):
     """
     creating the results chart
     """
-    # Create the figure: p
+    # Create the figure: p and chart the data
     p = figure(x_axis_label='titer', y_axis_type="log", y_axis_label='result',title='Jasper Data')
-    # Plot result by date
     p.circle(df['titer'], df['result'], size=10)
+
+    #create a standard log curve and plot on chart for reference
+    y = np.linspace(1,df['result'].max(), df.shape[0]*2)
+    y = np.flip(y) #add twice the points of what we are plotting
+    x = list(map(lambda n: df['titer'].max()-math.log2(n), y))
+    print(y)
+    print(x)
+
+    lsource = ColumnDataSource(dict(x=x, y=y))
+
+    glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
+    p.add_glyph(lsource, glyph)
+
+    #modify the y-axis to be log 2
+    p.yaxis[0].ticker.base = 2
+    p.yaxis[0].formatter.ticker = p.yaxis[0].ticker
+
     return components(p)
+    # Plot result by date
 
 def create_table(df):
     """

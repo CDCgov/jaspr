@@ -1,5 +1,5 @@
-title: Developer Notes
 ---
+title: Developer Notes
 
 Creating HTML Version of this file
 ---
@@ -43,10 +43,13 @@ Next Steps
 1. [x] Load data into Pandas
 1. [x] Set up a graph page using Bokeh
 1. [x] Put data table into tab (temporary)
-1. [ ] Finish settings form
+1. [x] Connect data grid to graph
+1. [ ] Add custom x axis labels for titers
+1. [ ] Flesh out settings form
 1. [ ] Add configuration (yaml)
+1. [ ] fix Juypter to restart from old or recreate
+1. [ ] Flesh out calls to bas service tier
 1. [ ] Add pdf file creation functionality
-1. [ ] Connect data grid to graph
 1. [ ] Add validation so that only xslx files can be uploaded
 1. [ ] Convert to Vue.js components
 
