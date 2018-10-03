@@ -1,0 +1,22 @@
+# file jaspr/config/met_3_drug_fluro8
+
+# IMPORTANT: Every experiment needs a unique, descriptive name!
+[experiment]
+name = MET 3-drug Fluoro 8 Samples
+description = Three NAI drugs, fluorescence detection, 8 samples, 11 concentrations
+
+[plate]
+orientation = row
+reverse_dilution = False
+blank_position = last
+blank_orientation = col
+
+[detection]
+method = Fluorescence
+units = RFU
+
+[drug]
+drugs = Zanamivir,Oseltamivir,Peramivir
+concs = 1000,320,100,32,10,3.2,1,0.32,0.1,0.032,0
+conc_unit = nM
+graph_zero = 0.001

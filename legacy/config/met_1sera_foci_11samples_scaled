@@ -1,0 +1,20 @@
+# file jaspr/config/ferret anti sera 1/80
+
+# IMPORTANT: Every experiment needs a unique, descriptive name!
+[experiment]
+name = Diluted ferret sera 1/80 
+description = ferret anti sera, infected cell detection, 11 concentrations
+
+[plate]
+orientation = row
+reverse_dilution = False
+
+[detection]
+method = Foci
+units = number
+
+[drug]
+drugs = ferret anti sera
+concs = 1.25e4, 6.25e3, 3.125e3, 1.563e3, 7.813e2, 3.906e2, 1.953e2, 9.755e1, 4.883e1, 2.441e1, 0
+conc_unit = dilution x 1e6
+graph_zero = 1

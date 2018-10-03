@@ -1,0 +1,75 @@
+# file jaspr/config/aus_3_drug_fluoro
+
+# The configuration file for standard inhibition experiments with
+# fluorescence detection.
+
+# We assume 96-well plates, 8 rows (A-H), 12 columns (1-12).
+
+# Each experiment is assumed to cycle through N drugs, one per plate,
+# and M samples in batches of 7, 8, 11, or 12 depending on the detection
+# technology and dilution series
+
+# Note that we list the most common set of drugs, but the number and
+# order can be easily be set in an experiment key file, while still
+# using the plate layout.
+
+
+# The experiment section tracks the name of the experiment and a more
+# verbose description of the experiment.
+# IMPORTANT: Every experiment needs a unique, descriptive name!
+[experiment]
+name = AUS 3-drug Fluoro 11 Samples
+description = Three NAI drugs, fluorescence detection, 11 samples, 8 concentrations
+
+
+# The plate section tracks the row/col orientation of plates, and
+# whether to reverse the order of the dilution series.
+#
+# orientation (row, col): set the direction of the dilutions
+#
+# reverse_dilution (True, False): Typically, the highest drug
+# concentrations are located in the lowest postion.  This is
+# inconvenient for right-handed lab-techs using multi-channel pippettes
+# to do serial dilutions.  If True, the concentrations are ordered
+# low->high instead.
+#
+# blank_orientation (row, col): one row or column on the plate should be
+# left as a blank in every experiment.  This allows the the user the
+# flexibility to choose row or col independent of the plate orientation,
+# allowing more flexible experimental design.
+#
+# blank_position (first, last): allows the blank to be in the first or
+# last row/col.  Note that first is an absolute position, while last is
+# relative to how many samples there are on a plate.
+
+# This plate layout is used for the Austrialian 8-sample, 11 dilution
+# layout.  It is reversed for ease of use by right-handed lab-techs.
+# There are 8 blank wells in the last column.
+[plate]
+orientation = col
+blank_position = last
+blank_orientation = col
+reverse_dilution = True
+
+
+# The detection section tracks quantitation method and units.  These
+# values will become y-axis labels on graphs.
+[detection]
+method = Fluorescence
+units = A.U.
+
+
+# The drug section contains:
+#   * A list of drugs, comma separated.
+#   * A series of dilution values, comma separated.
+#   * A concentration unit.
+#   * A graph 'zero concentration', which should be a positive number
+#     1-1.5 logs smaller than the smallest dilution for use in graphing.
+#     This avoids log(0) -> -infinity when we graph on a log scale.
+#
+# Drug names and conc_units will become x-axis labels on the graphs.
+[drug]
+drugs = Zanamivir,Oseltamivir,Peramivir
+concs = 10000,1000,100,10,1,0.1,0.01,0
+conc_unit = nM
+graph_zero = 0.001

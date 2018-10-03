@@ -1,0 +1,23 @@
+# file jaspr/config/niid_3drug_hdr_12samples
+
+# IMPORTANT: Every experiment needs a unique, descriptive name!
+[experiment]
+name = MET 3-drug Fluoro 8 Samples
+name = NIID 3-drug HDR 12 Samples
+description = Three NAI drugs, 12 samples, 7 concentrations (high dyanamic range)
+
+[plate]
+orientation = col
+reverse_dilution = False
+blank_position = last
+blank_orientation = row
+
+[detection]
+method = Fluorescence
+units = RFU
+
+[drug]
+drugs = Zanamivir,Oseltamivir,Peramivir
+concs = 1250000,12500,125,1.25,0.0125,0.000125,0
+conc_unit = nM
+graph_zero = 0.00000125
