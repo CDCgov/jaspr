@@ -7,16 +7,16 @@ Creating HTML Version of this file
 
 To create the HTML version of these notes install pandoc from https://pandoc.org and then use the batch file _createhtmldocs.bat_ to generate an HTML file
 
-Creating and Running the Jasper project container for development
+Creating and Running the jaspr project container for development
 -----------------------------------------------------------------
 
 __Using provided Python tooling__
 
-This project is designed to be developed using a Docker container as a running environment.  The python file to create this container is _jasperbuild.py_.  Here are the instructions to use this tool:
+This project is designed to be developed using a Docker container as a running environment.  The python file to create this container is _jasprbuild.py_.  Here are the instructions to use this tool:
 
-	jasperbuild.py
+	jasprbuild.py
 
-	This will build and run the Jasper software within
+	This will build and run the jaspr software within
 	a docker container
 
 	-b(--build) to build the container
@@ -30,7 +30,7 @@ docker-compose build
 
 __to run container__
 
-docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app --rm cdcflu/jasper:v1
+docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app --rm cdcflu/jaspr:v1
 
 Next Steps
 -----------
@@ -51,7 +51,7 @@ Next Steps
 1. [ ] Flesh out calls to bas service tier
 1. [ ] Add pdf file creation functionality
 1. [ ] Add validation so that only xslx files can be uploaded
-1. [ ] Convert to Vue.js components
+1. [ ] Plan for use of ReactJS components
 
 
 Other Notes/random stuff

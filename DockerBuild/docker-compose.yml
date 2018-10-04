@@ -1,8 +1,8 @@
 version: '3.3'
 
 services:
-   jasper:
+   jaspr:
       build: .
-      image: cdcflu/jasper:v1
+      image: cdcflu/jaspr:v1
       ports:
        - "5000:5000"

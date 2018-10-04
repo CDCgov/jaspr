@@ -29,7 +29,7 @@ class JasprConfigParser(ConfigParser.SafeConfigParser):
         value = self.get(section, option)
         if not value in acceptable_values:
             msg = 'Unrecognized %s.%s value: %s' % (section, option, value)
-            raise JasperConfigParserError(msg)
+            raise jasprConfigParserError(msg)
         return value
 
 

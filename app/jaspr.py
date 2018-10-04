@@ -23,7 +23,8 @@ app = Flask(__name__)
 pinging = True
 def gather_data():
     """
-    gather data from the excel file in the uploader director
+
+\    gather data from the excel file in the uploader director
     """
 
     xlsx = pd.ExcelFile(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
@@ -35,22 +36,22 @@ def create_chart(df):
     creating the results chart
     """
     # Create the figure: p and chart the data
-    p = figure(x_axis_label='titer', y_axis_type="log", y_axis_label='result',title='Jasper Data')
+    p = figure(x_axis_label='titer', y_axis_label='result',title='jaspr Data')
     p.circle(df['titer'], df['result'], size=10)
 
     #create a standard log curve and plot on chart for reference
-    y = np.linspace(1,df['result'].max(), df.shape[0]*2)
-    y = np.flip(y) #add twice the points of what we are plotting
-    x = list(map(lambda n: df['titer'].max()-math.log2(n), y))
+    y = np.linspace(df['result'].min(),df['result'].max(), df.shape[0]*5)#add 5x the points of what we are plotting
+    y = np.flip(y)
+    x = list(map(lambda n: df['titer'].max()-math.log2(n)+df['titer'].min(), y))
 
     lsource = ColumnDataSource(dict(x=x, y=y))
 
     glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
     p.add_glyph(lsource, glyph)
 
-    #modify the y-axis to be log 2
-    p.yaxis[0].ticker.base = 2
-    p.yaxis[0].formatter.ticker = p.yaxis[0].ticker
+    #modify the x-axis to be log 2
+    #p.xaxis[0].ticker.base = 2
+    #p.xaxis[0].formatter.ticker = p.xaxis[0].ticker
 
     return components(p)
     # Plot result by date

@@ -2,8 +2,8 @@
 #coding: utf-8
 import glob, subprocess, argparse, sys
 
-RUN_STRING="docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -w /app  --rm cdcflu/jasper:v1 python jasper.py"
-CMD_STRING="docker run -i -t -v c:/Projects/jasper/app:/app -p 5000:5000 -w /app  --rm cdcflu/jasper:v1 /bin/bash"
+RUN_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app  --rm cdcflu/jaspr:v1 python jaspr.py"
+CMD_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app  --rm cdcflu/jaspr:v1 /bin/bash"
 JUPYTER_STRING="docker run -i -t  -v c:/frunk:/frunk -p 8888:8888 continuumio/anaconda3 /bin/bash -c \"/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip=*  --no-browser --allow-root\""
 
 BUILD_STRING="cd DockerBuild && docker-compose build && cd .."
@@ -14,7 +14,7 @@ def completeTask( taskCommandLine):
     return
 
 def main():
-    parser = argparse.ArgumentParser(description="build and run jasper in a container")
+    parser = argparse.ArgumentParser(description="build and run jaspr in a container")
     parser.add_argument('-b','--build', help="", action="store_true")
     parser.add_argument('-r','--run', help="", action="store_true")
     parser.add_argument('-c','--command', help="", action="store_true")
@@ -22,7 +22,7 @@ def main():
 
     args = parser.parse_args()
     print("--------------------------------------------------------")
-    print(" This will build and run the Jasper software within     ")
+    print(" This will build and run the jaspr software within     ")
     print(" a docker container                                     ")
     print("                                                        ")
     print(" -b(--build) to build the container                     ")
