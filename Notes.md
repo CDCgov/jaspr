@@ -7,6 +7,29 @@ Creating HTML Version of this file
 
 To create the HTML version of these notes install pandoc from https://pandoc.org and then use the batch file _createhtmldocs.bat_ to generate an HTML file
 
+Next Steps
+-----------
+
+1. [x] Set up a basic template for the main page
+1. [x] Add bootstrap and break out basic page layout
+1. [x] Add basic color scheme so it isn't ugly
+1. [x] Add file upload function (flask-uploads)
+1. [x] Remove CDN from graphing
+1. [x] Load data into Pandas
+1. [x] Set up a graph page using Bokeh
+1. [x] Put data table into tab (temporary)
+1. [x] Connect data grid to graph
+1. [x] fix Juypter to restart from old or recreate
+1. [ ] Add custom x axis labels for titers
+1. [ ] Flesh out settings form
+1. [ ] Add configuration (yaml)
+1. [ ] Flesh out calls to bas service tier
+1. [ ] Add pdf file creation functionality
+1. [ ] Add validation so that only xslx files can be uploaded
+1. [ ] Plan for use of ReactJS components
+
+
+
 Creating and Running the jaspr project container for development
 -----------------------------------------------------------------
 
@@ -32,26 +55,6 @@ __to run container__
 
 docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -e FLASK_APP=hello.py -w /app --rm cdcflu/jaspr:v1
 
-Next Steps
------------
-
-1. [x] Set up a basic template for the main page
-1. [x] Add bootstrap and break out basic page layout
-1. [x] Add basic color scheme so it isn't ugly
-1. [x] Add file upload function (flask-uploads)
-1. [x] Remove CDN from graphing
-1. [x] Load data into Pandas
-1. [x] Set up a graph page using Bokeh
-1. [x] Put data table into tab (temporary)
-1. [x] Connect data grid to graph
-1. [ ] Add custom x axis labels for titers
-1. [ ] Flesh out settings form
-1. [ ] Add configuration (yaml)
-1. [ ] fix Juypter to restart from old or recreate
-1. [ ] Flesh out calls to bas service tier
-1. [ ] Add pdf file creation functionality
-1. [ ] Add validation so that only xslx files can be uploaded
-1. [ ] Plan for use of ReactJS components
 
 
 Other Notes/random stuff
