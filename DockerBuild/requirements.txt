@@ -2,3 +2,4 @@ Flask
 Bokeh
 Pandas
 xlrd
+flask-debugtoolbar
