@@ -24,7 +24,7 @@ pinging = True
 def gather_data():
     """
 
-\    gather data from the excel file in the uploader director
+    gather data from the excel file in the uploader director
     """
 
     xlsx = pd.ExcelFile(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
@@ -83,6 +83,11 @@ def uploader():
       f.save(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
    return redirect("/", code=302)
 
+@app.route("/settings")
+def settings():
+    """ render the settings page
+    """
+    return render_template('settings.html')
 
 @app.route("/")
 def main():

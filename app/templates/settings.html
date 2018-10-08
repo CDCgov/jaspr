@@ -1,0 +1,16 @@
+{% extends "main_layout.html" %}
+{% set txtTitle="Welcome to JASPR!" %}
+<div id="#body" class="container-fluid">
+{% block body %}
+
+<form action='#'>
+		<checkbox id="showTrend">Show Trends</checkbox>
+		<button id="pingButton" onclick="GetPing();" value="">ping</button>
+		<span id="pingTitle">ping value: </span>
+		<span id="pingValue">Not Known</span>
+</form>
+<div>
+<a href="\">Return</a>
+</div>
+{%endblock%}
+</div> <!-- Body -->

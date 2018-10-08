@@ -1,83 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-		<title>jaspr Web Interface</title>
-		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/jaspr.css') }}" />
-		<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='css/jsgrid.min.css') }}" />
-		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid-theme.min.css') }}" />
-
-		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-0.13.0.min.css') }}" />
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-widgets-0.13.0.min.css') }}" />
-		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-tables-0.13.0.min.css') }}" />
-
-		<script src= {{ url_for('static', filename='js/jquery.min.js') }}></script>
-		<script src= {{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}></script>
-		<script src= {{ url_for('static', filename='js/jsgrid.min.js') }}></script>
-
-		<script src= {{ url_for('static', filename='js/bokeh-0.13.0.min.js') }}></script>
-		<script src= {{ url_for('static', filename='js/bokeh-widgets-0.13.0.min.js') }}></script>
-		<script src= {{ url_for('static', filename='js/bokeh-tables-0.13.0.min.js') }}></script>
-
-
-
-	</head>
-	<body id="app">
-		<div class="container-fluid">
-			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-				<a class="navbar-brand" href="#">Welcome to jaspr Web</a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarNav">
-					<ul class="navbar-nav">
-						<li class="nav-item">
-							<a class="nav-link" href="\">Home <span class="sr-only">(current)</span></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="\upload">Load Data</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="\help">Help</a>
-						</li>
-					</ul>
-				</div>
-			</nav>
-
-			<div class="row main">
-				<div class="col-2">
-					<ul class="nav nav-tabs" id="myTab" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" data-toggle="tab" href="#results" role="tab" aria-controls="results">Results</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" data-toggle="tab" href="#data" role="tab" aria-controls="data">Data</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" data-toggle="tab" href="#setup" role="tab" aria-controls="setup">Setup</a>
-						</li>
-					</ul>
-				</div>
-				<div class="col-10 tab-content">
-					<div class="tab-pane active" id="results" role="tabpanel">{{graph_div | safe }}</div>
-					<div class="tab-pane" id="data" role="tabpanel">{{table_div | safe }}</div>
-					<div class="tab-pane " id="setup" role="tabpanel">{% include 'settingsForm.html' %}</div>
-				</div>
+{% extends "main_layout.html" %}
+{% set txtTitle="Welcome to JASPR!" %}
+<div id="#body" >
+	{% block body %}
+	<div class="row">
+		<div class="col-3"></div>
+		<div class="col-9">
+			<div class="nav nav-tabs" role="tablist">
+					<a class="nav-item nav-link active" data-toggle="tab" href="#graph" aria-controls="graph">Graph</a>
+					<a class="nav-item nav-link" data-toggle="tab" href="#table" aria-controls="table">Table</a>
 			</div>
-			<div class="row bg-dark">
-				<div class="col-12 footer">
-					the footer will go here
-				</div>
-			</div>
-
 		</div>
-		<script src= {{ url_for('static', filename='js/jaspr.js') }}></script>
-		{{graph_script | safe }}
-		{{table_script | safe }}
-	</body>
-</html>
+	</div>
+	<div class="row">
+		<div class="col-3">
+			<ul class="nav nav-pills nav-stacked">
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="pill" href="#" >Sample #1</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="pill" href="#" >Sample #2</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link " data-toggle="pill" href="#" >Sample #3</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link " data-toggle="pill" href="#" >Sample #4</a>
+				</li>
+			</ul>
+		</div>
+		<div class="col-9">
+
+			<div class="tab-content">
+				<div class="tab-pane fade show active" role="tabpanel" active id="graph">
+					<span class="dataGraph" role="tabpanel"> {{graph_div | safe }}</span>
+				</div>
+				<div class="tab-pane fade" id="table">
+					<span class="dataTable"> {{table_div | safe }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	{%endblock%}
+</div> <!-- Body -->

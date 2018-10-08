@@ -1,20 +1,12 @@
 $(document).ready(function() {
-
-});
-
-var app = new Vue({
-  el: '#title',
-  data: {
-    message: 'Ping Testing Value'
-  }
+  $("#pingTitle").html("Ping Value");return false;
 });
 
 var GetPing = function() {
-  $.get('/ping', {}, function(response){
-       console.log("success");
-       console.log(response);
-       $("#pingValue").html(response);
+  $.get('/ping', {}, function(response) {
+    console.log("success");
+    console.log(response);
+    $("#pingValue").html(response);
+    return false;
   });
 };
-
-}
