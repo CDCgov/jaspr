@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+	{% include "head.html" %}
+	<body>
+	  {% include "nav.html" %}
+		{% block body %}Body Code Here{% endblock %}
+		{% include "footer.html" %}
+		<script src= {{ url_for('static', filename='js/jaspr.js') }}></script>
+		{{graph_script | safe }}
+		{{table_script | safe }}
+	</body>
+</html>
