@@ -1,0 +1,49 @@
+{% extends "main_layout.html" %}
+{% set txtTitle="Welcome to JASPR!" %}
+{% block body %}
+<div id="body">
+	<div class="row">
+		<div class="col-3">
+			&nbsp;
+		</div>
+		<div class="col-9">
+			<ul class="nav nav-tabs" >
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="tab" href="#graph">Graph</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#table">Table</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-3">
+			<ul class="nav nav-pills">
+				<li class="nav-item w-100">
+					<a class="nav-link active" data-toggle="pill" href="#">Sample #1</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" data-toggle="pill" href="#">Sample #2</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link " data-toggle="pill" href="#">Sample #3</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link " data-toggle="pill" href="#">Sample #4</a>
+				</li>
+			</ul>
+		</div>
+		<div class="col-9">
+			<div class="tab-content">
+				<div class="tab-pane fade show active" active id="graph">
+					<span class="dataGraph" > {{graph_div | safe }}</span>
+				</div>
+				<div class="tab-pane fade" id="table">
+					<span class="dataTable"> {{table_div | safe }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> <!-- Body -->
+{%endblock%}

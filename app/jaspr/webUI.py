@@ -1,6 +1,7 @@
 import os
 import math
 import numpy as np
+import logging
 from flask import Flask, render_template, request,redirect
 from werkzeug import secure_filename
 from pandas import pandas as pd
@@ -10,6 +11,7 @@ from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
+from jaspr import app
 
 """
 merge these in after the table is done
@@ -18,9 +20,11 @@ merge these in after the table is done
 UPLOAD_FOLDER = '/app/uploads'
 CURRENT_DATA_FILE = 'currentdata.xlsx'
 
-app = Flask(__name__)
-
 pinging = True
+def pol():
+    logging.warning("We can call into WebUI at least")
+    return
+
 def gather_data():
     """
 
@@ -111,6 +115,3 @@ def ping():
         pinging = True;
         returnStr = "Ping"
     return returnStr
-
-if __name__=="__main__":
-    app.run(host='0.0.0.0', port='5000', debug=True)

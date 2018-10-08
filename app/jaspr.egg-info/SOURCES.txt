@@ -1,0 +1,9 @@
+jaspr/__init__.py
+jaspr/config.py
+jaspr/webAPI.py
+jaspr/webUI.py
+jaspr.egg-info/PKG-INFO
+jaspr.egg-info/SOURCES.txt
+jaspr.egg-info/dependency_links.txt
+jaspr.egg-info/requires.txt
+jaspr.egg-info/top_level.txt

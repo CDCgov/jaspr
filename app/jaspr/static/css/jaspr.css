@@ -1,0 +1,26 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.header, .main, .aside, .footer {
+  padding: 2em;
+}
+
+.header {
+  background: white;
+}
+
+.main {
+  background: white;
+}
+
+.footer {
+
+  color: white;
+  text-align: center;
+}
