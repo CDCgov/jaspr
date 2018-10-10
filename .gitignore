@@ -1,6 +1,5 @@
-app/jaspr/__pycache__/*.*
-app/jaspr/__pycache__
-*.*~
+__pycache__/
+*~
 *.*.*~
 *.pyc
 Notes.html
