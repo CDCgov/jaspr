@@ -1,5 +1,8 @@
-\app\jaspr\__pycache__\*.*
-\app\jaspr\__pycache__\
+app/jaspr/__pycache__/*.*
+app/jaspr/__pycache__
 *.*~
+*.*.*~
+*.pyc
 Notes.html
-\app\jaspr.egg-info\
+app/jaspr.egg-info/*.*
+app/jaspr.egg-info
