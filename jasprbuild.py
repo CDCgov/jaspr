@@ -2,8 +2,8 @@
 #coding: utf-8
 import glob, subprocess, argparse, sys
 
-RUN_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True --rm cdcflu/jaspr:v1 flask run -h 0.0.0.0"
-CMD_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True --rm cdcflu/jaspr:v1 /bin/bash"
+RUN_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True --rm cdcflu/jaspr:v1 /bin/bash -i -c \"pip install -e . ; flask run -h 0.0.0.0\""
+CMD_STRING="docker run -i -t -v c:/Projects/jaspr/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True --rm cdcflu/jaspr:v1 /bin/bash -i -c \"pip install -e . ; /bin/bash\""
 JUPYTER_STRING="docker run -i -t  -v c:/frunk:/frunk -p 8888:8888 continuumio/anaconda3 /bin/bash -c \"/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip=*  --no-browser --allow-root\""
 
 BUILD_STRING="cd DockerBuild && docker-compose build && cd .."

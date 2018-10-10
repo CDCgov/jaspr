@@ -1,8 +1,12 @@
-import os
+#!/usr/bin/env python
+# file webUI.py
+
+
 import math
 import numpy as np
+import os
 import logging
-from flask import Flask, render_template, request,redirect
+from flask import Flask, render_template
 from werkzeug import secure_filename
 from pandas import pandas as pd
 from bokeh.plotting import figure
@@ -11,14 +15,7 @@ from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
-from jaspr import app
-
-"""
-merge these in after the table is done
-"""
-
-UPLOAD_FOLDER = '/app/uploads'
-CURRENT_DATA_FILE = 'currentdata.xlsx'
+from jaspr import app, UPLOAD_FOLDER, CURRENT_DATA_FILE
 
 pinging = True
 def pol():
@@ -27,10 +24,8 @@ def pol():
 
 def gather_data():
     """
-
-    gather data from the excel file in the uploader director
+    gather data from the excel file in the uploader directory
     """
-
     xlsx = pd.ExcelFile(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
     df = pd.read_excel(xlsx, 'Sheet1',na_filter=False)
     return df
@@ -80,13 +75,6 @@ def create_table(df):
 def upload_file():
    return render_template('upload.html')
 
-@app.route('/uploader', methods = ['GET', 'POST'])
-def uploader():
-   if request.method == 'POST':
-      f = request.files['file']
-      f.save(os.path.join(UPLOAD_FOLDER, CURRENT_DATA_FILE))
-   return redirect("/", code=302)
-
 @app.route("/settings")
 def settings():
     """ render the settings page
@@ -101,17 +89,3 @@ def main():
     g_script, g_div = create_chart(df)
     t_script, t_div = create_table(df)
     return render_template('main.html',graph_script=g_script, graph_div=g_div, table_script=t_script, table_div=t_div)
-
-@app.route("/ping")
-def ping():
-    """ Simple function for AJAX test:
-    """
-    global pinging
-    returnStr = "";
-    if pinging:
-        pinging = False;
-        returnStr = "Pong"
-    else:
-        pinging = True;
-        returnStr = "Ping"
-    return returnStr

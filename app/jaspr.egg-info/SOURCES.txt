@@ -1,5 +1,6 @@
+jaspr/Model.py
 jaspr/__init__.py
-jaspr/config.py
+jaspr/testModel.py
 jaspr/webAPI.py
 jaspr/webUI.py
 jaspr.egg-info/PKG-INFO
