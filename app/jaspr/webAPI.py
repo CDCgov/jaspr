@@ -1,27 +1,29 @@
-#!/usr/bin/env python
-# file webAPI.py
-import os
-from flask import Flask, request, redirect
-from jaspr import app, UPLOAD_FOLDER, CURRENT_DATA_FILE
-
+from flask import Flask, request, redirect, session
+from jaspr import app
 
 @app.route('/uploader', methods = ['GET', 'POST'])
 def uploader():
    if request.method == 'POST':
       f = request.files['file']
-      f.save(os.path.join(jaspr.UPLOAD_FOLDER, jaspr.CURRENT_DATA_FILE))
+      #f.save(os.path.join(jaspr.UPLOAD_FOLDER, jaspr.CURRENT_DATA_FILE))
    return redirect("/", code=302)
 
 @app.route("/ping")
 def ping():
  """ Simple function for AJAX test:
  """
- global pinging
+ print(session)
  returnStr = "";
- if pinging:
-     pinging = False;
+ NOT_SET='not set'
+
+ pingValue = session.get('pingvalue', NOT_SET)
+ if pingValue == NOT_SET:
+     session['pingvalue']=False
+     pingValue=False
+ if pingValue:
+     session['pingvalue'] = False;
      returnStr = "Pong"
  else:
-     pinging = True;
+     session['pingvalue'] = True;
      returnStr = "Ping"
  return returnStr

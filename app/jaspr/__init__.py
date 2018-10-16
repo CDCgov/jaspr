@@ -1,16 +1,19 @@
 """Main application package."""
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 
+SESSION_TYPE = 'FileSystemSessionInterface'
+SESSION_FILE_THRESHOLD = 30
 app = Flask(__name__)
+app.config['TESTING'] = True
+app.secret_key = b'HoleyMoleyRocky'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.debug=True
 
-UPLOAD_FOLDER = '/app/uploads'
-CURRENT_DATA_FILE = 'currentdata.xlsx'
+Session(app)
+toolbar = DebugToolbarExtension(app)
 
 #put these at the end (per Flask Documentation)
 import jaspr.webUI
 import jaspr.webAPI
-
-#TODO: take this last stuff out when ready to deploy to production use
-app.config['SECRET_KEY']="pleasedonttellme"
-toolbar = DebugToolbarExtension(app)

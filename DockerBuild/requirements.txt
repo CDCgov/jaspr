@@ -1,5 +1,7 @@
 Flask
+flask-debugtoolbar
+Flask-Session
 Bokeh
 Pandas
 xlrd
-flask-debugtoolbar
+markdown

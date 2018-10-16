@@ -1,13 +1,11 @@
 {% extends "main_layout.html" %}
-{% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
-<div id="body">
 	<div class="row">
-		<div class="col-3">
+		<div class="col-2">
 			&nbsp;
 		</div>
-		<div class="col-9">
-			<ul class="nav nav-tabs" >
+		<div class="col-10">
+			<ul class="nav nav-tabs">
 				<li class="nav-item">
 					<a class="nav-link active" data-toggle="tab" href="#graph">Graph</a>
 				</li>
@@ -17,27 +15,23 @@
 			</ul>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-3">
-			<ul class="nav nav-pills">
-				<li class="nav-item w-100">
-					<a class="nav-link active" data-toggle="pill" href="#">Sample #1</a>
+	<div class="row content-row">
+		<div class="col-2 selector ">
+			<ul class="nav flex-column nav-pills" role="tablist">
+				{% for sample in sampleList %}
+				<li class="nav-item"><a class="nav-link
+							{% if sample == selectedSample %}
+							active
+							{% endif %}
+							" data-toggle=" pill" href="{{ sample }}">{{ sample }}</a>
 				</li>
-				<li class="nav-item w-100">
-					<a class="nav-link" data-toggle="pill" href="#">Sample #2</a>
-				</li>
-				<li class="nav-item w-100">
-					<a class="nav-link " data-toggle="pill" href="#">Sample #3</a>
-				</li>
-				<li class="nav-item w-100">
-					<a class="nav-link " data-toggle="pill" href="#">Sample #4</a>
-				</li>
+				{% endfor %}
 			</ul>
 		</div>
-		<div class="col-9">
+		<div class="col-10">
 			<div class="tab-content">
 				<div class="tab-pane fade show active" active id="graph">
-					<span class="dataGraph" > {{graph_div | safe }}</span>
+					<span class="dataGraph"> {{graph_div | safe }}</span>
 				</div>
 				<div class="tab-pane fade" id="table">
 					<span class="dataTable"> {{table_div | safe }}</span>
@@ -45,5 +39,4 @@
 			</div>
 		</div>
 	</div>
-</div> <!-- Body -->
 {%endblock%}
