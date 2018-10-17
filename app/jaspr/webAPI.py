@@ -8,22 +8,21 @@ def uploader():
       #f.save(os.path.join(jaspr.UPLOAD_FOLDER, jaspr.CURRENT_DATA_FILE))
    return redirect("/", code=302)
 
-@app.route("/ping")
+@app.route("/ping", methods = ['GET', 'POST'])
 def ping():
- """ Simple function for AJAX test:
- """
- print(session)
- returnStr = "";
- NOT_SET='not set'
-
- pingValue = session.get('pingvalue', NOT_SET)
- if pingValue == NOT_SET:
-     session['pingvalue']=False
-     pingValue=False
- if pingValue:
-     session['pingvalue'] = False;
-     returnStr = "Pong"
- else:
-     session['pingvalue'] = True;
-     returnStr = "Ping"
- return returnStr
+    """ Simple function for AJAX test:
+    """
+    returnStr = "";
+    NOT_SET='not set'
+    pingValue = session.get('pingvalue', NOT_SET)
+    if pingValue == NOT_SET:
+        session['pingvalue']=False
+        pingValue=False
+    if pingValue:
+        session['pingvalue'] = False;
+        returnStr = "Pong"
+    else:
+        session['pingvalue'] = True;
+        returnStr = "Ping"
+    session.modified = True
+    return returnStr

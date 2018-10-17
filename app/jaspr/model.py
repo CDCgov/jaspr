@@ -195,7 +195,7 @@ class JasprModel(object):
         self._jasprExperiments = None
         self._jasprConfig = None
 
-    def loadDefaultSession(self):
+    def loadDefaultModel(self):
         """Loads the model with hardcoded sample session data (anscombs quartet)
             Returns:
                 None
