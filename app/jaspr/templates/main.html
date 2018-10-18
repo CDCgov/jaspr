@@ -2,12 +2,14 @@
 {% block body %}
 <div class="row">
 	<div class="col-2">
-		<div>Selected Experiment</div>
-		<select>
-			{% for experiment in experimentList %}
-			<option value="{{experiment}}">{{experiment}}</option>
-			{% endfor %}
-		</select>
+		<div class="form-group">
+			<div>Selected Experiment</div>
+			<select class="selectExperiment">
+				{% for experiment in experimentList %}
+				<option value="{{experiment}}">{{experiment}}</option>
+				{% endfor %}
+			</select>
+		</div>
 	</div>
 	<div class="col-10">
 		<ul class="nav nav-tabs">

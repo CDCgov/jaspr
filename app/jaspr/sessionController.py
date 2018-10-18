@@ -19,19 +19,23 @@ class SessionController(object):
 
     def __init__(self):
         self._currentModel = JasprModel()
-        self._initKey(EXPERIMENTS_SESSION_KEY,self.getModel().getExperimentString)
-        self._initKey(CONFIG_SESSION_KEY,self.getModel().getConfigString)
-        self._initKey(UISTATE_SESSION_KEY,self.getModel().getUIStateString)
+        self._initKey(EXPERIMENTS_SESSION_KEY,self.getModel().getExperimentString,
+                      self.getModel().setExperimentString)
+        self._initKey(CONFIG_SESSION_KEY,self.getModel().getConfigString,
+                      self.getModel().setConfigString)
+        self._initKey(UISTATE_SESSION_KEY,self.getModel().getUIStateString,
+                      self.getModel().setUIStateString)
 
-    def _initKey(self, keyString,keystringFunction):
+    def _initKey(self, keyString, getkeystringFunction,
+                    setkeystringFunction):
         #if there is not a model set then load default and set session to it
         if session.get(keyString, KEY_NOT_SET) == KEY_NOT_SET:
             self.getModel().loadDefaultModel()
             session[keyString] = keystringFunction()
-            session.modified=True
         #otherwise load the model from the session
         else:
-            self.getModel().setExperimentString(session.get(keyString,'{'+keyString+': null}'))
+            setkeystringFunction(session.get(keyString,'{'+keyString+': null}'))
+        session.modified=True
 
     def getModel(self):
         return self._currentModel
