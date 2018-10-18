@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 from flask import Flask, render_template,request,session
 from jaspr import app
-from jaspr.Model import JasprModel
-from jaspr.Charting import JasperCharts
+from jaspr.model import JasprModel
+from jaspr.charting import JasperCharts
+from jaspr.sessionController import SessionController
 
 @app.route('/upload')
 def upload_file():
@@ -14,25 +15,27 @@ def settings():
     """
     return render_template('settings.html')
 
+@app.route('/newSample')
+def newSample():
+    newSample = request.args.get('sample')
+    sc = SessionController()
+    jm = sc.getModel()
+    jm.updateUIState("currentSample",newSample)
+    return redirect(url_for("mainPage"))
+
 @app.route("/")
-def main():
+def mainPage():
     """ render the main page
     """
-    jm = JasprModel()
-
-
-    #TODO: I am just loading a default model for now
-    jm.loadDefaultModel()
-    session["config"]=jm.getConfigString()
-    session["model"]=jm.getExperimentString()
-    session.modified=True
-
-    #TODO: wire up actual sample selection from left menu
-    currentExperiment = jm.getExperimentNames()[0]
-    sampleList = jm.getSampleNames(currentExperiment)
-    selectedSample = sampleList[0]
+    sc = SessionController()
+    jm = sc.getModel()
     #TODO: wire up actual experiement selection from left menu
     experimentList = jm.getExperimentNames()
+    currentExperiment = jm.getUIStateValue("currentExperiment")
+
+    #TODO: wire up actual sample selection from left menu
+    sampleList = jm.getSampleNames(currentExperiment)
+    selectedSample = jm.getUIStateValue("currentSample")
 
     jc = JasperCharts(jm)
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
