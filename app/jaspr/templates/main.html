@@ -24,11 +24,8 @@
 	<div class="col-2 selector ">
 		<ul class="nav flex-column nav-pills" role="tablist">
 			{% for sample in sampleList %}
-			<li class="nav-item"><a class="nav-link
-							{% if sample == selectedSample %}
-							active
-							{% endif %}
-							" data-toggle=" pill" href="{{ sample }}">{{ sample }}</a>
+			<li class="nav-item">
+				<a class="nav-link {% if sample == selectedSample %}active{% endif %}" data-toggle="pill" href="/newSample?sample={{ sample }}">{{ sample }}</a>
 			</li>
 			{% endfor %}
 		</ul>
