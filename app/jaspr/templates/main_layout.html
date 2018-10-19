@@ -9,8 +9,7 @@
 			{% include "footer.html" %}
 		</div>
 		<script src={{ url_for('static', filename='js/jaspr.js') }}></script>
-		{{graph_script | safe }}
-		{{table_script | safe }}
+		{% block pagescript %}javascript here{% endblock %}
 	</body>
 
 </html>
