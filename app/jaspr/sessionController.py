@@ -31,7 +31,7 @@ class SessionController(object):
         #if there is not a model set then load default and set session to it
         if session.get(keyString, KEY_NOT_SET) == KEY_NOT_SET:
             self.getModel().loadDefaultModel()
-            session[keyString] = keystringFunction()
+            session[keyString] = getkeystringFunction()
         #otherwise load the model from the session
         else:
             setkeystringFunction(session.get(keyString,'{'+keyString+': null}'))

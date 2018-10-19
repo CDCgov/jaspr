@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, session
 from jaspr import app
 from datetime import datetime
+import json
 
 @app.route('/uploader', methods = ['GET', 'POST'])
 def uploader():
@@ -15,4 +16,4 @@ def ping():
     """
     returnStr = "Server Contacted at:" +datetime.utcnow() \
                 .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-    return returnStr
+    return json.dumps(returnStr)
