@@ -4,6 +4,7 @@ from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
+import json
 
 @app.route('/upload')
 def upload_file():
@@ -29,26 +30,36 @@ def mainPage():
     sampleList = jm.getSampleNames(currentExperiment)
     selectedSample = jm.getUIStateValue("currentSample")
 
-    jc = JasperCharts(jm)
-    g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
-    t_script, t_div = jc.create_table(currentExperiment,selectedSample)
-
     return render_template('main.html',
         experimentList=experimentList,
         sampleList=sampleList,
-        selectedSample=selectedSample,
-        graph_script=g_script, graph_div=g_div,
-        table_script=t_script, table_div=t_div)
+        selectedSample=selectedSample)
 
-@app.route("/graphHTML", methods=["GET"])
-def graphHTML():
+@app.route("/changeSample/<sample_name>", methods=["post"])
+def changeSample(sample_name):
+    sc = SessionController()
+    sc.updateUIState("currentSample",sample_name)
+
+    jm = sc.getModel()
+    print("got to changeSample: " + jm.getUIStateValue("currentSample"))
+    print("got to changeSample: " + jm.getUIStateString())
+    print("cookie: " + json.dumps(request.cookies["session"]))
+    return jsonify(request.json)
+
+@app.route("/drawWidgetHTML", methods=["GET"])
+def drawWidgetHTML():
     sc = SessionController()
     jm = sc.getModel()
 
     currentExperiment = jm.getUIStateValue("currentExperiment")
     selectedSample = jm.getUIStateValue("currentSample")
 
+    print("got to draw widget: " + jm.getUIStateValue("currentSample"))
+    print("got to draw widget: " + jm.getUIStateString())
+    print("cookie: " + json.dumps(request.cookies["session"]))
+
     jc = JasperCharts(jm)
+
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
     t_script, t_div = jc.create_table(currentExperiment,selectedSample)
 

@@ -30,6 +30,7 @@ class SessionController(object):
                     setkeystringFunction):
         #if there is not a model set then load default and set session to it
         if session.get(keyString, KEY_NOT_SET) == KEY_NOT_SET:
+            print("SessionController:_initKey: !!!!! No Session for: " + keyString)
             self.getModel().loadDefaultModel()
             session[keyString] = getkeystringFunction()
         #otherwise load the model from the session
@@ -40,6 +41,7 @@ class SessionController(object):
     def getModel(self):
         return self._currentModel
 
-    def updateUIState(key,value):
-        session[key]=value
-        self._initKey(UISTATE_SESSION_KEY,self.getModel().getUIStateString)
+    def updateUIState(self,key,value):
+        self.getModel().setUIStateValue(key,value)
+        session[UISTATE_SESSION_KEY] = self.getModel().getUIStateString()
+        session.modified = True
