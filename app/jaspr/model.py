@@ -78,6 +78,17 @@ class JasprModel(object):
         """
         return self._jasprConfig[settingKey]
 
+    def setUIStateValue(self, keyname, value):
+        """sets a ui valueKey
+            Args:
+                keyname: key to be changed
+                value: new value
+
+            Returns:
+                None
+        """
+        self._jasprUIState[keyname] = value
+
     def getUIStateValue(self, statekey):
         """returns a specific configuration setting
 
@@ -98,6 +109,17 @@ class JasprModel(object):
 
         """
         return list(self._jasprConfig)
+
+    def setConfigSettings(self,keyname, value):
+        """sets a settings valueKey
+            Args:
+                keyname: key to be changed
+                value: new value
+
+            Returns:
+                None
+        """
+        self._jasperConfig[keyname] = value
 
     def getExperimentNames(self):
         """returns array of the names of experiments in the JSON
