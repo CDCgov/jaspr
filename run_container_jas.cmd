@@ -1,0 +1,1 @@
+docker run -i -t -v d:/working/jasper_cdc/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True -e FLASK_ENV=development --rm cdcflu/jaspr:v1 /bin/bash -i -c "pip install -e . ; /bin/bash"

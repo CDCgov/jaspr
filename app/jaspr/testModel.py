@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 # file testmodel.py
+
+# python imports
 import unittest
+
+# local imports
 from model import JasprModel
+
 
 class TestDefaultModel(unittest.TestCase):
 
     def setUp(self):
         self.model = JasprModel()
-        self.model.loadDefaultSession()
+        self.model.loadDefaultModel()
 
     def test_ConfigSetting_Retrieve(self):
         self.assertEqual(self.model.getConfigSetting("fitType"),"linear/future")
