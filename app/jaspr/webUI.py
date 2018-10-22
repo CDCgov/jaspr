@@ -39,11 +39,7 @@ def mainPage():
 def changeSample(sample_name):
     sc = SessionController()
     sc.updateUIState("currentSample",sample_name)
-
     jm = sc.getModel()
-    print("got to changeSample: " + jm.getUIStateValue("currentSample"))
-    print("got to changeSample: " + jm.getUIStateString())
-    print("cookie: " + json.dumps(request.cookies["session"]))
     return jsonify(request.json)
 
 @app.route("/drawWidgetHTML", methods=["GET"])
@@ -53,11 +49,6 @@ def drawWidgetHTML():
 
     currentExperiment = jm.getUIStateValue("currentExperiment")
     selectedSample = jm.getUIStateValue("currentSample")
-
-    print("got to draw widget: " + jm.getUIStateValue("currentSample"))
-    print("got to draw widget: " + jm.getUIStateString())
-    print("cookie: " + json.dumps(request.cookies["session"]))
-
     jc = JasperCharts(jm)
 
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
