@@ -1,5 +1,7 @@
 from flask import Flask, request, redirect, session
 from jaspr import app
+from datetime import datetime
+import json
 
 @app.route('/uploader', methods = ['GET', 'POST'])
 def uploader():
@@ -12,17 +14,6 @@ def uploader():
 def ping():
     """ Simple function for AJAX test:
     """
-    returnStr = "";
-    NOT_SET='not set'
-    pingValue = session.get('pingvalue', NOT_SET)
-    if pingValue == NOT_SET:
-        session['pingvalue']=False
-        pingValue=False
-    if pingValue:
-        session['pingvalue'] = False;
-        returnStr = "Pong"
-    else:
-        session['pingvalue'] = True;
-        returnStr = "Ping"
-    session.modified = True
-    return returnStr
+    returnStr = "Server Contacted at:" +datetime.utcnow() \
+                .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    return json.dumps(returnStr)
