@@ -1,12 +1,20 @@
 #!/usr/bin/env python
-from flask import Flask, render_template,request,session
+# file jaspr/webUI.py
+
+from flask import render_template, request, session
 from jaspr import app
-from jaspr.Model import JasprModel
-from jaspr.Charting import JasperCharts
+from jaspr.model import JasprModel
+from jaspr.charting import JasperCharts
+
+"""Flask routes for browser based jaspr UI
+
+"""
+
 
 @app.route('/upload')
 def upload_file():
    return render_template('upload.html')
+
 
 @app.route("/settings")
 def settings():
@@ -14,12 +22,12 @@ def settings():
     """
     return render_template('settings.html')
 
+
 @app.route("/")
 def main():
     """ render the main page
     """
     jm = JasprModel()
-
 
     #TODO: I am just loading a default model for now
     jm.loadDefaultModel()

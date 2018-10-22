@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# file Charting.py
+# file charting.py
 
 """
 This module manages the charting functionality for Jaspr.  It's main object
@@ -25,7 +25,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 
-from jaspr.Model import JasprModel
+from jaspr.model import JasprModel
 
 class JasperCharts(object):
     """Jaspr Charts class that builds chart artifacts based upon a data model
