@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # file testmodel.py
 import unittest
-from Model import JasprModel
+from model import JasprModel
 
 class TestDefaultModel(unittest.TestCase):
 
