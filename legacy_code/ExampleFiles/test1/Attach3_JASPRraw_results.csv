@@ -1,0 +1,14 @@
+Detection method,Foci,number
+Conc units,dilution
+
+,,ferret anti sera 1,,,ferret anti sera 2,,
+
+ID#,Strain Name,IC50,Fold,S/B,IC50,Fold,S/B
+virus 1,,6.07e-5,,1428,7.87e-5,,3140
+virus 2,,2.42e-5,,1297,3.23e-5,,3679
+virus 3,,2.69e-5,,1187,3.33e-5,,3826
+virus 4,,1.04e-4,,1140,1.04e-4,,4004
+virus 5,,9.38e-5,,728,8.53e-5,,3535
+virus 6,,2.30e-5,,1348,3.74e-5,,3778
+virus 7,,6.53e-4,,1348,7.57e-4,,3570
+virus 8,,1.15e-4,,1505,1.09e-4,,4359

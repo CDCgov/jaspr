@@ -1,0 +1,13 @@
+Drugs (listed in order)
+"Virus B/NY/52"
+"Virus B/Laos/0654"
+"Virsu B/Brisbane"
+
+"ID,Strain Name (optional)"
+Anti-Laos/0654(Ferret 1)
+Anti-Laos/0654(Ferret 2)
+Anti-Laos/0654(Ferret 3)
+Anti-Laos/0654(Ferret 10)
+Anti-Laos/0654(Ferret 11)
+Anti-Laos/0654(Ferret 12)
+Anti-B/Brisbane/60
