@@ -33,21 +33,21 @@ flask run
 8.  [x] Put data table into tab (temporary)
 9.  [x] Connect data grid to graph
 10. [x] fix Juypter to restart from old or recreate
-11. [ ] create stubbed out API and wire up to prototype
-11. [ ] Add Flask configuration file
-12. [ ] Wire in old help content
+11. [x] create stubbed out API and wire up to prototype
+12. [x] Wire in old help content
+14. [x] Establish classes for data and load them in for use
+15. [x] Wire in multi sample list
+16. [x] Wire up individual charts and data
+17. [x] Flesh out calls to base service tier
+18. [x] Wire in grabbing data for each sample separately
 13. [ ] Hook up the excel file reading functionality from legacy application
-14. [ ] Establish classes for data and load them in for use
-15. [ ] Wire in multi sample list
-16. [ ] Wire up individual charts and data
-17. [ ] Flesh out calls to base service tier
-18. [ ] Wire in grabbing data for each sample separately
 19. [ ] Add custom x axis labels for titers
 20. [ ] Add cp50 and cp90 labels
 21. [ ] Flesh out settings form
 22. [ ] Add configuration (yaml)
 23. [ ] Add report file creation functionality
 24. [ ] Add validation so that only xslx files can be uploaded
+25. [ ] Add Flask configuration file
 
 ## Creating and Running the jaspr project container for development
 
