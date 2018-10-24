@@ -1,11 +1,13 @@
 """Main application package."""
+SESSION_TYPE = 'FileSystemSessionInterface'
+SESSION_FILE_THRESHOLD = 30
+PERMANENT_SESSION_LIFETIME = 600
+
 from flask import Flask, session
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 
-SESSION_TYPE = 'FileSystemSessionInterface'
-SESSION_FILE_THRESHOLD = 30
-PERMANENT_SESSION_LIFETIME = 600
+
 app = Flask(__name__)
 app.config['TESTING'] = True
 app.secret_key = b'HoleyMoleyRocky'

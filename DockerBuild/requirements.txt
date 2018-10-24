@@ -1,5 +1,7 @@
 Flask
 flask-debugtoolbar
+#temporary measure to fix Flask-Session error, should be resolved in a week
+itsdangerous>=0.24,<1.0.0
 Flask-Session
 Bokeh
 Pandas

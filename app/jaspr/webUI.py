@@ -1,10 +1,17 @@
 #!/usr/bin/env python
-from flask import Flask, render_template,request,session,jsonify
+from flask import Flask, render_template,request,session,jsonify,redirect
 from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
 import json
+
+@app.route('/reset')
+def resetUI():
+    """resets the UI to the default
+    """
+    SessionController().resetDefaultSession()
+    return mainPage()
 
 @app.route('/upload')
 def upload_file():
@@ -51,13 +58,10 @@ def drawWidgetHTML():
     selectedSample = jm.getUIStateValue("currentSample")
     jc = JasperCharts(jm)
 
-    g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
-    t_script, t_div = jc.create_table(currentExperiment,selectedSample)
-
-#TODO pull this into the controller
     retVal = {}
-    retVal["g_script"] = g_script
-    retVal["g_div"] = g_div
-    retVal["t_script"] = t_script
-    retVal["t_div"] = t_div
+    retVal["g_script"], retVal["g_div"] = \
+          jc.create_chart(currentExperiment,selectedSample)
+    retVal["t_script"], retVal["t_div"] = \
+     jc.create_table(currentExperiment,selectedSample)
+
     return jsonify(retVal)

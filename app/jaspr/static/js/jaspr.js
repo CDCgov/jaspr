@@ -6,16 +6,22 @@ $(function() {
   loadGraph();
 });
 
-var ChangeSample = function(sampleName)
-{
-    $.post('/changeSample/'+sampleName, function(){
+var ChangeSample = function(sampleName) {
+  $.ajax({
+    type: 'POST',
+    xhrFields: {
+      withCredentials: true
+    },
+    url: '/changeSample/'+sampleName,
+    success: function() {
       loadGraph();
-    });
+    }
+  });
 }
 
 var GetPing = function() {
   $.getJSON('/ping', {}, function(data) {
-      $("#pingValue").text(data);
+    $("#pingValue").text(data);
   });
 };
 
@@ -23,12 +29,16 @@ var loadGraph = function() {
   $(".dataGraph").html("loading graph...");
   $(".dataTable").html("loading table...");
 
-  $.getJSON('/drawWidgetHTML',function(data) {
-    $(".dataGraph").replaceWith('<span class="dataGraph">' + data.g_div +
-                                  '</span>');
-    $(".dataTable").replaceWith('<span class="dataTable">' + data.t_div +
-                                  '</span>');
-    $(data.g_script).appendTo(".dataGraph");
-    $(data.t_script).appendTo(".dataTable");
+  $.ajax({
+    dataType: 'json',
+    url: '/drawWidgetHTML',
+    success: function(data) {
+      $(".dataGraph").replaceWith('<span class="dataGraph">' + data.g_div +
+        '</span>');
+      $(".dataTable").replaceWith('<span class="dataTable">' + data.t_div +
+        '</span>');
+      $(data.g_script).appendTo(".dataGraph");
+      $(data.t_script).appendTo(".dataTable");
+    }
   });
 };
