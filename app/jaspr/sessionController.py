@@ -48,7 +48,13 @@ class SessionController(object):
     def resetDefaultSession(self):
         self.getModel().loadDefaultModel()
         self.loadSessionFromModel()
-        
+
+    def resetUISession(self):
+        experimentKey = self.getModel().getExperimentNames()[0]
+        self.updateUIState("currentExperiment", experimentKey)
+        self.updateUIState("currentSample", self.getModel().\
+                getSampleNames(experimentKey)[0])
+
     def loadSessionFromModel(self):
         session[UISTATE_SESSION_KEY] = self.getModel().getUIStateString()
         session[EXPERIMENTS_SESSION_KEY] = self.getModel().getExperimentString()
