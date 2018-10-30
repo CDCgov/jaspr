@@ -1,17 +1,18 @@
 {% extends "main_layout.html" %}
 {% block body %}
 <div class="row">
-	<div class="col-2">
+	<div class="col-3">
 		<div class="form-group">
 			<label for="selExp">Selected Experiment</label>
-			<select class="form-control" id="selExp">
+			<select class="form-control" id="selExp"
+							onchange='ChangeExperiment(this);'>
 				{% for experiment in experimentList %}
 				<option value="{{experiment}}">{{experiment}}</option>
 				{% endfor %}
 			</select>
 		</div>
 	</div>
-	<div class="col-10">
+	<div class="col-9">
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
 				<a class="nav-link active" data-toggle="tab" href="#jasprgraph">Graph</a>
@@ -23,7 +24,7 @@
 	</div>
 </div>
 <div class="row content-row">
-	<div class="col-2 selector ">
+	<div class="col-3 selector ">
 		<ul class="nav flex-column nav-pills">
 			{% for sample in sampleList %}
 			<li class="nav-item">
@@ -33,7 +34,7 @@
 			{% endfor %}
 		</ul>
 	</div>
-	<div class="col-10">
+	<div class="col-9">
 		<div class="tab-content">
 			<div class="tab-pane fade show active" active id="jasprgraph">
 				<span class="dataGraph">loading Graph</span>
