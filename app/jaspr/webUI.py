@@ -32,8 +32,7 @@ def mainPage():
     #TODO: wire up actual experiement selection from left menu
     experimentList = jm.getExperimentNames()
     currentExperiment = jm.getUIStateValue("currentExperiment")
-
-    #TODO: wire up actual sample selection from left menu
+    
     sampleList = jm.getSampleNames(currentExperiment)
     selectedSample = jm.getUIStateValue("currentSample")
 

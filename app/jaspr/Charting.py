@@ -46,7 +46,7 @@ class JasperCharts(object):
                 a dataframe object
 
         """
-        (xSeries,ySeries) = self._model.getSampleDataSeries(
+        (xSeries,ySeries,blankValue) = self._model.getSampleDataSeries(
                           experimentKey=experimentKey,
                           sampleKey=sampleKey)
 
