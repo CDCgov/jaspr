@@ -31,6 +31,7 @@ def uploader():
       #datafile_temp.delete()
       #keyfile_temp.delete()
       sc.loadSessionFromModel()
+      sc.resetUISession()
       #todo we probably have to update session data there
       #todo: delete temporary files
    return redirect("/", code=302)
