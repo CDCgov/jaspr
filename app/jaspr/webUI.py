@@ -4,6 +4,7 @@ from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
+from urllib.parse import unquote
 import json
 
 @app.route('/reset')
@@ -32,7 +33,7 @@ def mainPage():
     #TODO: wire up actual experiement selection from left menu
     experimentList = jm.getExperimentNames()
     currentExperiment = jm.getUIStateValue("currentExperiment")
-    
+
     sampleList = jm.getSampleNames(currentExperiment)
     selectedSample = jm.getUIStateValue("currentSample")
 
@@ -41,11 +42,23 @@ def mainPage():
         sampleList=sampleList,
         selectedSample=selectedSample)
 
-@app.route("/changeSample/<sample_name>", methods=["post"])
+@app.route("/changeSample/<path:sample_name>", methods=["post"])
 def changeSample(sample_name):
     sc = SessionController()
-    sc.updateUIState("currentSample",sample_name)
+    realSampleName = unquote(sample_name).replace("%28","(").replace("%29",")")
+    print("Going to change sample to:",realSampleName )
+    sc.updateUIState("currentSample",realSampleName)
+    return jsonify(request.json)
+
+@app.route("/changeExperiment/<path:experiment_name>", methods=["post"])
+def changeExperiment(experiment_name):
+    sc = SessionController()
+    realExperimentName = unquote(experiment_name).replace("%28","(").replace("%29",")")
+    print("Going to change expirment to:", unquote(realExperimentName))
+    sc.updateUIState("currentExperiment",unquote(realExperimentName))
     jm = sc.getModel()
+    firstSample = jm.getSampleNames(realExperimentName)
+    sc.updateUIState("currentSample",firstSample)
     return jsonify(request.json)
 
 @app.route("/drawWidgetHTML", methods=["GET"])
