@@ -8,8 +8,8 @@ Creating HTML Version of this file
 
 To create the HTML version of these notes install pandoc from <https://pandoc.org> and then use the batch file _createhtmldocs.bat_ to generate an HTML file
 
+* * *
 
-******
 export FLASK_APP=jaspr
 If you are outside of the project directory make sure to provide the exact path to your application directory. Similiarly you can turn on “debug mode” with this environment variable:
 
@@ -18,36 +18,38 @@ In order to install and run the application you need to issue the following comm
 
 pip install -e .
 flask run
-************
 
+* * *
 
 ## Next Steps
 
-1.  [x] Set up a basic template for the main page
-2.  [x] Add bootstrap and break out basic page layout
-3.  [x] Add basic color scheme so it isn't ugly
-4.  [x] Add file upload function (flask-uploads)
-5.  [x] Remove CDN from graphing
-6.  [x] Load data into Pandas
-7.  [x] Set up a graph page using Bokeh
-8.  [x] Put data table into tab (temporary)
-9.  [x] Connect data grid to graph
-10. [x] fix Juypter to restart from old or recreate
-11. [ ] create stubbed out API and wire up to prototype
-11. [ ] Add Flask configuration file
-12. [ ] Wire in old help content
-13. [ ] Hook up the excel file reading functionality from legacy application
-14. [ ] Establish classes for data and load them in for use
-15. [ ] Wire in multi sample list
-16. [ ] Wire up individual charts and data
-17. [ ] Flesh out calls to base service tier
-18. [ ] Wire in grabbing data for each sample separately
-19. [ ] Add custom x axis labels for titers
-20. [ ] Add cp50 and cp90 labels
-21. [ ] Flesh out settings form
-22. [ ] Add configuration (yaml)
-23. [ ] Add report file creation functionality
-24. [ ] Add validation so that only xslx files can be uploaded
+1.  [ ] Load example file into model and plot in linear space
+1.  [ ] Add ability to plot log graph again
+1.  [ ] Add custom x axis labels for titers
+1.  [ ] Add custom x axis labels for titers
+2.  [ ] Add labels (cp50, cp90 etc.)
+3.  [ ] Flesh out settings form
+4.  [ ] Add configuration loading (yaml)
+5.  [ ] Add report file creation functionality
+6.  [ ] Add validation so that only xslx files can be uploaded
+8.  [x] Set up a basic template for the main page
+9.  [x] Add bootstrap and break out basic page layout
+10. [x] Add basic color scheme so it isn't ugly
+11. [x] Add file upload function (flask-uploads)
+12. [x] Remove CDN from graphing
+13. [x] Load data into Pandas
+14. [x] Set up a graph page using Bokeh
+15. [x] Put data table into tab (temporary)
+16. [x] Connect data grid to graph
+17. [x] fix Juypter to restart from old or recreate
+18. [x] create stubbed out API and wire up to prototype
+19. [x] Wire in old help content
+20. [x] Establish classes for data and load them in for use
+21. [x] Wire in multi sample list
+22. [x] Wire up individual charts and data
+23. [x] Flesh out calls to base service tier
+24. [x] Wire in grabbing data for each sample separately
+25. [ ] Hook up the excel file reading functionality from legacy application
 
 ## Creating and Running the jaspr project container for development
 

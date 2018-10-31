@@ -12,8 +12,26 @@ var ChangeSample = function(sampleName) {
     xhrFields: {
       withCredentials: true
     },
-    url: '/changeSample/'+sampleName,
+    url: '/changeSample/'+encodeURIComponent(sampleName)
+                            .replace(/\(/g, "%28").replace(/\)/g, "%29"),
     success: function() {
+      loadGraph();
+    }
+  });
+}
+
+var ChangeExperiment = function(selectedItem) {
+  $.ajax({
+    type: 'POST',
+    xhrFields: {
+      withCredentials: true
+    },
+    url: '/changeExperiment/'+encodeURIComponent(selectedItem.value)
+                              .replace(/\(/g, "%28").replace(/\)/g, "%29"),
+    success: function() {
+      //the sample got set to th first one in the sampleList
+      $("ul.samplelist").find("a.nav-link").removeClass("active");
+      $("ul.samplelist li a.nav-link").first().addClass("active");
       loadGraph();
     }
   });
