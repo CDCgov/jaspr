@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, session
+from flask import Flask, request, redirect, session,render_template
 from datetime import datetime
 import json,tempfile
 
@@ -32,6 +32,10 @@ def uploader():
       #keyfile_temp.delete()
       sc.loadSessionFromModel()
       sc.resetUISession()
+      print("\n\n\nIn uploader")
+      for item in session:
+          print(item, "-->",session[item])
+      print("So that is what you should see\n\n\n")
       #todo we probably have to update session data there
       #todo: delete temporary files
    return redirect("/", code=302)

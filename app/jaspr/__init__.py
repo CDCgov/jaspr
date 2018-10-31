@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['TESTING'] = True
 app.secret_key = b'HoleyMoleyRocky'
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False 
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.debug=True
 app.TEMPFILEDIR="temp"
 #allow intercepts without stopping while debugging
