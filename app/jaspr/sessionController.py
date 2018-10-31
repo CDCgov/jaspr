@@ -31,6 +31,11 @@ class SessionController(object):
         #if there is not a model set then load default and set session to it
         if session.get(keyString, KEY_NOT_SET) == KEY_NOT_SET:
             print("SessionController:_initKey: !!!!! No Session for: " + keyString)
+            print("\n\n\nSession Contains:")
+            for item in session:
+                print(item, "-->",session[item])
+            print("So we will load defaults\n\n\n")
+
             self.resetDefaultSession()
         #otherwise load the model from the session
         else:
@@ -47,6 +52,15 @@ class SessionController(object):
 
     def resetDefaultSession(self):
         self.getModel().loadDefaultModel()
+        self.loadSessionFromModel()
+
+    def resetUISession(self):
+        experimentKey = self.getModel().getExperimentNames()[0]
+        self.updateUIState("currentExperiment", experimentKey)
+        self.updateUIState("currentSample", self.getModel().\
+                getSampleNames(experimentKey)[0])
+
+    def loadSessionFromModel(self):
         session[UISTATE_SESSION_KEY] = self.getModel().getUIStateString()
         session[EXPERIMENTS_SESSION_KEY] = self.getModel().getExperimentString()
         session[CONFIG_SESSION_KEY] = self.getModel().getConfigString()
