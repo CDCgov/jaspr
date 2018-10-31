@@ -29,6 +29,9 @@ var ChangeExperiment = function(selectedItem) {
     url: '/changeExperiment/'+encodeURIComponent(selectedItem.value)
                               .replace(/\(/g, "%28").replace(/\)/g, "%29"),
     success: function() {
+      //the sample got set to th first one in the sampleList
+      $("ul.samplelist").find("a.nav-link").removeClass("active");
+      $("ul.samplelist li a.nav-link").first().addClass("active");
       loadGraph();
     }
   });
