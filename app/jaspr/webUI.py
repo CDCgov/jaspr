@@ -9,7 +9,7 @@ import json
 from urllib.parse import unquote
 
 # flask imports
-from flask import Flask, render_template, request,session,
+from flask import Flask, render_template, request,session, \
         jsonify, redirect, make_response
 
 # local imports
