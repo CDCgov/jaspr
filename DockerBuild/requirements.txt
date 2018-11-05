@@ -5,3 +5,4 @@ Bokeh
 Pandas
 xlrd
 markdown
+scipy
