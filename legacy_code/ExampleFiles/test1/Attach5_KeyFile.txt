@@ -1,0 +1,14 @@
+Drugs (listed in order)	
+ferret anti sera 1	
+ferret anti sera 2	
+	
+ID	Strain Name (optional)
+virus 1	
+virus 2	
+virus 3	
+virus 4	
+virus 5	
+virus 6	
+virus 7	
+virus 8	
+

@@ -6,9 +6,11 @@
 
 # python imports
 import json
+from urllib.parse import unquote
 
 # flask imports
-from flask import Flask, render_template, request,session, jsonify
+from flask import Flask, render_template, request,session,
+        jsonify, redirect, make_response
 
 # local imports
 from jaspr import app
@@ -16,6 +18,16 @@ from jaspr.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
 
+
+@app.route('/reset')
+def resetUI():
+    """resets the UI to the default
+    """
+    session.clear()
+    sc = SessionController()
+    sc.resetDefaultSession()
+    sc.resetUISession()
+    return redirect("/", code=302)
 
 @app.route('/upload')
 def upload_file():
@@ -48,14 +60,23 @@ def mainPage():
 
 
 @app.route("/changeSample/<sample_name>", methods=["post"])
+@app.route("/changeSample/<path:sample_name>", methods=["post"])
 def changeSample(sample_name):
     sc = SessionController()
-    sc.updateUIState("currentSample",sample_name)
+    #return the \ and ( ) characters among others i nhe sample name
+    realSampleName = unquote(sample_name).replace("%28","(").replace("%29",")")
+    sc.updateUIState("currentSample",realSampleName)
+    return jsonify(request.json)
 
+@app.route("/changeExperiment/<path:experiment_name>", methods=["post"])
+def changeExperiment(experiment_name):
+    sc = SessionController()
+    #return the \ and ( ) characters among others in the experiment name
+    realExperimentName = unquote(experiment_name).replace("%28","(").replace("%29",")")
+    sc.updateUIState("currentExperiment",unquote(realExperimentName))
     jm = sc.getModel()
-    print("got to changeSample: " + jm.getUIStateValue("currentSample"))
-    print("got to changeSample: " + jm.getUIStateString())
-    print("cookie: " + json.dumps(request.cookies["session"]))
+    firstSample = jm.getSampleNames(realExperimentName)[0]
+    sc.updateUIState("currentSample",firstSample)
     return jsonify(request.json)
 
 
@@ -63,14 +84,8 @@ def changeSample(sample_name):
 def drawWidgetHTML():
     sc = SessionController()
     jm = sc.getModel()
-
     currentExperiment = jm.getUIStateValue("currentExperiment")
     selectedSample = jm.getUIStateValue("currentSample")
-
-    print("got to draw widget: " + jm.getUIStateValue("currentSample"))
-    print("got to draw widget: " + jm.getUIStateString())
-    print("cookie: " + json.dumps(request.cookies["session"]))
-
     jc = JasperCharts(jm)
 
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
@@ -78,8 +93,9 @@ def drawWidgetHTML():
 
     #TODO pull this into the controller
     retVal = {}
-    retVal["g_script"] = g_script
-    retVal["g_div"] = g_div
-    retVal["t_script"] = t_script
-    retVal["t_div"] = t_div
+    retVal["g_script"], retVal["g_div"] = \
+          jc.create_chart(currentExperiment,selectedSample)
+    retVal["t_script"], retVal["t_div"] = \
+     jc.create_table(currentExperiment,selectedSample)
+
     return jsonify(retVal)
