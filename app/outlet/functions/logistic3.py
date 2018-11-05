@@ -8,9 +8,13 @@ class Logistic3(FunctionRegistry):
     description = '3-parameter logistic'
 
     def _guess_params(self, data, concs):
-        pass
+        """Fit a non-linear inhibition curve using least squares."""
+        vmax_guess = max(data)
+        for index, ki_guess in enumerate(concs):
+            yield (vmax_guess, ki_guess)
 
-    def _calculate(self, data, concs):
+
+    def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration
 
             rate = Vmax * (1 - (c / (Ki + c)))
@@ -24,7 +28,6 @@ class Logistic3(FunctionRegistry):
         * c is the concentration of inhibitor.
 
         """
-        Vmax =  data[0]
-        Ki = data[1]
+        Vmax =  params[0]
+        Ki = params[1]
         return Vmax * (1 - (concs / (Ki + concs)))
-

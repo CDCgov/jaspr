@@ -30,7 +30,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
     """Registry of known funcitons to use for curve fits
 
     Plugins implementing functions must provide:
-    
+
         Attributes:
          * name        - A short, unique name of the function being defined
          * description - A longer description of the function describing
@@ -53,7 +53,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
 
     def _residuals(self, params, independent_array, data_array):
         """Calculate the distance between each observed and calculated value"""
-        return data - self._calculate(params, independent_array)
+        return data_array - self._calculate(params, independent_array)
 
     def __call__(self, data_array, independent_array):
         """Fit the function to the data
@@ -63,7 +63,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
 
         """
         for params in self._guess_params(data_array, independent_array):
-            fit = leastsq(residuals, params,
+            fit = leastsq(self._residuals, params,
                     args=(independent_array, data_array))
             if 0 < fit[-1] < 5:
                 # indicates we've converged, stop guessing
