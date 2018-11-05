@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+from outlet import FunctionRegistry
+
+
+class Logistic4(FunctionRegistry):
+    name = 'logistic4'
+    description = '4-parameter logistic'
+
+    def _guess_params(self, data, concs):
+        """Fit a non-linear inhibition curve using least squares."""
+        vmax_guess = max(data)
+        h_guess = 1.0
+        for ki_guess in concs:
+            yield (vmax_guess, ki_guess, h_guess)
+
+
+    def _calculate(self, params, concs):
+        """Evaluate rate as a function of concentration
+
+            rate = Vmax * (1 - (1 /(1 + (Ki + c)^-h)))
+
+        * Vmax is the reaction rate when no inhibitor is present.
+
+        * Ki is the equilibrium constant for the interation between the
+          inhibitor and the enzyme.  It is equal to the concentration of
+          inhibitor where rate/Vmax = 1/2.  This is also known as IC50.
+
+        * c is the concentration of inhibitor.
+
+        """
+        Vmax = params[0]
+        Ki = params[1]
+        h = params[2]
+
+        return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
