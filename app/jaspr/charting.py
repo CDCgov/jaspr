@@ -26,6 +26,7 @@ from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 
 from jaspr.model import JasprModel
+from outlet import FunctionRegistry
 
 class JasperCharts(object):
     """Jaspr Charts class that builds chart artifacts based upon a data model
@@ -46,7 +47,7 @@ class JasperCharts(object):
                 a dataframe object
 
         """
-        (xSeries,ySeries,blankValue) = self._model.getSampleDataSeries(
+        (ySeries,xSeries,blankValue) = self._model.getSampleDataSeries(
                           experimentKey=experimentKey,
                           sampleKey=sampleKey)
 
@@ -78,13 +79,22 @@ class JasperCharts(object):
 
         # Create the figure: p and chart the data
         p = figure(x_axis_label=xLabel, y_axis_label=yLabel ,
+        x_axis_type="log",
         title=experimentKey + " : " + sampleKey)
         p.circle(df[xLabel], df[yLabel], size=10)
 
         # regression line
-        (slope,intercept) = np.polyfit(df[xLabel],df[yLabel],1)
-        x = np.linspace(df[xLabel].min(),df[xLabel].max(), df.shape[0])
-        y = list(map(lambda x: intercept + slope*x, x))
+        #(slope,intercept) = np.polyfit(df[xLabel],df[yLabel],1)
+        #x = np.linspace(df[xLabel].min(),df[xLabel].max(), df.shape[0])
+        #y = list(map(lambda x: intercept + slope*x, x))
+
+        # could loop over plugins collection to get names and descriptions
+        fit = FunctionRegistry.plugins['logistic3']()
+        fitObject=fit(df[yLabel],df[xLabel])
+
+        print(df)
+        x = np.logspace(math.log2(df[xLabel].min()),math.log2(df[xLabel].max()), df.shape[0]*50,False,2)
+        y = fit._calculate(fitObject[0], x)
 
         lsource = ColumnDataSource(dict(x=x, y=y))
 

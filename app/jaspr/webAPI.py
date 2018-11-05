@@ -10,8 +10,9 @@ from jaspr.model import JasprModel
 @app.route('/uploader', methods = ['GET', 'POST'])
 def uploader():
    #todo read dilution values from settings
+   #todo Note that we converted a zero to a "near zero for this to work"
    dilutionValues = [2.5e-2, 1.25e-2, 6.25e-3, 3.125e-3, 1.5625e-3, 7.8125e-4,
-                     3.90625e-4, 1.953125e-4, 9.765625e-5, 4.8832813e-5, 0]
+                     3.90625e-4, 1.953125e-4, 9.765625e-5, 4.8832813e-5, 1e-6]
    if request.method == 'POST':
 
       datafile_req = request.files['datafile']
