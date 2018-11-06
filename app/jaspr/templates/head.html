@@ -8,14 +8,19 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/jaspr.css') }}" />
 
-  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-0.13.0.min.css') }}" />
-  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-widgets-0.13.0.min.css') }}" />
-  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-tables-0.13.0.min.css') }}" />
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh.min.css') }}" />
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-widgets.min.css') }}" />
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-tables.min.css') }}" />
 
-  <script src= {{ url_for('static', filename='js/jquery.min.js') }}></script>
-  <script src= {{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}></script>
+  <script src= "{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src= "{{ url_for('static', filename='js/popper.js') }}"></script>
+  <script src= "{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
 
-  <script src= {{ url_for('static', filename='js/bokeh-0.13.0.min.js') }}></script>
-  <script src= {{ url_for('static', filename='js/bokeh-widgets-0.13.0.min.js') }}></script>
-  <script src= {{ url_for('static', filename='js/bokeh-tables-0.13.0.min.js') }}></script>
+  <script src= "{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+  <script src= "{{ url_for('static', filename='js/bokeh.min.js') }}"></script>
+  <script src= "{{ url_for('static', filename='js/bokeh-widgets.min.js') }}"></script>
+  <script src= "{{ url_for('static', filename='js/bokeh-tables.min.js') }}"></script>
+  <script src= "{{ url_for('static', filename='js/bokeh-api.min.js') }}"></script>
+
 </head>

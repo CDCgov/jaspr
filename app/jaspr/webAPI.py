@@ -33,10 +33,10 @@ def uploader():
       #keyfile_temp.delete()
       sc.loadSessionFromModel()
       sc.resetUISession()
-      print("\n\n\nIn uploader")
-      for item in session:
-          print(item, "-->",session[item])
-      print("So that is what you should see\n\n\n")
+      # print("\n\n\nIn uploader")
+      # for item in session:
+      #     print(item, "-->",session[item])
+      # print("So that is what you should see\n\n\n")
       #todo we probably have to update session data there
       #todo: delete temporary files
    return redirect("/", code=302)
@@ -45,6 +45,5 @@ def uploader():
 def ping():
     """ Simple function for AJAX test:
     """
-    returnStr = "Server Contacted at:" +datetime.utcnow() \
-                .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    returnStr = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
     return json.dumps(returnStr)
