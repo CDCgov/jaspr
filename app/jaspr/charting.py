@@ -15,7 +15,7 @@ import os
 import logging
 
 from pandas import pandas as pd
-from numpy import arange,array,ones,linalg
+from numpy import array
 
 
 from bokeh.plotting import figure
@@ -79,17 +79,13 @@ class JasperCharts(object):
 
         # Create the figure: p and chart the data
         p = figure(x_axis_label=xLabel, y_axis_label=yLabel ,
-        x_axis_type="log",
+        #x_axis_type="log",
         title=experimentKey + " : " + sampleKey)
         p.circle(df[xLabel], df[yLabel], size=10)
 
-        # regression line
-        #(slope,intercept) = np.polyfit(df[xLabel],df[yLabel],1)
-        #x = np.linspace(df[xLabel].min(),df[xLabel].max(), df.shape[0])
-        #y = list(map(lambda x: intercept + slope*x, x))
 
         # could loop over plugins collection to get names and descriptions
-        fit = FunctionRegistry.plugins['logistic4']()
+        fit = FunctionRegistry.plugins['LinearRegression']()
         fitObject=fit(df[yLabel],df[xLabel])
         print(f'FitObject: {fitObject}')
 
