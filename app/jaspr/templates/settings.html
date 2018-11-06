@@ -2,14 +2,33 @@
 {% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
 
-<form action='#'>
-	<checkbox id="showTrend">Show Trends</checkbox>
-	<button onClick="GetPing()">ping</button>
-	<span id="pingTitle">ping value: </span>
-	<span id="pingValue">Not Known</span>
+<form action=''>
+	<input type="checkbox" id="showTrend">Show Curve Fit</input><br><br>
+	<div class="btn-group btn-group-toggle" data-toggle="buttons">
+	  <label class="btn btn-secondary active">
+	    <input type="radio" name="axisScale" id="logScale" autocomplete="off" checked> Log Scale
+	  </label>
+	  <label class="btn btn-secondary">
+	    <input type="radio" name="axisScale" id="LinearScale" autocomplete="off"> Linear Scale
+	  </label>
+	</div><br><br>
+	<div class="dropdown">
+	  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    Curve Fit Algorithm
+	  </button>
+	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	    <a class="dropdown-item" href="#">Action</a>
+	    <a class="dropdown-item" href="#">Another action</a>
+	    <a class="dropdown-item" href="#">Something else here</a>
+	  </div>
+	</div>
+	<br>
+	<button type="button" class="btn" onClick="GetPing();">ping</button><br>
+	<span id="pingTitle" style="display: None">ping value:</span>&nbsp;
+	<span id="pingValue"></span>
 </form>
 <div>
-	<a href="\">Return</a>
+	<a href="\" class="btn btn-primary">Return</a>
 </div>
 {%endblock%}
 </div> <!-- Body -->

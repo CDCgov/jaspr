@@ -38,8 +38,9 @@ var ChangeExperiment = function(selectedItem) {
 }
 
 var GetPing = function() {
-  $.getJSON('/ping', {}, function(data) {
+  $.getJSON('/ping', function(data) {
     $("#pingValue").text(data);
+    $("#pingTitle").css("display","block");
   });
 };
 
