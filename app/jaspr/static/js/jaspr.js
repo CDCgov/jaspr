@@ -6,14 +6,16 @@ $(function() {
   loadGraph();
 });
 
+
+
 var ChangeSample = function(sampleName) {
   $.ajax({
     type: 'POST',
     xhrFields: {
       withCredentials: true
     },
-    url: '/changeSample/'+encodeURIComponent(sampleName)
-                            .replace(/\(/g, "%28").replace(/\)/g, "%29"),
+    url: '/changeSample/' + encodeURIComponent(sampleName)
+      .replace(/\(/g, "%28").replace(/\)/g, "%29"),
     success: function() {
       loadGraph();
     }
@@ -26,8 +28,8 @@ var ChangeExperiment = function(selectedItem) {
     xhrFields: {
       withCredentials: true
     },
-    url: '/changeExperiment/'+encodeURIComponent(selectedItem.value)
-                              .replace(/\(/g, "%28").replace(/\)/g, "%29"),
+    url: '/changeExperiment/' + encodeURIComponent(selectedItem.value)
+      .replace(/\(/g, "%28").replace(/\)/g, "%29"),
     success: function() {
       //the sample got set to th first one in the sampleList
       $("ul.samplelist").find("a.nav-link").removeClass("active");
@@ -40,7 +42,7 @@ var ChangeExperiment = function(selectedItem) {
 var GetPing = function() {
   $.getJSON('/ping', function(data) {
     $("#pingValue").text(data);
-    $("#pingTitle").css("display","block");
+    $("#pingTitle").css("display", "block");
   });
 };
 
