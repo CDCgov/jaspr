@@ -24,9 +24,8 @@ def resetUI():
     """resets the UI to the default
     """
     session.clear()
-    sc = SessionController()
-    sc.resetDefaultSession()
-    sc.resetUISession()
+    response = make_response("<div>clearing session</div>")
+    response.set_cookie(app.session_cookie_name, expires=0)
     return redirect("/", code=302)
 
 @app.route('/upload')

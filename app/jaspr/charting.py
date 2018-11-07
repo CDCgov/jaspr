@@ -87,7 +87,6 @@ class JasperCharts(object):
         # could loop over plugins collection to get names and descriptions
         fit = FunctionRegistry.plugins['LinearRegression']()
         fitObject=fit(df[yLabel],df[xLabel])
-        print(f'FitObject: {fitObject}')
 
         x = np.logspace(math.log2(df[xLabel].min()),math.log2(df[xLabel].max()), df.shape[0]*50,False,2)
         y = fit._calculate(fitObject[0], x)
