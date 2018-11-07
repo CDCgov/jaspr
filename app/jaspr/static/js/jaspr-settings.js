@@ -19,3 +19,10 @@ $(function() {
   });
 
 });
+
+var GetPing = function() {
+  $.getJSON('/ping', function(data) {
+    $("#pingValue").text(data);
+    $("#pingTitle").css("display", "block");
+  });
+};

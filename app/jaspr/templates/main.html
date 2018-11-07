@@ -1,5 +1,7 @@
-{% extends "main_layout.html" %}
+{% extends "jaspr_layout.html" %}
+
 {% block body %}
+<script src={{ url_for('static', filename='js/jaspr-main.js') }}></script>
 <div class="row">
 	<div class="col-3">
 		<div class="form-group">

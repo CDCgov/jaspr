@@ -1,14 +1,40 @@
-<html>
-   <body>
-      <form action = "/uploader" method = "POST"
-         enctype = "multipart/form-data">
-         Data File:
-         <input type = "file" name = "datafile" /><br>
-         <br>
-         Key File:
-         <input type = "file" name = "keyfile" /><br>
-         <input type = "submit"/>
-      </form>
-
-   </body>
-</html>
+{% extends "jaspr_layout.html" %}
+{% set txtTitle="Welcome to JASPR!" %}
+{% block body %}
+<div class="row">
+  <div class="col-3">
+  </div>
+  <div class="col-6">
+    <script src={{ url_for('static', filename='js/jaspr-upload.js') }}></script>
+    <h1>File Processing selection</h1>
+    <form action="/uploader" method="POST" enctype="multipart/form-data">
+      <div class="input-group">
+        <label class="input-group-btn">
+          <span class="btn btn-primary">
+            Browse&hellip; <input name ='datafile' type="file" style="display: none;" multiple>
+          </span>
+        </label>
+        <input type="text" class="form-control" readonly>
+      </div>
+      <span class="help-block">
+        select a data file for the samples being uploaded
+      </span>
+      <div class="input-group">
+        <label class="input-group-btn">
+          <span class="btn btn-primary">
+            Browse&hellip; <input name ='keyfile' type="file" style="display: none;" multiple>
+          </span>
+        </label>
+        <input type="text" class="form-control" readonly>
+      </div>
+      <span class="help-block">
+        select a key file for the samples being uploaded
+      </span>
+      <br>
+      <input class="btn" type="submit" />
+    </form>
+  </div>
+  <div class="col-3"></div>
+</div>
+</div>
+{%endblock%}

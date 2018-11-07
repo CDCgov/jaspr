@@ -15,6 +15,8 @@ def uploader():
                      3.90625e-4, 1.953125e-4, 9.765625e-5, 4.8832813e-5, 1e-6]
    if request.method == 'POST':
 
+      if 'datafile' not in request.files:
+          print("no datafile selected")
       datafile_req = request.files['datafile']
       datafile_temp = tempfile.NamedTemporaryFile(delete=False,dir=app.TEMPFILEDIR)
       datafile_temp.close()
