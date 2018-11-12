@@ -17,10 +17,11 @@ from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
+from outlet import FunctionRegistry
 
 
 @app.route('/reset')
-def resetUI():
+def reset():
     """resets the UI to the default
     """
     session.clear()
@@ -36,8 +37,19 @@ def upload_file():
 @app.route('/settings')
 def settings():
     """render the settings page"""
-    return render_template('settings.html')
-
+    sc = SessionController()
+    jm = sc.getModel()
+    showCurveFit = jm.getConfigSetting('showCurveFit')
+    blankCorrection = jm.getConfigSetting('blankCorrection')
+    axisScale=jm.getConfigSetting('axisScale')
+    selectedAlgorithm=jm.getConfigSetting('selectedAlgorithm')
+    functionList = FunctionRegistry.plugins
+    return render_template('settings.html',
+            blankCorrection=blankCorrection,
+            showCurveFit=showCurveFit,
+            axisScale=axisScale,
+            functionList=functionList,
+            selectedAlgorithm=selectedAlgorithm)
 
 @app.route('/')
 def mainPage():
@@ -58,7 +70,6 @@ def mainPage():
         selectedSample=selectedSample)
 
 
-@app.route("/changeSample/<sample_name>", methods=["post"])
 @app.route("/changeSample/<path:sample_name>", methods=["post"])
 def changeSample(sample_name):
     sc = SessionController()

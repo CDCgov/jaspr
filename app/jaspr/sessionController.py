@@ -30,7 +30,10 @@ class SessionController(object):
                     setkeystringFunction):
         #if there is not a model set then load default and set session to it
         if session.get(keyString, KEY_NOT_SET) == KEY_NOT_SET:
+            print("***************************************************")
+            print("SessionController:_initKey couldn't find: {} in {}".format(keyString, session))
             self.resetDefaultSession()
+            print("***************************************************")
         #otherwise load the model from the session
         else:
             setkeystringFunction(session.get(keyString,'{'+keyString+': null}'))

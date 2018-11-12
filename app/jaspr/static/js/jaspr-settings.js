@@ -1,21 +1,31 @@
 $(function() {
   $("#showCurve").click(function() {
     var selected = $('#showCurve').prop('checked');
-    if (selected) {
-      alert("curve will be shown");
-    } else {
-      alert("curve will not be shown");
-    }
+    $.post("/updateConfigSetting", {
+        showCurveFit: selected
+      });
+  });
+
+  $("#blankCorrection").click(function() {
+    var selected = $('#blankCorrection').prop('checked');
+    $.post("/updateConfigSetting", {
+        blankCorrection: selected
+      });
   });
 
   $("#axisScaleSelect > .btn").click(function() {
-    num = this.control.id
-    alert("Axis selected is " + num );
+    axisScale = this.control.id
+    $.post("/updateConfigSetting", {
+        axisScale: axisScale
+      });
   });
 
   // handles selections on a bootstrap dropdown list
-  $('.dropdown-menu').click(function(e){
-      alert(" Algorithm selected is " + e.target.innerText );
+  $('.dropdown-menu').click(function(e) {
+    $("#dropdownMenuButton").text(e.target.innerText)
+    $.post("/updateConfigSetting",{
+        selectedAlgorithm:e.target.innerText
+    });
   });
 
 });
