@@ -6,7 +6,7 @@ import unittest
 import sys
 
 # local imports
-from model import JasprModel
+#from model import JasprModel
 from jaspr.model import JasprModel
 
 
@@ -15,12 +15,6 @@ class TestDefaultModel(unittest.TestCase):
     def setUp(self):
         self.model = JasprModel()
         self.model.loadDefaultModel()
-
-    def test_ConfigSetting_Retrieve(self):
-        self.assertEqual(self.model.getConfigSetting("fitType"),"linear/future")
-
-    def test_ConfigSettings_Retrieve_List(self):
-        self.assertEqual(self.model.getConfigSettings(),["fitType"])
 
     def test_Experiments_Retrieve_List(self):
         self.assertEqual(self.model.getExperimentNames(),["Anscombe"])
@@ -55,4 +49,10 @@ class TestDefaultModel(unittest.TestCase):
         self.model.addExperiment("testExperiment","x","y")
         self.model.addDataSeries("testExperiment","testSample",[1,2,3,4],[5,6,7,8],0)
         self.assertEqual(self.model.getSampleNames("testExperiment"), ["testSample"])
+
+    def testConfig(self):
+        self.assertEqual(self.model.getConfigSetting("showCurveFit"),'True')
+        self.model.setConfigSetting("showCurveFit","False")
+        self.assertEqual(self.model.getConfigSetting("showCurveFit"),"False")
+
 unittest.main()

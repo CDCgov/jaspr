@@ -1,29 +1,37 @@
 {% extends "jaspr_layout.html" %}
 {% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
-	<script src={{ url_for('static', filename='js/jaspr-settings.js') }}></script>
+<script src={{ url_for('static', filename='js/jaspr-settings.js') }}></script>
 <div class="row">
 	<div class="col-3">
 	</div>
 	<div class="col-9">
 		<form action=''>
-			<input type="checkbox" id="showCurve">Show Curve Fit</input><br><br>
+			<input type="checkbox" {% if showCurveFit=='true' %}Checked{%endif%} id="showCurve">
+			Show Curve Fit
+			</input><br><br>
+			<input type="checkbox" id="blankCorrection" {% if blankCorrection=='true' %}Checked{%endif%}>
+			Blank Correction</input><br><br>
 			<div id="axisScaleSelect" class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary active">
-					<input type="radio" name="axisScale" id="logScale" autocomplete="off" checked> Log Scale
+				<label class="btn btn-secondary {% if axisScale=='logScale' %}active{%endif%}">
+					<input type="radio" name="axisScale" id="logScale" autocomplete="off" {% if axisScale=='logScale' %}Checked{%endif%}>
+					Log Scale
+					</input>
 				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="axisScale" id="linearScale" autocomplete="off"> Linear Scale
+				<label class="btn btn-secondary {% if axisScale=='linearScale' %}active{%endif%}">
+					<input type="radio" name="axisScale" id="linearScale" autocomplete="off" {% if axisScale=='linearScale' %}Checked{%endif%}>
+					Linear Scale
+					</input>
 				</label>
 			</div><br><br>
 			<div class="dropdown">
 				<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Curve Fit Algorithm
+					{{selectedAlgorithm}}
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					<a class="dropdown-item" href="#">Action</a>
-					<a class="dropdown-item" href="#">Another action</a>
-					<a class="dropdown-item" href="#">Something else here</a>
+					{% for fn in functionList%}
+					<a class="dropdown-item" href="#">{{fn}}</a>
+					{%endfor%}
 				</div>
 			</div>
 			<br>
@@ -37,4 +45,4 @@
 	</div>
 </div>
 {%endblock%}
-</div> <!-- Body -->
+</body>
