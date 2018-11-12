@@ -24,6 +24,7 @@ flask run
 ## Next Steps
 
 1.  [x] Flesh out settings form ui
+1.  [ ] Add blank correction option to settings and blank data to table view
 2.  [ ] Style the import screens
 3.  [ ] Wire up the settings form functionality
 4.  [ ] Deploy the application to the linux box
@@ -39,6 +40,9 @@ flask run
 14. [ ] Add report file creation functionality
 15. [ ] Add ability to create PNG images of graphs
 16. [ ] Move import, report and image generation to web service calls
+17. [ ] convert string literals to .Format and constants
+
+
 
 ## Creating and Running the jaspr project container for development
 
