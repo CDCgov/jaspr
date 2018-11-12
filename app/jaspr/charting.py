@@ -76,25 +76,30 @@ class JasperCharts(object):
         (xLabel,yLabel) = self._model.getExperimentLabels(experimentKey)
 
         df = self.createDataFrame(experimentKey,sampleKey)
-
+        if self._model.getConfigSetting('axisScale') == 'linearScale':
+            axisScale="linear"
+        else:
+            axisScale="log"
         # Create the figure: p and chart the data
         p = figure(x_axis_label=xLabel, y_axis_label=yLabel ,
-        #x_axis_type="log",
+        x_axis_type=axisScale,
         title=experimentKey + " : " + sampleKey)
         p.circle(df[xLabel], df[yLabel], size=10)
 
 
         # could loop over plugins collection to get names and descriptions
-        fit = FunctionRegistry.plugins['LinearRegression']()
-        fitObject=fit(df[yLabel],df[xLabel])
+        if self._model.getConfigSetting('showCurveFit') == 'true':
+            pluginName = self._model.getConfigSetting('selectedAlgorithm')
+            fit = FunctionRegistry.plugins[pluginName]()
+            fitObject=fit(df[yLabel],df[xLabel])
 
-        x = np.logspace(math.log2(df[xLabel].min()),math.log2(df[xLabel].max()), df.shape[0]*50,False,2)
-        y = fit._calculate(fitObject[0], x)
+            x = np.logspace(math.log2(df[xLabel].min()),math.log2(df[xLabel].max()), df.shape[0]*50,False,2)
+            y = fit._calculate(fitObject[0], x)
 
-        lsource = ColumnDataSource(dict(x=x, y=y))
+            lsource = ColumnDataSource(dict(x=x, y=y))
 
-        glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
-        p.add_glyph(lsource, glyph)
+            glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
+            p.add_glyph(lsource, glyph)
 
         return components(p)
 

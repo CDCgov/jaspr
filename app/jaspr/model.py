@@ -3,7 +3,9 @@
 import json
 
 DEFAULT_UISTATE="""{"currentExperiment":"Anscombe", "currentSample":"Set I"}"""
-DEFAULT_CONFIG ="""{"fitType":"linear/future"}"""
+DEFAULT_CONFIG ="""{"showCurveFit":"true","blankCorrection":"false",
+                     "axisScale":"linearScale",
+                     "selectedAlgorithm":"LinearRegression"}"""
 DEFAULT_EXPIREMENT = """{"experiments": [
      {"experimentName": "Anscombe",
         "dependentVariableLabel": "X",
@@ -137,7 +139,7 @@ class JasprModel(object):
         """
         return list(self._jasprConfig)
 
-    def setConfigSettings(self,keyname, value):
+    def setConfigSetting(self,keyname, value):
         """sets a settings valueKey
             Args:
                 keyname: key to be changed
@@ -146,7 +148,7 @@ class JasprModel(object):
             Returns:
                 None
         """
-        self._jasperConfig[keyname] = value
+        self._jasprConfig[keyname] = value
 
     def getExperimentNames(self):
         """returns array of the names of experiments in the JSON
