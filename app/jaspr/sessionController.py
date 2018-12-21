@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # file sessionController.py
 from flask import session
-from jaspr.model import JasprModel
+from jaspr.Model.model import JasprModel
 import json
 
 EXPERIMENTS_SESSION_KEY = "experiments"
@@ -23,8 +23,8 @@ class SessionController(object):
                       self.getModel().setExperimentString)
         self._initKey(CONFIG_SESSION_KEY,self.getModel().getConfigString,
                       self.getModel().setConfigString)
-        self._initKey(UISTATE_SESSION_KEY,self.getModel().getUIStateString,
-                      self.getModel().setUIStateString)
+        self._initKey(UISTATE_SESSION_KEY,self.getModel()._uiState.getUIStateString,
+                      self.getModel()._uiState.setUIStateString)
 
     def _initKey(self, keyString, getkeystringFunction,
                     setkeystringFunction):
@@ -43,8 +43,8 @@ class SessionController(object):
         return self._currentModel
 
     def updateUIState(self,key,value):
-        self.getModel().setUIStateValue(key,value)
-        session[UISTATE_SESSION_KEY] = self.getModel().getUIStateString()
+        self.getModel()._uiState.setUIStateValue(key,value)
+        session[UISTATE_SESSION_KEY] = self.getModel()._uiState.getUIStateString()
         session.modified = True
 
     def resetDefaultSession(self):
@@ -60,7 +60,7 @@ class SessionController(object):
                 getSampleNames(experimentKey)[0])
 
     def loadSessionFromModel(self):
-        session[UISTATE_SESSION_KEY] = self.getModel().getUIStateString()
+        session[UISTATE_SESSION_KEY] = self.getModel()._uiState.getUIStateString()
         session[EXPERIMENTS_SESSION_KEY] = self.getModel().getExperimentString()
         session[CONFIG_SESSION_KEY] = self.getModel().getConfigString()
         session.modified=True

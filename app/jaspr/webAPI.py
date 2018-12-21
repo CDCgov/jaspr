@@ -5,7 +5,7 @@ import json,tempfile
 from jaspr import app
 from jaspr.sessionController import SessionController
 from jaspr.standardImport import StandardImport_CSV
-from jaspr.model import JasprModel
+from jaspr.Model.model import JasprModel
 
 @app.route('/updateConfigSetting', methods =['POST'])
 def updateConfigSetting():

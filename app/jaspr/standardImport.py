@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # file StandardImport.py
-from jaspr.model import JasprModel
+from jaspr.Model.model import JasprModel
 import pandas as pd
 import csv
 

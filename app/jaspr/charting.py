@@ -25,7 +25,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 
-from jaspr.model import JasprModel
+from jaspr.Model.model import JasprModel
 from outlet import FunctionRegistry
 
 class JasperCharts(object):
