@@ -14,7 +14,7 @@ from flask import Flask, render_template, request,session, \
 
 # local imports
 from jaspr import app
-from jaspr.model import JasprModel
+from jaspr.Model.model import JasprModel
 from jaspr.charting import JasperCharts
 from jaspr.sessionController import SessionController
 from outlet import FunctionRegistry
@@ -58,11 +58,11 @@ def mainPage():
     jm = sc.getModel()
     #TODO wire up actual experiement selection from left menu
     experimentList = jm.getExperimentNames()
-    currentExperiment = jm.getUIStateValue("currentExperiment")
+    currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
 
     #TODO wire up actual sample selection from left menu
     sampleList = jm.getSampleNames(currentExperiment)
-    selectedSample = jm.getUIStateValue("currentSample")
+    selectedSample = jm._uiState.getUIStateValue("currentSample")
 
     return render_template('main.html',
         experimentList=experimentList,
@@ -94,8 +94,8 @@ def changeExperiment(experiment_name):
 def drawWidgetHTML():
     sc = SessionController()
     jm = sc.getModel()
-    currentExperiment = jm.getUIStateValue("currentExperiment")
-    selectedSample = jm.getUIStateValue("currentSample")
+    currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
+    selectedSample = jm._uiState.getUIStateValue("currentSample")
     jc = JasperCharts(jm)
 
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
