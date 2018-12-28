@@ -2,10 +2,8 @@
 # file model.py
 import json
 from jaspr.Model.UIState import UIState
+from jaspr.Model.jasprConfig import JasprConfig
 
-DEFAULT_CONFIG ="""{"showCurveFit":"true","blankCorrection":"false",
-                     "axisScale":"linearScale",
-                     "selectedAlgorithm":"LinearRegression"}"""
 DEFAULT_EXPIREMENT = """{"experiments": [
      {"experimentName": "Anscombe",
         "dependentVariableLabel": "X",
@@ -35,7 +33,7 @@ class JasprModel(object):
     This is the Model class for the application.
     The information stored is as follows:
     _jasprUIState: a class containing the UI state for this session
-    _jasprConfig: {"fitType":"linear/future"}
+    _jasprConfig: a class containing the configuration status for this session
     _jasprExperiments:
         {"expirements": [
             {"experimentName": "experiment name",
@@ -55,7 +53,7 @@ class JasprModel(object):
         """ initialize with empty data
         """
         self._jasprExperiments = {"experiments": []}
-        self._jasprConfig = {}
+        self._jasprConfig = JasprConfig();
         self._uiState = UIState();
 
 
@@ -88,42 +86,9 @@ class JasprModel(object):
         Returns:
         None
         """
-        self.setConfigString(DEFAULT_CONFIG)
         self.setExperimentString(DEFAULT_EXPIREMENT)
+        self._jasprConfig.loadDefaultModel()
         self._uiState.loadDefaultModel()
-
-
-    def getConfigSetting(self, settingKey):
-        """returns a specific configuration setting
-
-            Args:
-            settingKey - settings key
-
-            Returns:
-                setting
-
-        """
-        return self._jasprConfig[settingKey]
-
-    def getConfigSettings(self):
-        """returns entire settings key as a string
-
-            Returns:
-                settings string
-
-        """
-        return list(self._jasprConfig)
-
-    def setConfigSetting(self,keyname, value):
-        """sets a settings valueKey
-            Args:
-                keyname: key to be changed
-                value: new value
-
-            Returns:
-                None
-        """
-        self._jasprConfig[keyname] = value
 
     def getExperimentNames(self):
         """returns array of the names of experiments in the JSON
@@ -224,16 +189,9 @@ class JasprModel(object):
 #------------------------------------------------------------------------------
 
 
-    def setConfigString(self, configString):
-        self._jasprConfig = json.loads(configString)
-        return None
-
     def setExperimentString(self, experimentString):
         self._jasprExperiments = json.loads(experimentString)
         return None
-
-    def getConfigString(self):
-        return json.dumps(self._jasprConfig)
 
     def getExperimentString(self):
         return json.dumps(self._jasprExperiments)
