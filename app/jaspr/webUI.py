@@ -57,11 +57,11 @@ def mainPage():
     sc = SessionController()
     jm = sc.getModel()
     #TODO wire up actual experiement selection from left menu
-    experimentList = jm.getExperimentNames()
+    experimentList = jm._jasprExperiments.getExperimentNames()
     currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
 
     #TODO wire up actual sample selection from left menu
-    sampleList = jm.getSampleNames(currentExperiment)
+    sampleList = jm._jasprExperiments.getSampleNames(currentExperiment)
     selectedSample = jm._uiState.getUIStateValue("currentSample")
 
     return render_template('main.html',

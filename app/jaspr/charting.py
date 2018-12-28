@@ -47,11 +47,11 @@ class JasperCharts(object):
                 a dataframe object
 
         """
-        (ySeries,xSeries,blankValue) = self._model.getSampleDataSeries(
+        (ySeries,xSeries,blankValue) = self._model._jasprExperiments.getSampleDataSeries(
                           experimentKey=experimentKey,
                           sampleKey=sampleKey)
 
-        (xLabel, yLabel) = self._model.getExperimentLabels(
+        (xLabel, yLabel) = self._model._jasprExperiments.getExperimentLabels(
                            experimentKey=experimentKey)
 
         chartIndex = pd.RangeIndex(11)
@@ -73,7 +73,7 @@ class JasperCharts(object):
                 HTML string and JavaScript string
 
         """
-        (xLabel,yLabel) = self._model.getExperimentLabels(experimentKey)
+        (xLabel,yLabel) = self._model._jasprExperiments.getExperimentLabels(experimentKey)
 
         df = self.createDataFrame(experimentKey,sampleKey)
         if self._model._jasprConfig.getConfigSetting('axisScale') == 'linearScale':
