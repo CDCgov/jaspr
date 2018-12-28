@@ -26,7 +26,7 @@ def updateConfigSetting():
     print("updateConfigSetting: Set value {} to {}".format(key, value))
     sc = SessionController()
     model = sc.getModel()
-    model.setConfigSetting(key,value)
+    model._jasprConfig.setConfigSetting(key,value)
     sc.loadSessionFromModel()
     return "success"
 

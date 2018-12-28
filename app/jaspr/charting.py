@@ -76,7 +76,7 @@ class JasperCharts(object):
         (xLabel,yLabel) = self._model.getExperimentLabels(experimentKey)
 
         df = self.createDataFrame(experimentKey,sampleKey)
-        if self._model.getConfigSetting('axisScale') == 'linearScale':
+        if self._model._jasprConfig.getConfigSetting('axisScale') == 'linearScale':
             axisScale="linear"
         else:
             axisScale="log"
@@ -86,10 +86,9 @@ class JasperCharts(object):
         title=experimentKey + " : " + sampleKey)
         p.circle(df[xLabel], df[yLabel], size=10)
 
-
         # could loop over plugins collection to get names and descriptions
-        if self._model.getConfigSetting('showCurveFit') == 'true':
-            pluginName = self._model.getConfigSetting('selectedAlgorithm')
+        if self._model._jasprConfig.getConfigSetting('showCurveFit') == 'true':
+            pluginName = self._model._jasprConfig.getConfigSetting('selectedAlgorithm')
             fit = FunctionRegistry.plugins[pluginName]()
             fitObject=fit(df[yLabel],df[xLabel])
 

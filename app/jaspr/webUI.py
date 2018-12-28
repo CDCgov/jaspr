@@ -39,10 +39,10 @@ def settings():
     """render the settings page"""
     sc = SessionController()
     jm = sc.getModel()
-    showCurveFit = jm.getConfigSetting('showCurveFit')
-    blankCorrection = jm.getConfigSetting('blankCorrection')
-    axisScale=jm.getConfigSetting('axisScale')
-    selectedAlgorithm=jm.getConfigSetting('selectedAlgorithm')
+    showCurveFit = jm._jasprConfig.getConfigSetting('showCurveFit')
+    blankCorrection = jm._jasprConfig.getConfigSetting('blankCorrection')
+    axisScale=jm._jasprConfig.getConfigSetting('axisScale')
+    selectedAlgorithm=jm._jasprConfig.getConfigSetting('selectedAlgorithm')
     functionList = FunctionRegistry.plugins
     return render_template('settings.html',
             blankCorrection=blankCorrection,

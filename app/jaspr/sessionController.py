@@ -21,8 +21,8 @@ class SessionController(object):
         self._currentModel = JasprModel()
         self._initKey(EXPERIMENTS_SESSION_KEY,self.getModel().getExperimentString,
                       self.getModel().setExperimentString)
-        self._initKey(CONFIG_SESSION_KEY,self.getModel().getConfigString,
-                      self.getModel().setConfigString)
+        self._initKey(CONFIG_SESSION_KEY,self.getModel()._jasprConfig.getConfigString,
+                      self.getModel()._jasprConfig.setConfigString)
         self._initKey(UISTATE_SESSION_KEY,self.getModel()._uiState.getUIStateString,
                       self.getModel()._uiState.setUIStateString)
 
@@ -62,5 +62,5 @@ class SessionController(object):
     def loadSessionFromModel(self):
         session[UISTATE_SESSION_KEY] = self.getModel()._uiState.getUIStateString()
         session[EXPERIMENTS_SESSION_KEY] = self.getModel().getExperimentString()
-        session[CONFIG_SESSION_KEY] = self.getModel().getConfigString()
+        session[CONFIG_SESSION_KEY] = self.getModel()._jasprConfig.getConfigString()
         session.modified=True
