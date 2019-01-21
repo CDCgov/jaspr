@@ -1,10 +1,9 @@
 import json
 DEFAULT_CONFIG ="""{"showCurveFit":"true","blankCorrection":"false",
-                     "axisScale":"linearScale",
-                     "selectedAlgorithm":"LinearRegression"}"""
+                     "axisScale":"LogScale",
+                     "selectedAlgorithm":"logistic3"}"""
 
 class JasprConfig(object):
-
     def setConfigString(self, configString):
         self._jasprConfig = json.loads(configString)
         return None

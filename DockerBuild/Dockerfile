@@ -16,3 +16,9 @@ RUN pip install --upgrade pip
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 WORKDIR /app
+
+EXPOSE 5000/tcp
+
+VOLUME /app
+
+CMD /bin/bash -i -c "pip install -e . ; flask run -h 0.0.0.0"

@@ -2,10 +2,9 @@
 
 from outlet import FunctionRegistry
 
-
 class LinearRegression(FunctionRegistry):
     # regression line
-    name = 'LinearRegression'
+    name = 'linearRegression'
     description = 'Simple Linear Regression'
 
     def _guess_params(self, data, concs):
@@ -19,4 +18,8 @@ class LinearRegression(FunctionRegistry):
         """
         slope =  params[0]
         intercept = params[1]
+        self.labels ={"slope" : slope, "intercept" : intercept}
         return slope*concs + intercept
+
+    def _labels(self):
+        return self.labels
