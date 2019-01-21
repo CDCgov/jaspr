@@ -28,9 +28,15 @@ class Logistic4(FunctionRegistry):
 
         * c is the concentration of inhibitor.
 
+        * h is <<<<Todo: James needs to tell us what this is >>>>
+
         """
         Vmax = params[0]
         Ki = params[1]
         h = params[2]
+        self.labels = {"IC50":Ki}
 
         return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
+
+    def _labels(self):
+        return self.labels

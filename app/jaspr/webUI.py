@@ -85,7 +85,7 @@ def changeExperiment(experiment_name):
     realExperimentName = unquote(experiment_name).replace("%28","(").replace("%29",")")
     sc.updateUIState("currentExperiment",unquote(realExperimentName))
     jm = sc.getModel()
-    firstSample = jm.getSampleNames(realExperimentName)[0]
+    firstSample = jm._jasprExperiments.getSampleNames(realExperimentName)[0]
     sc.updateUIState("currentSample",firstSample)
     return jsonify(request.json)
 

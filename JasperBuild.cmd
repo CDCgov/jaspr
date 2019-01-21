@@ -2,9 +2,10 @@ ECHO OFF
 SET LOCAL_APP_DIR=c:/Projects/jaspr_cdc
 SET TEMP_DIRECTORY=c:/frunk
 
-SET RUN_STRING=docker run -i -t -v %LOCAL_APP_DIR%/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True -e FLASK_ENV=development --rm cdcflu/jaspr:v1 /bin/bash -i -c ^"pip install -e . ; flask run -h 0.0.0.0^"
-SET JUPYTER_STRING=docker run -i -t  -v %TEMP_DIRECTORY%:/frunk -p 8888:8888 continuumio/anaconda3 /bin/bash -c ^"/opt/conda/bin/conda install jupyter -y --quiet ^&^& mkdir /opt/notebooks ^&^& /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip=*  --no-browser --allow-root^"
-SET CMD_STRING=docker run -i -t -v %LOCAL_APP_DIR%/app:/app -p 5000:5000 -w /app -e FLASK_APP=jaspr -e FLASK_DEBUG=True -e FLASK_ENV=development --rm cdcflu/jaspr:v1 /bin/bash -i -c ^"pip install -e . ; /bin/bash^"
+SET COMPOSE_RUN_STRING = docker compose
+SET RUN_STRING=docker run --interactive --tty --volume %LOCAL_APP_DIR%/app:/app -p 5000:5000 -w /app --env FLASK_APP=jaspr --env FLASK_DEBUG=True --env FLASK_ENV=development --rm cdcflu/jaspr:v1 /bin/bash -i -c ^"pip install -e . ; flask run -h 0.0.0.0^"
+SET JUPYTER_STRING=docker run --interactive --tty  --volume %TEMP_DIRECTORY%:/frunk -p 8888:8888 --rm continuumio/anaconda3  /bin/bash -c ^"/opt/conda/bin/conda install jupyter -y --quiet ^&^& mkdir /opt/notebooks ^&^& /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip=*  --no-browser --allow-root^"
+SET CMD_STRING=docker run --interactive --tty --volume %LOCAL_APP_DIR%/app:/app -p 5000:5000 -w /app --env FLASK_APP=jaspr --env FLASK_DEBUG=True --env FLASK_ENV=development --rm cdcflu/jaspr:v1 /bin/bash -i -c ^"pip install -e . ; /bin/bash^"
 
 ECHO --------------------------------------------------------
 ECHO This supports development of jaspr software within

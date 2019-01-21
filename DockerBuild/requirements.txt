@@ -8,3 +8,4 @@ Pandas
 xlrd
 markdown
 scipy
+redis

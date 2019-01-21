@@ -23,6 +23,7 @@ from bokeh.embed import components
 from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
+from bokeh.models import Label
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 
 from jaspr.Model.model import JasprModel
@@ -84,6 +85,7 @@ class JasperCharts(object):
         p = figure(x_axis_label=xLabel, y_axis_label=yLabel ,
         x_axis_type=axisScale,
         title=experimentKey + " : " + sampleKey)
+
         p.circle(df[xLabel], df[yLabel], size=10)
 
         # could loop over plugins collection to get names and descriptions
@@ -99,6 +101,17 @@ class JasperCharts(object):
 
             glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
             p.add_glyph(lsource, glyph)
+
+            chartLabel = fit.description
+            for key,value in fit._labels().items():
+                chartLabel = f'{chartLabel} {key}:{value:.2e}'
+            #add label
+            fitAlgoLabel = Label(x=10, y=1, x_units='screen', y_units='screen',
+                 text=chartLabel, render_mode='css',
+                 background_fill_color='white', background_fill_alpha=0)
+
+            p.add_layout(fitAlgoLabel)
+
 
         return components(p)
 

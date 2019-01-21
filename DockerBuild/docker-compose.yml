@@ -1,8 +1,29 @@
 version: '3.3'
 
 services:
-   jaspr:
-      build: .
+  jaspr:
+      build:
+        context: .
+        dockerfile: Dockerfile
       image: cdcflu/jaspr:v1
+      environment:
+        - FLASK_APP=jaspr
+        - FLASK_DEBUG=True
+        - FLASK_ENV=development
+        - REDIS_HOST=redis
       ports:
-       - "5000:5000"
+        - "5000:5000"
+      volumes:
+        - ${CODESHARE}:/app
+      working_dir: /app
+      tty: true
+      links:
+        - redis
+      depends_on:
+        - redis
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  #  expose:
+  #    - "6379/tcp"
