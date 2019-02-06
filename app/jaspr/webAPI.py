@@ -51,16 +51,8 @@ def uploader():
       jm = sc.getModel()
       si = StandardImport_CSV(dilutionValues,jm)
       si.loadPlate(datafile_temp.name,keyfile_temp.name)
-      #datafile_temp.delete()
-      #keyfile_temp.delete()
       sc.loadSessionFromModel()
       sc.resetUISession()
-      # print("\n\n\nIn uploader")
-      # for item in session:
-      #     print(item, "-->",session[item])
-      # print("So that is what you should see\n\n\n")
-      #todo we probably have to update session data there
-      #todo: delete temporary files
    return redirect("/", code=302)
 
 @app.route("/ping", methods = ['GET'])

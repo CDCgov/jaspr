@@ -10,12 +10,12 @@ from urllib.parse import unquote
 
 # flask imports
 from flask import Flask, render_template, request,session, \
-        jsonify, redirect, make_response
+        jsonify, redirect, make_response, send_from_directory
 
 # local imports
 from jaspr import app
 from jaspr.Model.model import JasprModel
-from jaspr.charting import JasperCharts
+from jaspr.charting import JasprCharts
 from jaspr.sessionController import SessionController
 from outlet import FunctionRegistry
 
@@ -33,6 +33,26 @@ def reset():
 def upload_file():
    return render_template('upload.html')
 
+@app.route('/report')
+def report():
+    """render the reports"""
+    sc = SessionController()
+    jm = sc.getModel()
+
+    experimentList = jm._jasprExperiments.getExperimentNames()
+    currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
+
+    sampleList = jm._jasprExperiments.getSampleNames(currentExperiment)
+    pngList = []
+    for selectedSample in sampleList:
+        jc = JasprCharts(jm)
+        pngList.append(jc.create_PNG(currentExperiment,selectedSample))
+
+    return render_template('report.html', pngList=pngList)
+
+@app.route('/reportpngs/<path:filename>')
+def reportpngs(filename):
+    return send_from_directory(f"/app/{app.TEMPFILEDIR}", filename)
 
 @app.route('/settings')
 def settings():
@@ -56,11 +76,10 @@ def mainPage():
     """render the main page"""
     sc = SessionController()
     jm = sc.getModel()
-    #TODO wire up actual experiement selection from left menu
+
     experimentList = jm._jasprExperiments.getExperimentNames()
     currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
 
-    #TODO wire up actual sample selection from left menu
     sampleList = jm._jasprExperiments.getSampleNames(currentExperiment)
     selectedSample = jm._uiState.getUIStateValue("currentSample")
 
@@ -96,7 +115,7 @@ def drawWidgetHTML():
     jm = sc.getModel()
     currentExperiment = jm._uiState.getUIStateValue("currentExperiment")
     selectedSample = jm._uiState.getUIStateValue("currentSample")
-    jc = JasperCharts(jm)
+    jc = JasprCharts(jm)
 
     g_script, g_div = jc.create_chart(currentExperiment,selectedSample)
     t_script, t_div = jc.create_table(currentExperiment,selectedSample)

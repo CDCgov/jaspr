@@ -14,9 +14,10 @@ import numpy as np
 import os
 import logging
 
+
 from pandas import pandas as pd
 from numpy import array
-
+from uuid import uuid4
 
 from bokeh.plotting import figure
 from bokeh.embed import components
@@ -25,11 +26,14 @@ from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
 from bokeh.models import Label
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
+from bokeh.io import export_png
 
 from jaspr.Model.model import JasprModel
+from jaspr import app
 from outlet import FunctionRegistry
 
-class JasperCharts(object):
+
+class JasprCharts(object):
     """Jaspr Charts class that builds chart artifacts based upon a data model
 
     """
@@ -61,6 +65,64 @@ class JasperCharts(object):
                             index=chartIndex,
                             columns = [xLabel,yLabel])
 
+    def create_PNG(self, experimentKey, sampleKey):
+        """Create PNG chart for a given sample using the current model
+
+            Args:
+                experimentKey: the experiement where the sample resides
+                sampleKey: the sampleKey
+
+            Returns:
+                PNG file name
+
+            Notes:
+                Todo: This is just a copy of create Chart, we need to combine
+                 that code.
+
+        """
+        (xLabel,yLabel) = self._model._jasprExperiments.getExperimentLabels(experimentKey)
+
+        df = self.createDataFrame(experimentKey,sampleKey)
+        if self._model._jasprConfig.getConfigSetting('axisScale') == 'linearScale':
+            axisScale="linear"
+        else:
+            axisScale="log"
+        # Create the figure: p and chart the data
+        p = figure(x_axis_label=xLabel, y_axis_label=yLabel ,
+        x_axis_type=axisScale,
+        title=experimentKey + " : " + sampleKey)
+
+        p.circle(df[xLabel], df[yLabel], size=10)
+
+        # could loop over plugins collection to get names and descriptions
+        if self._model._jasprConfig.getConfigSetting('showCurveFit') == 'true':
+            pluginName = self._model._jasprConfig.getConfigSetting('selectedAlgorithm')
+            fit = FunctionRegistry.plugins[pluginName]()
+            fitObject=fit(df[yLabel],df[xLabel])
+
+            x = np.logspace(math.log2(df[xLabel].min()),math.log2(df[xLabel].max()), df.shape[0]*50,False,2)
+            y = fit._calculate(fitObject[0], x)
+
+            lsource = ColumnDataSource(dict(x=x, y=y))
+
+            glyph = Line(x="x", y="y", line_color="#3aaf13", line_width=3, line_alpha=0.6)
+            p.add_glyph(lsource, glyph)
+
+            chartLabel = fit.description
+            for key,value in fit._labels().items():
+                chartLabel = f'{chartLabel} {key}:{value:.2e}'
+            #add label
+            fitAlgoLabel = Label(x=10, y=1, x_units='screen', y_units='screen',
+                 text=chartLabel, render_mode='css',
+                 background_fill_color='white', background_fill_alpha=0)
+
+            p.add_layout(fitAlgoLabel)
+            p.toolbar_location=None
+            baseFileName = uuid4()
+            pngFile_temp = f"{baseFileName}.png"
+            export_png(p,filename=f"{app.TEMPFILEDIR}/{pngFile_temp}")
+
+        return pngFile_temp
 
     def create_chart(self, experimentKey, sampleKey):
         """Create HTML and Javascript components that will display a chart
