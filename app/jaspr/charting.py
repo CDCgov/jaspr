@@ -41,7 +41,7 @@ class JasprCharts(object):
     def __init__(self, model):
         self._model = model
 
-    def createDataFrame(self, experimentKey, sampleKey):
+    def createDataFrame(self, experimentKey, sampleKey, bBlankCorrected):
         """Create a dataframe for a given sample using the current model
 
             Args:
@@ -52,7 +52,7 @@ class JasprCharts(object):
                 a dataframe object
 
         """
-        (ySeries,xSeries,blankValue) = self._model._jasprExperiments.getSampleDataSeries(
+        (xSeries,ySeries,blankCorrectedYSeries, blankValue) = self._model._jasprExperiments.getSampleDataSeries(
                           experimentKey=experimentKey,
                           sampleKey=sampleKey)
 
@@ -61,9 +61,16 @@ class JasprCharts(object):
 
         chartIndex = pd.RangeIndex(11)
 
-        return pd.DataFrame(np.array([xSeries,ySeries]).T,
-                            index=chartIndex,
-                            columns = [xLabel,yLabel])
+        if bBlankCorrected == True:
+            print(f"Blankcorrected data returned because bBlankCorrected is {bBlankCorrected}")
+            return pd.DataFrame(np.array([xSeries, blankCorrectedYSeries]).T, 
+                                index=chartIndex,
+                                columns = [xLabel,yLabel])
+        else:
+            print (f"uncorrected data returned because bBlankCorrected is {bBlankCorrected}")
+            return pd.DataFrame(np.array([xSeries,ySeries]).T,
+                    index=chartIndex,
+                    columns = [xLabel,yLabel])
 
     def create_PNG(self, experimentKey, sampleKey):
         """Create PNG chart for a given sample using the current model
@@ -82,7 +89,9 @@ class JasprCharts(object):
         """
         (xLabel,yLabel) = self._model._jasprExperiments.getExperimentLabels(experimentKey)
 
-        df = self.createDataFrame(experimentKey,sampleKey)
+        bBlankCorrected = self._model._jasprConfig.getConfigSetting('blankCorrection')
+
+        df = self.createDataFrame(experimentKey,sampleKey, bBlankCorrected)
         if self._model._jasprConfig.getConfigSetting('axisScale') == 'linearScale':
             axisScale="linear"
         else:
@@ -138,7 +147,10 @@ class JasprCharts(object):
         """
         (xLabel,yLabel) = self._model._jasprExperiments.getExperimentLabels(experimentKey)
 
-        df = self.createDataFrame(experimentKey,sampleKey)
+        bBlankCorrected = self._model._jasprConfig.getConfigSetting('blankCorrection')
+
+        df = self.createDataFrame(experimentKey,sampleKey, bBlankCorrected)
+
         if self._model._jasprConfig.getConfigSetting('axisScale') == 'linearScale':
             axisScale="linear"
         else:
@@ -189,7 +201,9 @@ class JasprCharts(object):
                 HTML string and JavaScript string
 
         """
-        df = self.createDataFrame(experimentKey,sampleKey)
+        bBlankCorrected = self._model._jasprConfig.getConfigSetting('blankCorrection')
+        print (f"Blank correction is {bBlankCorrected} ")
+        df = self.createDataFrame(experimentKey,sampleKey, bBlankCorrected)
         source = ColumnDataSource(df)
 
         bcols = [TableColumn(field=Ci, title=Ci) for Ci in df.columns] # bokeh columns
