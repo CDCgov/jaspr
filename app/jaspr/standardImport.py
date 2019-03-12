@@ -76,11 +76,12 @@ class StandardImport_CSV(object):
         for drug in self._rawData.drug.unique():
             #Todo: have james weigh in on what the axis labels should be
             self._model._jasprExperiments.addExperiment(drug,"concentration","dilutions")
+        #note that we assume that the last one is a blank
         for index,row in self._rawData.iterrows():
             results=[row.d1,row.d2,row.d3,row.d4,row.d5,row.d6, row.d7,
                      row.d8,row.d9,row.d10,row.d11]
             self._model._jasprExperiments.addDataSeries(row.drug,row.id,
-                    results, self._dilutionValues, row.blank)
+                    results, self._dilutionValues, row.blank,row.d11)
         return
 
     def addSamples(self, firstCols):
