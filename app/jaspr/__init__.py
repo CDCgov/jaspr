@@ -29,5 +29,5 @@ Session(app)
 toolbar = DebugToolbarExtension(app)
 
 #put these at the end (per Flask Documentation)
-import jaspr.webUI
-import jaspr.webAPI
+import jaspr.routes
+import jaspr.api
