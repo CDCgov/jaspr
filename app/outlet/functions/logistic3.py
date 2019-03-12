@@ -13,7 +13,6 @@ class Logistic3(FunctionRegistry):
         for index, ki_guess in enumerate(concs):
             yield (vmax_guess, ki_guess)
 
-
     def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration
 
@@ -30,7 +29,7 @@ class Logistic3(FunctionRegistry):
         """
         Vmax =  params[0]
         Ki = params[1]
-        self.labels = {"IC50":Ki}
+        self.labels = {"IC50": Ki}
         return Vmax * (1 - (concs / (Ki + concs)))
 
     def _labels(self):

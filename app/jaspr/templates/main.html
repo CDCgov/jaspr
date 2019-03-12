@@ -8,8 +8,8 @@
 			<label for="selExp">Selected Experiment</label>
 			<select class="form-control" id="selExp"
 							onchange='ChangeExperiment(this);'>
-				{% for experiment in experimentList %}
-				<option value="{{experiment}}">{{experiment}}</option>
+				{% for experiment in experiment_list %}
+                    <option value="{{experiment}}">{{experiment}}</option>
 				{% endfor %}
 			</select>
 		</div>
@@ -28,9 +28,9 @@
 <div class="row content-row">
 	<div class="col-3 selector ">
 		<ul class="samplelist nav flex-column nav-pills">
-			{% for sample in sampleList %}
+			{% for sample in sample_list %}
 			<li class="nav-item">
-				<a class="nav-link {% if sample == selectedSample %}active{% endif %}"
+				<a class="nav-link {% if sample == curr_sample %}active{% endif %}"
 				   data-toggle="pill" onclick="ChangeSample('{{sample}}');" href="#">{{ sample }}</a>
 			</li>
 			{% endfor %}

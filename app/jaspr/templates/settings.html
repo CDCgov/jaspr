@@ -7,31 +7,37 @@
 	</div>
 	<div class="col-9">
 		<form action=''>
-			<input type="checkbox" {% if showCurveFit=='true' %}Checked{%endif%} id="showCurve">
-			Show Curve Fit
-			</input><br><br>
-			<input type="checkbox" id="blankCorrection" {% if blankCorrection=='true' %}Checked{%endif%}>
-			Blank Correction</input><br><br>
+			<input type="checkbox" id="showCurve" {% if show_fit %}Checked{% endif %}>Show Curve Fit</input>
+
+            <br /><br />
+
+			<input type="checkbox" id="blankCorrection" {% if blank_correction %}Checked{% endif %}>Blank Correction</input>
+
+            <br /><br />
+
 			<div id="axisScaleSelect" class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary {% if axisScale=='logScale' %}active{%endif%}">
-					<input type="radio" name="axisScale" id="logScale" autocomplete="off" {% if axisScale=='logScale' %}Checked{%endif%}>
-					Log Scale
+				<label class="btn btn-secondary {% if x_axis_type == 'log' %}active{% endif %}">
+					<input type="radio" name="axisScale" id="log" autocomplete="off" {% if x_axis_type == 'log' %}Checked{%endif%}>
+                        Log Scale
 					</input>
 				</label>
-				<label class="btn btn-secondary {% if axisScale=='linearScale' %}active{%endif%}">
-					<input type="radio" name="axisScale" id="linearScale" autocomplete="off" {% if axisScale=='linearScale' %}Checked{%endif%}>
-					Linear Scale
+				<label class="btn btn-secondary {% if x_axis_type == 'linear' %}active{% endif %}">
+					<input type="radio" name="axisScale" id="linear" autocomplete="off" {% if x_axis_type=='linear' %}Checked{%endif%}>
+                        Linear Scale
 					</input>
 				</label>
-			</div><br><br>
+			</div>
+            
+            <br /><br />
+
 			<div class="dropdown">
 				<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					{{selectedAlgorithm}}
+					{{ curr_function }}
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					{% for fn in functionList%}
-					<a class="dropdown-item" href="#">{{fn}}</a>
-					{%endfor%}
+					{% for fn in function_list %}
+                        <a class="dropdown-item" href="#">{{fn}}</a>
+                    {%endfor%}
 				</div>
 			</div>
 			<br>

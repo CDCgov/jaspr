@@ -2,6 +2,7 @@
 {% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
 <script src={{ url_for('static', filename='js/jaspr-report.js') }}></script>
+
 {% for pngImage in pngList %}
 
 {% if loop.index is not divisibleby 2 %}

@@ -49,23 +49,45 @@ class FunctionRegistry(object, metaclass=PluginMount):
                ...
                return dependent_array
 
+        * __returnParms()
+               # a function that returns an array of KVP for return descriptors
+
     """
 
     def _residuals(self, params, independent_array, data_array):
         """Calculate the distance between each observed and calculated value"""
         return data_array - self._calculate(params, independent_array)
 
-    def __call__(self, data_array, independent_array):
+    def __call__(self, x_data, y_data):
         """Fit the function to the data
 
         Iterate through initial guesses for the fitting parameters until
         initial guesses are exhausted, or the least squares converges
 
         """
-        for params in self._guess_params(data_array, independent_array):
+        for params in self._guess_params(x_data, y_data):
             fit = leastsq(self._residuals, params,
-                    args=(independent_array, data_array))
+                    args=(x_data, y_data))
             if 0 < fit[-1] < 5:
                 # indicates we've converged, stop guessing
                 break
         return fit
+
+
+class ParserRegistry(object, metaclass=PluginMount):
+    """Registry of known parsers for various data formats
+
+    Plugins implementing importers must provide:
+
+        Attributes:
+         * name        - A short, unique name of the function being defined
+         * description - A longer description of the function describing
+                         its use
+
+        Functions:
+            __call__():
+                # returns a JASPR data structure
+
+    """
+
+    pass
