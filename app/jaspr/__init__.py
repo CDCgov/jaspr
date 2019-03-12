@@ -26,8 +26,6 @@ for f in files:
 
 Session(app)
 
-
-
 toolbar = DebugToolbarExtension(app)
 
 #put these at the end (per Flask Documentation)
