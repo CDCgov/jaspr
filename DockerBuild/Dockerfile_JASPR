@@ -35,20 +35,3 @@ ENV LISTEN_PORT 5003
 VOLUME /app
 
 CMD /bin/bash -i -c "pip install -e . "; uwsgi --ini app.ini
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

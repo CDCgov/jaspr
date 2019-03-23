@@ -28,6 +28,7 @@
 # python imports
 import pandas as pd
 import csv
+from itertools import product
 
 # app imports
 from outlet import ParserRegistry
@@ -37,87 +38,57 @@ class ParseMET8Sample(ParserRegistry):
     name = 'met8sample'
     description = 'MET 8 samples per plate, 2-fold dilutions'
 
-    def __init__(self, keyfile, datafile):
-        self.keyfile = keyfile
-        self.datafile = datafile
-        #self.concs = [0] * 11
-        #self.experiment_names = []
-        #self.sample_names = []
-        #self.raw_Data = None
+    #def __init__(self, keyfile, datafile):
+    #    self.sera, self.starting_titers = self._get_sera(keyfile)
+    #    self.titer_lookup = dict(zip(self.sera, serlf.starting_titers))
+    #    self.viruses = self._get_viruses(keyfile)
 
-    def _parse_keyfile(self):
-        """Read in a design file describing the experiment"""
-        with open(self.keyfile, 'rt') as handle:
-            rows = [row for row in csv.reader(handle)][1:]
+    #    self.dilutions = {}
+    #    for titer in self.starting_titers:
+    #        self._get_dilutions(titer)
 
-        # collect the experiments until we hit the sample list
-        # then collect the samples
-        state = 'experiments'
-        experiment_names, sample_names = [], []
-        for row in rows:
-            if state == 'experiments':
-                if not row or row[0].strip() == '':
-                    continue
-                elif row[0].startswith('ID'):
-                    state = 'samples'
-                    continue
-                else:
-                    experiment_names.append(row[0].strip())
+    #    self.data = {
+    #        'show_fit': True,
+    #        'blank_correction': True,
+    #        'x_axis_type': 'log',
+    #        'curr_function' : 'logistic3',
+    #    }
 
-            elif state == 'samples':
-                if not row or row[0].strip() == '':
-                    continue
-                elif len(row) < 2:
-                    row.append('')
-                else:
-                    sample_names.append((row[0].strip(), row[1].strip(), ))
+    #    self.data['experiments'] = self._get_experiments(datafile)
 
-        return experiment_names, sample_names
+    #def _get_sera(self, keyfile):
+    #    df = read_excel(keyfile, sheet_name='Sera')
+    #    return list(df['Sera']), list(df['Starting titer'])
 
-    def _parse_platefile(self, platefile):
-        colLabels = ['d1','d2','d3','d4','d5','d6','d7',
-                     'd8','d9','d10','d11','blank']
-        df = pd.read_csv(platefile,delimiter = ',',
-                         names=colLabels,
-                         usecols=colLabels)
-        df = df.dropna(thresh=1)
-        return df
+    #def _get_viruses(self, keyfile):
+    #    df = read_excel(keyfile, sheet_name='Viruses')
+    #    return [f"{row['ID']} {row['Strain Name (optional)']}"
+    #            for index, row in df.iterrows()]
+
+    #def _get_dilutions(self, start_titer):
+    #    if start_titer not in self.dilutions:
+    #        self.dilutions[start_titer] = [
+    #                1/(start_titer * pow(2, i)) for i in range(12)]
+    #        self.dilutions[start_titer][-1] = \
+    #                self.dilutions[start_titer][-1] / 8
+
+    #def _get_experiments(self, datafile):
+    #    df = read_excel(datafile)
+    #    df.dropna(inplace=True)
+    #    experiments = {}
+    #    for index, (serum, virus) in \
+    #            enumerate(product(self.sera, self.viruses)):
+    #        titer = self.titer_lookup[serum])
+    #        exp = experiments.get(virus, {
+    #                'x_axis_label': 'Dilution (conc)',
+    #                'y_axis_label': 'Fluorescence (A.U.)'
+    #        })
+    #        data = {
+    #            'x_values': self.dilutions[titer],
+    #            'y_values'
+    #        }
+
+    #    return exps
 
     def __call__(self):
-        experiment_names, sample_names = self._parse_keyfile()
-        raw_data = self._parse_platefile()
-        raw_data
-
-    def loadPlate(self, plateFile, keyFile):
-        self._rawData = self.read_plateFile(plateFile)
-        firstCols = [(drug,id) for drug in self._drugs for id in self._ids]
-        self.addDrugs(firstCols)
-        self.addSamples(firstCols)
-        self._rawData.index = range(len(self._rawData.index ))
-        self._model._jasprExperiments.clearExperiments()
-        for drug in self._rawData.drug.unique():
-            self._model._jasprExperiments.addExperiment(drug,"concentration","dilutions")
-        for index,row in self._rawData.iterrows():
-            results=[row.d1,row.d2,row.d3,row.d4,row.d5,row.d6, row.d7,
-                     row.d8,row.d9,row.d10,row.d11]
-            self._model._jasprExperiments.addDataSeries(row.drug,row.id,
-                    results, self._dilutionValues, row.blank)
-        return
-
-    def addSamples(self, firstCols):
-        """add the id and strains to dataframe """
-        #if there id and strain in the first sample add them both
-        #ToDo: add tests for the strains being only in some samples (not first)
-        if isinstance(firstCols[0][1],tuple):
-            self._rawData.insert(1,"id",[col[1][0] for col in firstCols])
-            #add strain to the end
-            self._rawData["strain"]=[col[1][1] for col in firstCols]
-        else:
-            self._rawData.insert(1,"id",[col[1] for col in firstCols])
-
-    def addDrugs(self,firstCols):
-        """ add the drugs to the dataframe """
-        #create an array of drugs and _ids
-        self._rawData.insert(0,"drug",[col[0] for col in firstCols])
-        return
-
+        return self.data
