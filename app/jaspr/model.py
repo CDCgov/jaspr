@@ -81,9 +81,10 @@ class JasprModel(object):
 
     @property
     def y_array(self):
+        y_series = 'y_corrected' if self.blank_correction else 'y_values'
         return np.asarray(
                 self.experiments[self.curr_experiment]['data'][
-                        self.curr_sample]['y_values'])
+                        self.curr_sample][y_series])
 
     @property
     def x_axis_label(self):

@@ -59,7 +59,14 @@ class JasprChart(object):
                 y_axis_label=self.m.y_axis_label,
                 x_axis_type=self.m.x_axis_type,
                 title=f'{self.m.curr_experiment}: {self.m.curr_sample}')
-        p.circle(x='x_values', y='y_values', size=10,
+
+        # change from base 10 to base 2
+        if self.m.x_axis_type == 'log':
+            p.xaxis[0].ticker.base = 2
+            p.xaxis[0].formatter.ticker = p.xaxis[0].ticker
+
+        y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
+        p.circle(x='x_values', y=y_series, size=10,
                 source=source)
 
         # could loop over plugins collection to get names and descriptions
@@ -75,15 +82,20 @@ class JasprChart(object):
                     line_width=3, line_alpha=0.6)
             p.add_glyph(lsource, glyph)
 
-            chart_label = fit_function.description
+            chart_labels = [fit_function.description]
             for key, value in fit_function.labels.items():
-                chart_label = f'{chart_label} {key}:{value:.2e}'
+                chart_labels.append(f' - {key}: {value:6.3g}')
 
             #add label
-            label = Label(x=10, y=1, x_units='screen', y_units='screen',
-                 text=chart_label, render_mode='css',
-                 background_fill_color='white', background_fill_alpha=0)
-            p.add_layout(label)
+            offset = 1
+            for text in chart_labels[::-1]:
+                label = Label(x=10, y=offset*20,
+                        x_units='screen', y_units='screen',
+                        text=text, render_mode='css',
+                        background_fill_color='white',
+                        background_fill_alpha=0.7)
+                p.add_layout(label)
+                offset += 1
         return p
 
     def _get_chart_component(self):

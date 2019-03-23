@@ -2,21 +2,21 @@ $(function() {
   $("#showCurve").click(function() {
     var selected = $('#showCurve').prop('checked');
     $.post("/updateConfigSetting", {
-        showCurveFit: selected
+        show_fit: selected
       });
   });
 
   $("#blankCorrection").click(function() {
     var selected = $('#blankCorrection').prop('checked');
     $.post("/updateConfigSetting", {
-        blankCorrection: selected
+        blank_correction: selected
       });
   });
 
   $("#axisScaleSelect > .btn").click(function() {
     axisScale = this.control.id
     $.post("/updateConfigSetting", {
-        axisScale: axisScale
+        x_axis_type: axisScale
       });
   });
 
@@ -24,7 +24,7 @@ $(function() {
   $('.dropdown-menu').click(function(e) {
     $("#dropdownMenuButton").text(e.target.innerText)
     $.post("/updateConfigSetting",{
-        selectedAlgorithm:e.target.innerText
+        curr_function: e.target.innerText
     });
   });
 

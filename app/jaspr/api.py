@@ -11,6 +11,7 @@ from outlet import ParserRegistry
 @app.route('/updateConfigSetting', methods=['POST'])
 def updateConfigSetting():
     jm = JasprModel()
+    print(request.form)
     for k, v in request.form.items():
         jm.update_attribute(k, v)
     return 'true'
@@ -29,7 +30,7 @@ def uploader():
         kf_temp.close()
         kf.save(kf_temp.name)
 
-        settings = ParserRegistry.plugins['met8sample'](
+        settings = ParserRegistry.plugins['small_fra'](
                 kf_temp.name, df_temp.name)()
         jm = JasprModel().set_defaults(settings)
     return redirect("/", code=302)

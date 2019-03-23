@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # file jaspr/routes.py
 
-"""Flask routes for browser based jaspr UI
+"""Flask routes for browser based jaspr UI"""
 
-"""
 
 # python imports
 import json
@@ -72,9 +71,9 @@ def change_experiment(experiment_name):
 
 @app.route("/drawWidgetHTML", methods=["GET"])
 def drawWidgetHTML():
-    print(request.headers)
     chart = JasprChart()
     return jsonify(chart())
+
 
 @app.route('/report', methods=["GET"])
 def report():
@@ -82,6 +81,7 @@ def report():
     jc = JasprChart()
     pngList = jc.get_pngs()
     return render_template('report.html', pngList=pngList)
+
 
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):

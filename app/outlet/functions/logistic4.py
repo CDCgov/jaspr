@@ -7,12 +7,14 @@ class Logistic4(FunctionRegistry):
     name = 'logistic4'
     description = '4-parameter logistic'
 
-    def _guess_params(self, data, concs):
+    def _guess_params(self, concs, data):
         """Fit a non-linear inhibition curve using least squares."""
         vmax_guess = max(data)
         h_guess = 1.0
-        for ki_guess in concs:
-            yield (vmax_guess, ki_guess, h_guess)
+        for d, ki_guess in zip(data, concs):
+            if d < vmax_guess / 2:
+                yield (vmax_guess, ki_guess, h_guess)
+        yield (vmax_guess, concs[0]*4, h_guess)
 
 
     def _calculate(self, params, concs):
@@ -34,7 +36,7 @@ class Logistic4(FunctionRegistry):
         Vmax = params[0]
         Ki = params[1]
         h = params[2]
-        self.labels = {"IC50":Ki}
+        self.labels = {'IC50': Ki, 'titer': 1 / Ki, 'h': h, 'Vmax': Vmax}
 
         return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
 

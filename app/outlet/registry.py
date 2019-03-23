@@ -68,6 +68,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
         for params in self._guess_params(x_data, y_data):
             fit = leastsq(self._residuals, params,
                     args=(x_data, y_data))
+
             if 0 < fit[-1] < 5:
                 # indicates we've converged, stop guessing
                 break
