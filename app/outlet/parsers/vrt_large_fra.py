@@ -11,8 +11,8 @@ from outlet import ParserRegistry
 
 
 class SmallFraParser(ParserRegistry):
-    name = 'small_fra'
-    description = 'VRT small-format FRA parser'
+    name = 'large_fra'
+    description = 'VRT large-format FRA parser'
 
     def __init__(self, keyfile, datafile):
         self.sera, self.starting_titers = self._get_sera(keyfile)
@@ -26,7 +26,7 @@ class SmallFraParser(ParserRegistry):
             'show_fit': True,
             'blank_correction': True,
             'x_axis_type': 'log',
-            'curr_function' : 'logistic3',
+            'curr_function' : 'logistic4',
         }
 
         self.data['experiments'] = self._get_experiments(datafile)

@@ -9,12 +9,12 @@ class Logistic4(FunctionRegistry):
 
     def _guess_params(self, concs, data):
         """Fit a non-linear inhibition curve using least squares."""
-        vmax_guess = max(data)
+        vmax_guess = max(data) * 1.3
         h_guess = 1.0
         for d, ki_guess in zip(data, concs):
             if d < vmax_guess / 2:
                 yield (vmax_guess, ki_guess, h_guess)
-        yield (vmax_guess, concs[0]*4, h_guess)
+        yield (vmax_guess, concs[-1]/4, h_guess)
 
 
     def _calculate(self, params, concs):

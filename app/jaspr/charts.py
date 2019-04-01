@@ -59,6 +59,7 @@ class JasprChart(object):
                 y_axis_label=self.m.y_axis_label,
                 x_axis_type=self.m.x_axis_type,
                 title=f'{self.m.curr_experiment}: {self.m.curr_sample}')
+        print(p.title)
 
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
