@@ -13,7 +13,7 @@ class Logistic3(FunctionRegistry):
         for d, ki_guess in zip(data, concs):
             if d < vmax_guess / 2:
                 yield (vmax_guess, ki_guess)
-        yield (vmax_guess, concs[0]*4)
+        yield (vmax_guess, concs[-1]/4)
 
     def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration

@@ -30,7 +30,7 @@ def uploader():
         kf_temp.close()
         kf.save(kf_temp.name)
 
-        settings = ParserRegistry.plugins['small_fra'](
+        settings = ParserRegistry.plugins['large_fra'](
                 kf_temp.name, df_temp.name)()
         jm = JasprModel().set_defaults(settings)
     return redirect("/", code=302)
