@@ -6,3 +6,4 @@ app/temp/
 *.pyc
 Notes.html
 *.egg-info
+build/.env
