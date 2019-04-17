@@ -76,7 +76,7 @@ class JasprChart(object):
             fit_function = FunctionRegistry.plugins[plugin_name]()
             fit_result = fit_function(self.m.x_array, self.m.y_array)
             x = get_x_spacing()
-            y = fit_function._calculate(fit_result[0], x)
+            y = fit_function._calculate(fit_result.x, x)
 
             lsource = ColumnDataSource({'x': x, 'y': y})
             glyph = Line(x='x', y='y', line_color='#3aaf13',
@@ -133,7 +133,7 @@ class JasprChart(object):
             p=self._create_chart()
             p.toolbar_location=None
             pngFile_temp = f"{uuid4()}.png"
-            export_png(p,filename=f"{app.TEMPFILEDIR}/{pngFile_temp}")
+            export_png(p,filename=f"tmp/{pngFile_temp}")
             png_list.append(pngFile_temp)
 
         return png_list

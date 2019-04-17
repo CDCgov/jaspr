@@ -1,6 +1,5 @@
 Flask
 flask-debugtoolbar
-itsdangerous
 Flask-Session
 Bokeh
 Pandas

@@ -27,6 +27,9 @@ class Anscombe(ParserRegistry):
     name = 'anscombe'
     description = 'Anscombe Quartet'
 
+    def __init__(self, *args):
+        pass
+
     def __call__(self):
         return {
             'show_fit': True,

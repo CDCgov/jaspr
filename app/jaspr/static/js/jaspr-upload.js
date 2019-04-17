@@ -1,6 +1,14 @@
 $(function() {
 
-  // We can attach the `fileselect` event to all file inputs on the page
+  // selection on a bootstrap dropdown list
+  $('.dropdown-menu').click(function(e) {
+    $("#dropdownMenuButton").text(e.target.innerText)
+    $.post("/updateConfigSetting",{
+        curr_parser : e.target.innerText
+    });
+  });
+
+  // set a custom `fileselect` event to all file inputs on the page
   $(document).on('change', ':file', function() {
     var input = $(this),
         numFiles = input.get(0).files ? input.get(0).files.length : 1,
@@ -8,7 +16,7 @@ $(function() {
     input.trigger('fileselect', [numFiles, label]);
   });
 
-  // We can watch for our custom `fileselect` event like this
+  // watch for custom `fileselect` event
   $(document).ready( function() {
       $(':file').on('fileselect', function(event, numFiles, label) {
 

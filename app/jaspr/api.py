@@ -8,31 +8,31 @@ from jaspr.model import JasprModel
 from outlet import ParserRegistry
 
 
+def save_tmpfile(upload_handle):
+    """Save uploaded files to /tmp"""
+    tmp_handle = NamedTemporaryFile(delete=False)
+    tmp_handle.close()
+    upload_handle.save(tmp_handle.name)
+    return tmp_handle.name
+
+
 @app.route('/updateConfigSetting', methods=['POST'])
 def updateConfigSetting():
     jm = JasprModel()
-    print(request.form)
     for k, v in request.form.items():
         jm.update_attribute(k, v)
     return 'true'
 
 
-@app.route('/uploader', methods = ['POST'])
-def uploader():
-    if request.method == 'POST':
-        df = request.files['datafile']
-        df_temp = NamedTemporaryFile(delete=False, dir=app.TEMPFILEDIR)
-        df_temp.close()
-        df.save(df_temp.name)
+@app.route('/upload', methods = ['POST'])
+def upload():
+    datafile = save_tmpfile(request.files['datafile'])
+    keyfile = save_tmpfile(request.files['keyfile'])
 
-        kf = request.files['keyfile']
-        kf_temp = NamedTemporaryFile(delete=False, dir=app.TEMPFILEDIR)
-        kf_temp.close()
-        kf.save(kf_temp.name)
-
-        settings = ParserRegistry.plugins['large_fra'](
-                kf_temp.name, df_temp.name)()
-        jm = JasprModel().set_defaults(settings)
+    jm = JasprModel()
+    settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+    jm = JasprModel().set_defaults(settings)
+        
     return redirect("/", code=302)
    
 

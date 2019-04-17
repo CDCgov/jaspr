@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-	{% include "head.html" %}
 
-	<body>
-		<div class="content-container h-100">
-			{% include "nav.html" %}
-			{% block body %}Body Code Here{% endblock %}
-			{% include "footer.html" %}
-		</div>
-		{% block pagescript %}
-		<!--javascript inserted here if needed -->{% endblock %}
-	</body>
+  {% include "head.html" %}
+
+  <body>
+
+    <main class='site-content'>
+
+	  {% include "nav.html" %}
+
+      {% block body %}Body Code Here{% endblock %}
+
+    </main>
+
+    <footer>
+      {% include "footer.html" %}
+    </footer>
+
+	{% block pagescript %}
+	  <!--javascript inserted here if needed -->
+    {% endblock %}
+
+  </body>
 
 </html>

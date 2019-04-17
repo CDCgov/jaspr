@@ -4,33 +4,29 @@
 <script src={{ url_for('static', filename='js/jaspr-report.js') }}></script>
 
 {% for pngImage in pngList %}
-
-{% if loop.index is not divisibleby 2 %}
-<div class="row">
-  <div class="column">
+  {% if loop.index is not divisibleby 2 %}
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="column">
   		<img src="/reportpngs/{{pngImage}}" style="width:400px;height:400px;">
-  </div>
-{% endif %}
+      </div>
+  {% endif %}
 
-{% if loop.index is divisibleby 2 %}
-  <div class="column">
-	  		<img src="/reportpngs/{{pngImage}}" style="width:400px;height:400px;">
-  </div>
-{% endif %}
+  {% if loop.index is divisibleby 2 %}
+    <div class="column">
+	  <img src="/reportpngs/{{pngImage}}" style="width:400px;height:400px;">
+    </div>
+  {% endif %}
 
-{%if loop.index is divisibleby 2 or loop.last %}
-</div>
-{% endif %}
+  {%if loop.index is divisibleby 2 or loop.last %}
+    </div>
+  {% endif %}
 
 {% endfor %}
 
+<div class="row">&nbsp;</div>
 <div class="row">
-&nbsp
-</div>
-<div class="row">
-	<div class="col text-center">
-		<a href="\" class="btn btn-primary">Return</a>
-	</div>
+  <div class="col text-center"><a href="/" class="btn btn-primary">Return</a></div>
 </div>
 {%endblock%}
 </body>
