@@ -11,7 +11,7 @@ as they follow the documented pattern.
 
 """
 
-from scipy.optimize import leastsq
+from scipy.optimize import least_squares
 
 
 class PluginMount(type):
@@ -64,13 +64,22 @@ class FunctionRegistry(object, metaclass=PluginMount):
         Iterate through initial guesses for the fitting parameters until
         initial guesses are exhausted, or the least squares converges
 
+        least_sqares uses Trust Region Reflective (TRF) algorithm, as
+        opposed to Levenberg-Marquardt (LM) used previously.  The
+        soft_l1 loss func minimizes influence of outliers.  There are
+        options to go to constrained fits as needed.
+
         """
         for params in self._guess_params(x_data, y_data):
-            fit = leastsq(self._residuals, params,
-                    args=(x_data, y_data))
+            fit = least_squares(self._residuals, params, loss='soft_l1',
+                    verbose=2, args=(x_data, y_data))
 
-            if 0 < fit[-1] < 5:
+            #fit = least_squares(self._residuals, params, method='lm',
+            #        verbose=2, args=(x_data, y_data))
+
+            if fit.success:
                 # indicates we've converged, stop guessing
+                print (fit.fun)
                 break
         return fit
 

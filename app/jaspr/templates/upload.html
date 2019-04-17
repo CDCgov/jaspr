@@ -1,40 +1,73 @@
 {% extends "jaspr_layout.html" %}
 {% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
+<script src={{ url_for('static', filename='js/jaspr-upload.js') }}></script>
+
 <div class="row">
-  <div class="col-3">
-  </div>
-  <div class="col-6">
-    <script src={{ url_for('static', filename='js/jaspr-upload.js') }}></script>
-    <h1>File Processing selection</h1>
-    <form action="/uploader" method="POST" enctype="multipart/form-data">
-      <div class="input-group">
-        <label class="input-group-btn">
-          <span class="btn btn-primary">
-            Browse&hellip; <input name ='datafile' type="file" style="display: none;" multiple>
-          </span>
-        </label>
-        <input type="text" class="form-control" readonly>
-      </div>
-      <span class="help-block">
-        select a data file for the samples being uploaded
-      </span>
-      <div class="input-group">
-        <label class="input-group-btn">
-          <span class="btn btn-primary">
-            Browse&hellip; <input name ='keyfile' type="file" style="display: none;" multiple>
-          </span>
-        </label>
-        <input type="text" class="form-control" readonly>
-      </div>
-      <span class="help-block">
-        select a key file for the samples being uploaded
-      </span>
-      <br>
-      <input class="btn" type="submit" />
-    </form>
-  </div>
   <div class="col-3"></div>
+  <div class="col-6"><h1>File Selection</h1></div>
 </div>
-</div>
+
+<form action="/upload" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <div class="dropdown">
+       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+         {{ curr_parser or ' -- Select a parser -- ' }}
+       </button>
+       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+         {% for parser in parser_list %}
+           <a class="dropdown-item" href="#">{{ parser }}</a>
+         {% endfor %}
+       </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-2 align-right">Data file</div>
+    <div class="col-6">
+      <div class="input-group">
+        <label class="input-group-btn">
+          <span class="btn btn-primary">
+            Browse&hellip; <input name ='datafile' type="file" multiple>
+          </span>
+        </label>
+        <input type="text" class="form-control" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-2 align-right">Key file</div>
+    <div class="col-6">
+      <div class="input-group">
+        <label class="input-group-btn">
+          <span class="btn btn-primary">
+            Browse&hellip; <input name ='keyfile' type="file" multiple>
+          </span>
+        </label>
+        <input type="text" class="form-control" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <input class="btn" type="submit" />
+    </div>
+  </div>
+
+</form>
+
+<br />
+<br />
+
 {%endblock%}

@@ -30,15 +30,15 @@ def reset():
 
 @app.route('/upload')
 def upload_file():
-   return render_template('upload.html')
+    jm = JasprModel()
+    return render_template('upload.html', **jm.context)
 
 
 @app.route('/settings')
 def settings():
     """render the settings page"""
     jm = JasprModel()
-    context = jm.context
-    return render_template('settings.html', **context)
+    return render_template('settings.html', **jm.context)
 
 
 @app.route('/')
@@ -85,4 +85,4 @@ def report():
 
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):
-    return send_from_directory(f"/app/{app.TEMPFILEDIR}", filename)
+    return send_from_directory(f"/app/tmp", filename)

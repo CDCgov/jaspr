@@ -10,20 +10,33 @@ body {
   font-family: helvetica, arial, sans;
 }
 
+.site-content {
+  flex: 1;
+}
+
 .menubar {
 height: 35px;
+}
+
+.align-right {
+  text-align: right;
 }
 
 .content-row {
   min-height: 600px /*ensure enough room for decent size graph image*/
 }
+
 .selector {
   background-color: #f5f5f5;
 }
 
 .footer {
-  height: 35px;
+  margin-top: 100px;
   text-align: center;
   font-weight: bold;
   color: white;
+}
+
+input[type="file"] {
+    display: none;
 }

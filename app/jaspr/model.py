@@ -34,6 +34,7 @@ class JasprModel(object):
         # ui state settigns
         self.curr_experiment = ''
         self.curr_sample = ''
+        self.curr_parser = ''
         self.curr_function = 'linear'
 
         self.experiments = {}
@@ -46,12 +47,12 @@ class JasprModel(object):
             setattr(self, k, v)
         self.update_session(default=True)
 
-
     @property
     def context(self):
         context = self.__dict__
         context['experiment_list'] = self.experiment_list
         context['function_list'] = self.function_list
+        context['parser_list'] = self.parser_list
         context['sample_list'] = self.sample_list
         return context
 
@@ -59,6 +60,11 @@ class JasprModel(object):
     def function_list(self):
         """List fitting function plugins"""
         return list(FunctionRegistry.plugins)
+
+    @property
+    def parser_list(self):
+        """List file parsing plugins"""
+        return list(ParserRegistry.plugins)
 
     @property
     def experiment_list(self):
