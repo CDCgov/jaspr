@@ -16,11 +16,8 @@ class Logistic4(FunctionRegistry):
                 yield (vmax_guess, ki_guess, h_guess)
         yield (vmax_guess, concs[-1]/4, h_guess)
 
-
     def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration
-
-            rate = Vmax * (1 - (1 /(1 + (Ki + c)^-h)))
 
         * Vmax is the reaction rate when no inhibitor is present.
 
@@ -28,17 +25,24 @@ class Logistic4(FunctionRegistry):
           inhibitor and the enzyme.  It is equal to the concentration of
           inhibitor where rate/Vmax = 1/2.  This is also known as IC50.
 
-        * c is the concentration of inhibitor.
-
-        * h is <<<<Todo: James needs to tell us what this is >>>>
+        * h is the Hill coefficient (a slope correction factor)
 
         """
         Vmax = params[0]
         Ki = params[1]
         h = params[2]
-        self.labels = {'IC50': Ki, 'titer': 1 / Ki, 'h': h, 'Vmax': Vmax}
 
         return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
 
-    def _labels(self):
-        return self.labels
+    def labels(self, params):
+        Vmax = params[0]
+        Ki = params[1]
+        h = params[2]
+        titer = 1 / Ki
+
+        return {
+            'titer': f'{titer:.0f}',
+            'h': f'{h:.2f}',
+            'Vmax': f'{Vmax:.0f}',
+            'IC50': f'{Ki:.3g}',
+        }

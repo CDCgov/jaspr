@@ -77,6 +77,7 @@ class JasprChart(object):
             fit_result = fit_function(self.m.x_array, self.m.y_array)
             x = get_x_spacing()
             y = fit_function._calculate(fit_result.x, x)
+            labels = fit_function.labels(fit_result.x)
 
             lsource = ColumnDataSource({'x': x, 'y': y})
             glyph = Line(x='x', y='y', line_color='#3aaf13',
@@ -84,8 +85,8 @@ class JasprChart(object):
             p.add_glyph(lsource, glyph)
 
             chart_labels = [fit_function.description]
-            for key, value in fit_function.labels.items():
-                chart_labels.append(f' - {key}: {value:6.3g}')
+            for key, value in labels.items():
+                chart_labels.append(f' - {key}: {value}')
 
             #add label
             offset = 1

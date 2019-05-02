@@ -18,15 +18,11 @@ class Logistic3(FunctionRegistry):
     def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration
 
-            rate = Vmax * (1 - (c / (Ki + c)))
-
         * Vmax is the reaction rate when no inhibitor is present.
 
         * Ki is the equilibrium constant for the interation between the
           inhibitor and the enzyme.  It is equal to the concentration of
           inhibitor where rate/Vmax = 1/2.  This is also known as IC50.
-
-        * c is the concentration of inhibitor.
 
         """
         Vmax =  params[0]
@@ -34,5 +30,13 @@ class Logistic3(FunctionRegistry):
         self.labels = {'IC50': Ki, 'titer': 1 / Ki}
         return Vmax * (1 - (concs / (Ki + concs)))
 
-    def _labels(self):
-        return self.labels
+    def labels(self, params):
+        Vmax = params[0]
+        Ki = params[1]
+        titer = 1 / Ki
+
+        return {
+            'titer': f'{titer:.0f}',
+            'Vmax': f'{Vmax:.0f}',
+            'IC50': f'{Ki:.3g}',
+        }

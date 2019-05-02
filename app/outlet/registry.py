@@ -12,6 +12,7 @@ as they follow the documented pattern.
 """
 
 from scipy.optimize import least_squares
+from numpy import inf
 
 
 class PluginMount(type):
@@ -49,9 +50,6 @@ class FunctionRegistry(object, metaclass=PluginMount):
                ...
                return dependent_array
 
-        * __returnParms()
-               # a function that returns an array of KVP for return descriptors
-
     """
 
     def _residuals(self, params, independent_array, data_array):
@@ -71,7 +69,8 @@ class FunctionRegistry(object, metaclass=PluginMount):
 
         """
         for params in self._guess_params(x_data, y_data):
-            fit = least_squares(self._residuals, params, loss='soft_l1',
+            fit = least_squares(self._residuals, params,
+                    loss='soft_l1', x_scale='jac', f_scale=50,
                     verbose=2, args=(x_data, y_data))
 
             #fit = least_squares(self._residuals, params, method='lm',
