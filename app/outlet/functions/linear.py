@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+# file outlet/functions/linear.py
+
+"""A linear fitting function
+
+
+
+"""
 
 from outlet import FunctionRegistry
 

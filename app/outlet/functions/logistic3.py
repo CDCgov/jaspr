@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
+"""A standard logistic curve fitting function
+
+"""
+
 from outlet import FunctionRegistry
 
 
 class Logistic3(FunctionRegistry):
-    name = 'logistic3'
+    name = 'met_logistic3'
     description = '3-parameter logistic'
 
     def _guess_params(self, concs, data):
@@ -29,6 +33,8 @@ class Logistic3(FunctionRegistry):
         Ki = params[1]
         self.labels = {'IC50': Ki, 'titer': 1 / Ki}
         return Vmax * (1 - (concs / (Ki + concs)))
+
+    def __call__(self, x_data, y_data):
 
     def labels(self, params):
         Vmax = params[0]
