@@ -1,9 +1,12 @@
-Flask
+flask
+blinker
 flask-debugtoolbar
-Flask-Session
-Bokeh
-Pandas
+bokeh
+pandas
 xlrd
 markdown
 scipy
-redis
+redis-py
+phantomjs
+selenium=3.14.1
+uwsgi

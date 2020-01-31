@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+# file outlet/functions/linear.py
+
+"""A linear fitting function
+
+
+
+"""
 
 from outlet import FunctionRegistry
 
@@ -17,5 +24,12 @@ class LinearRegression(FunctionRegistry):
         """evaluate"""
         slope = params[0]
         intercept = params[1]
-        self.labels = {'slope': slope, 'intercept': intercept}
         return slope * concs + intercept
+
+    def labels(self, params):
+        slope = params[0]
+        intercept = params[1]
+        return {
+            'slope': f'{slope:.3f}',
+            'intercept': f'{intercept:.3f}',
+        }
