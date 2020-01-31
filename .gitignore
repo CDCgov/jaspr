@@ -4,6 +4,7 @@ app/temp/
 *~
 *.*.*~
 *.pyc
+*.swp
 Notes.html
 *.egg-info
 build/.env
