@@ -34,8 +34,6 @@ class Logistic3(FunctionRegistry):
         self.labels = {'IC50': Ki, 'titer': 1 / Ki}
         return Vmax * (1 - (concs / (Ki + concs)))
 
-    def __call__(self, x_data, y_data):
-
     def labels(self, params):
         Vmax = params[0]
         Ki = params[1]

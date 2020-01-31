@@ -1,37 +1,25 @@
-#gather miniconda
+# gather miniconda
 FROM continuumio/miniconda3
-
 MAINTAINER Garrett Peterson "garrettp@yaharasoftware.com"
-
-RUN apt-get update
-RUN apt-get -y dist-upgrade
-RUN apt-get -yq install net-tools nginx python-pip
 
 # Copy the current directory contents into the container at /build
 ADD . /build
-
-# Set the working directory to /build
 WORKDIR /build
 
-# Update pip
-RUN pip install --upgrade pip
-
-# Add libraries we need have
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-
+# update conda, create a new env, and install dependencies
+# docker reccomends don't apt-get upgrade if you can avoid it
 RUN conda update -n base -c defaults conda
-RUN conda install -c conda-forge phantomjs
-RUN conda install -c conda-forge selenium=3.14.1
-RUN conda install -c conda-forge uwsgi
+RUN conda create -y --name jaspr -c conda-forge --file requirements.txt
 
-WORKDIR /app
-
-EXPOSE 5000
-
-EXPOSE 5003
-
-ENV LISTEN_PORT 5003
+# to install to our new env, activate the env, then use pip3 to install
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
+    pip install flask-session
 
 VOLUME /app
+WORKDIR /app
 
-CMD /bin/bash -i -c "pip install -e . "; uwsgi --ini app.ini
+#CMD /bin/bash -i
+#CMD /bin/bash -i -c "pip install -e . "; uwsgi --ini app.ini
+CMD . /opt/conda/etc/profile.d/conda.sh && \
+    conda activate jaspr && pip install -e . && \
+    uwsgi --ini app.ini -H /opt/conda/envs/jaspr
