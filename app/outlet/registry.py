@@ -56,7 +56,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
         """Calculate the distance between each observed and calculated value"""
         return data_array - self._calculate(params, independent_array)
 
-    def __call__(self, x_data, y_data):
+    def __call__(self, x_data, y_data, **kwargs):
         """Fit the function to the data
 
         Iterate through initial guesses for the fitting parameters until
@@ -70,7 +70,7 @@ class FunctionRegistry(object, metaclass=PluginMount):
         """
         for params in self._guess_params(x_data, y_data):
             fit = least_squares(self._residuals, params,
-                    loss='soft_l1', x_scale='jac', f_scale=50,
+                    loss='soft_l1', x_scale='jac', f_scale=0.1,
                     verbose=2, args=(x_data, y_data))
 
             #fit = least_squares(self._residuals, params, method='lm',
