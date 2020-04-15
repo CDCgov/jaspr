@@ -1,6 +1,7 @@
 __pycache__/
 flask_session/
 app/temp/
+app/tmp/
 *~
 *.*.*~
 *.pyc
