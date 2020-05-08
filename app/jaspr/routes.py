@@ -74,6 +74,11 @@ def drawWidgetHTML():
     chart = JasprChart()
     return jsonify(chart())
 
+@app.route('/reportPNG', methods=["GET"])
+def reportPngs():
+    jc = JasprChart()
+    pngList = jc.get_pngs()
+    return render_template('reportPNG.html', pngList=pngList)
 
 @app.route('/report', methods=["GET"])
 def report():
