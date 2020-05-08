@@ -78,10 +78,12 @@ def drawWidgetHTML():
 @app.route('/report', methods=["GET"])
 def report():
     """render the reports"""
-    jc = JasprChart()
-    pngList = jc.get_pngs()
-    return render_template('report.html', pngList=pngList)
-
+    #The charting report is broken so we bypass it for now
+    # to make progress on other reports
+    # jc = JasprChart()
+    # pngList = jc.get_pngs()
+    #return render_template('report.html', pngList=pngList)
+    return render_template ('report.html')
 
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):
