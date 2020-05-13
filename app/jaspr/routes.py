@@ -7,16 +7,20 @@
 # python imports
 import json
 from urllib.parse import unquote
+from pandas import pandas as pd
+from io import BytesIO
 
 # flask imports
 from flask import render_template, request, \
-        jsonify, redirect, make_response, send_from_directory
+        jsonify, redirect, make_response, send_from_directory, send_file
 
 # local imports
 from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charts import JasprChart
 from outlet import FunctionRegistry
+
+
 
 
 @app.route('/reset')
@@ -93,3 +97,22 @@ def report():
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):
     return send_from_directory(f"/app/tmp", filename)
+
+@app.route('/reportExcel')
+def reportexcel():
+    """Generate Excel Report"""
+    jm = JasprModel()
+    # df = pd.DataFrame({'Data': [10,20,40,20,15,30,45]})
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    # loop sample sets
+    for sample_set in jm.sample_list:
+        df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
+        df.to_excel(writer, sheet_name=sample_set)
+    
+    writer.close()
+
+    output.seek(0)
+    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
