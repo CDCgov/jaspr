@@ -110,7 +110,7 @@ def reportexcel():
     # loop sample sets
     for sample_set in jm.sample_list:
         df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
-        df.to_excel(writer, sheet_name=sample_set)
+        df.to_excel(writer, sheet_name=sample_set, index=False)
     
     writer.close()
 
