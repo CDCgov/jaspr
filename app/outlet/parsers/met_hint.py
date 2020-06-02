@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
 # python imports
+import itertools
+from collections import OrderedDict
+
+import pandas as pd
+import numpy as np
+
 from io import StringIO
 from zipfile import ZipFile
-from pandas import read_excel
-import numpy as np
 
 # jaspr imports
 from outlet import ParserRegistry
@@ -20,8 +24,9 @@ class HintBase(object):
     """
 
     def __init__(self, keyfile, datafile):
-        self.sera, self.starting_titers = self._get_sera(keyfile)
-        self.viruses = self._get_viruses(keyfile)
+        self.sera, self.starting_titers, sera_details = \
+                self._get_sera(keyfile)
+        self.viruses, virus_details = self._get_viruses(keyfile)
 
         self.dilutions = {}
         for titer in self.starting_titers:
@@ -31,87 +36,69 @@ class HintBase(object):
             'show_fit': True,
             'blank_correction': True,
             'x_axis_type': 'log',
-            'curr_function' : 'logistic4',
+            'curr_function' : 'logistic3',
+            'experiments': self._get_all_experiments(datafile),
+            'sera': sera_details,
+            'viruses': virus_details,
         }
 
-        self.data['experiments'] = self._get_all_experiments(datafile)
-
     def _get_sera(self, keyfile):
-        df = read_excel(keyfile, sheet_name='Sera')
-        return list(df['Sera']), list(df['Starting titer'])
+        df = pd.read_excel(keyfile, sheet_name='Sera')
+        return list(df['Sera']), list(df['Starting titer']), \
+                df.to_dict('index')
 
     def _get_viruses(self, keyfile):
-        df = read_excel(keyfile, sheet_name='Viruses')
-        return [f"{row['ID']} {row['Strain Name (optional)']}"
-                for index, row in df.iterrows()]
+        df = pd.read_excel(keyfile, sheet_name='Viruses')
+        return [f"{row['ID']} {row['Strain name']}"
+                for index, row in df.iterrows()], \
+                df.to_dict('index')
 
     def _get_dilutions(self, start_titer):
         if start_titer not in self.dilutions:
             self.dilutions[start_titer] = [
-                    1/(start_titer * pow(2, i)) for i in range(8)]
-
-    def _get_single_experiment(self, df, control_col=11):
-        cc = np.mean(df[control_col][4:8])
-        vc = np.mean(df[control_col][0:4]) - cc
-
-        exp = {
-            'x_axis_label': 'Dilution (conc)',
-            'y_axis_label': 'Foci above Background (count)',
-            'data': {},
-            'cc': cc,
-            'vc': vc,
-        }
-
-        for label, titer, col in \
-                zip(self.sera, self.starting_titers, range(control_col)):
-            exp['data'][label] = {
-                'x_values': self.dilutions[titer],
-                'y_values': list(df[col]),
-                'y_corrected': list(df[col] - cc),
-            }
-
-        return exp
-
-    def _get_plate_experiments(self, index, df):
-        return ((index, self._get_single_experiment(df)), )
+                    1/(start_titer * pow(2, i)) for i in range(11)]
+            self.dilutions[start_titer][-1] = 0
 
     def _get_all_experiments(self, datafile):
-        raw_exps = []
-        with ZipFile(datafile) as zf_handle:
-            for plate_name in zf_handle.namelist():
-                index = int(plate_name.split('.')[0])
-                df = read_excel(zf_handle.open(plate_name),
-                        skiprows=34, index_col=None, nrows=8,
-                        usecols='C:N', names=range(0,12),
-                        header=None, convert_float=False)
+        experiments = {}
+        df = pd.read_csv('data')
 
-                raw_exps.extend(self._get_plate_experiments(index, df))
+        # Reshape our date to 12-long rows, and capture the last column
+        # as per-plate averaged background
+        grid, background = np.split(np.reshape(
+                df['SelectedObjectCount'].to_numpy(), (-1, 12)), [11], axis=1)
+        mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
 
-        raw_exps.sort()
-        return dict((virus, exp)
-                for virus, (index, exp) in zip(self.viruses, raw_exps))
+        v_count = len(self.viruses)
+        for s_index, serum in enumerate(self.sera):
+            for v_index, (virus, titer, row) in enumerate(
+                    zip(self.viruses, self.starting_titers,
+                    grid[v_count*s_index:v_count*(s_index+1)])):
+                cc = background[(v_count*s_index+v_index)//8]
+                vc = row[10] - cc
+
+                exp = experiments.get(virus, {
+                    'x_axis_label': 'Dilution (conc)',
+                    'y_axis_label': 'Infected Cells (count)',
+                    'data': {},
+                    'cc': cc,
+                    'vc': vc,
+                })
+                exp['data'][serum] = {
+                    'x_values': self.dilutions[titer],
+                    'y_values': list(row),
+                    'y_corrected': list(row - cc),
+                    'cc': cc,
+                }
+
+                experiments[virus] = exp
+
+        return experiments
 
     def __call__(self):
         return self.data
 
 
-#class LargeFraParser(FraBase, ParserRegistry):
-#    name = 'large_fra'
-#    description = 'VRT large-format FRA parser'
-#
-#
-#class SmallFraParser(FraBase, ParserRegistry):
-#    name = 'small_fra'
-#    description = 'VRT small-format FRA parser'
-#
-#    def _get_plate_experiments(self, index, df):
-#        # split our primary plate into two half-size plates and renumber
-#        # the columns for the second one to be identical to the first
-#        dfa, dfb = np.split(df, 2, axis=1)
-#        dfb.columns = dfa.columns
-#
-#        return (
-#                ((index, 'a'),
-#                    self._get_single_experiment(dfa, control_col=5)),
-#                ((index, 'b'),
-#                    self._get_single_experiment(dfb, control_col=5)), )
+class HintCx5Parser(HintBase, ParserRegistry):
+    name = 'hint_cx5'
+    description = 'MET CX5 HINT parser'
