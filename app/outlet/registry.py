@@ -82,7 +82,6 @@ class FunctionRegistry(object, metaclass=PluginMount):
                 break
         return fit
 
-
 class ParserRegistry(object, metaclass=PluginMount):
     """Registry of known parsers for various data formats
 
