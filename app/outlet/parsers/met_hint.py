@@ -11,7 +11,13 @@ from io import StringIO
 from zipfile import ZipFile
 
 # jaspr imports
-from outlet import ParserRegistry
+from outlet import ParserRegistry, FunctionRegistry
+
+
+def fit(plugin_name, x_data, y_data):
+    fitter = FunctionRegistry.plugins[plugin_name]()
+    result = fitter(x_data, y_data)
+    return fitter.labels(result.x)
 
 
 class HintBase(object):
@@ -36,7 +42,7 @@ class HintBase(object):
             'show_fit': True,
             'blank_correction': True,
             'x_axis_type': 'log',
-            'curr_function' : 'logistic3',
+            'curr_function' : 'logistic4',
             'experiments': self._get_all_experiments(datafile),
             'sera': sera_details,
             'viruses': virus_details,
@@ -44,7 +50,7 @@ class HintBase(object):
 
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
-        return list(df['Sera']), list(df['Starting titer']), \
+        return list(df['Sera ID']), list(df['Starting titer']), \
                 df.to_dict('index')
 
     def _get_viruses(self, keyfile):
@@ -57,43 +63,14 @@ class HintBase(object):
         if start_titer not in self.dilutions:
             self.dilutions[start_titer] = [
                     1/(start_titer * pow(2, i)) for i in range(11)]
-            self.dilutions[start_titer][-1] = 0
+            # set the no-sera concentration to three logs below the
+            # actual last dilution
+            self.dilutions[start_titer][-1] = \
+                    self.dilutions[start_titer][-1] / 4
 
     def _get_all_experiments(self, datafile):
-        experiments = {}
-        df = pd.read_csv('data')
-
-        # Reshape our date to 12-long rows, and capture the last column
-        # as per-plate averaged background
-        grid, background = np.split(np.reshape(
-                df['SelectedObjectCount'].to_numpy(), (-1, 12)), [11], axis=1)
-        mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
-
-        v_count = len(self.viruses)
-        for s_index, serum in enumerate(self.sera):
-            for v_index, (virus, titer, row) in enumerate(
-                    zip(self.viruses, self.starting_titers,
-                    grid[v_count*s_index:v_count*(s_index+1)])):
-                cc = background[(v_count*s_index+v_index)//8]
-                vc = row[10] - cc
-
-                exp = experiments.get(virus, {
-                    'x_axis_label': 'Dilution (conc)',
-                    'y_axis_label': 'Infected Cells (count)',
-                    'data': {},
-                    'cc': cc,
-                    'vc': vc,
-                })
-                exp['data'][serum] = {
-                    'x_values': self.dilutions[titer],
-                    'y_values': list(row),
-                    'y_corrected': list(row - cc),
-                    'cc': cc,
-                }
-
-                experiments[virus] = exp
-
-        return experiments
+        # override this function
+        return {}
 
     def __call__(self):
         return self.data
@@ -102,3 +79,53 @@ class HintBase(object):
 class HintCx5Parser(HintBase, ParserRegistry):
     name = 'hint_cx5'
     description = 'MET CX5 HINT parser'
+
+    def _get_all_experiments(self, datafile):
+        experiments = {}
+        df = pd.read_csv(datafile)
+
+        # Reshape our data to 12-long rows, and capture the last column
+        # as per-plate averaged background
+        grid, background = np.split(np.reshape(
+                df['SelectedObjectCount'].to_numpy(),
+                (-1, 12)), [11], axis=1)
+        grid = grid.astype('float64')
+        mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
+
+        new_exp = {
+            'x_axis_label': 'Dilution (conc)',
+            'y_axis_label': 'Infected Cells (count)',
+            'data': {},
+            'results': {
+                'logistic3': {},
+                'logistic4': {}
+            }
+        }
+
+        v_count = len(self.viruses)
+        for s_index, (titer, serum) in enumerate(
+                zip(self.starting_titers, self.sera)):
+            for v_index, (virus, row) in \
+                    enumerate(zip(self.viruses,
+                        grid[v_count*s_index:v_count*(s_index+1)])):
+                cc = mean_background[(v_count*s_index+v_index)//8]
+                vc = row[10] - cc
+
+                exp = experiments.get(virus, new_exp.copy())
+                y_corrected = list(row - cc)
+                exp['data'][serum] = {
+                    'x_values': self.dilutions[titer],
+                    'y_values': list(row),
+                    'y_corrected': y_corrected,
+                }
+                experiments[virus] = exp
+
+                x_fit = self.dilutions[titer].copy()
+                x_fit[-1] = 0
+                for plugin_name in exp['results'].keys():
+                    labels = fit(plugin_name, x_fit, y_corrected)
+                    labels['cc'] = str(cc)
+                    labels['vc'] = str(vc)
+                    exp['results'][plugin_name][serum] = labels
+
+        return experiments
