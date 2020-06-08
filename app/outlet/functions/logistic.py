@@ -12,14 +12,14 @@ class Logistic3(FunctionRegistry):
     description = '3-parameter logistic'
 
     def __init__(self, *args, **kwargs):
-        self.vmax_multiplier = 1.0
+        self.vmax_multiplier = 0.5
         super().__init__(*args, **kwargs)
 
     def _guess_params(self, concs, data):
         """Generate intial guesses for fit params"""
         vmax_guess = max(data) * self.vmax_multiplier
         for d, ki_guess in zip(data, concs):
-            if d < vmax_guess / 2:
+            if d < vmax_guess:
                 yield (vmax_guess, ki_guess)
         yield (vmax_guess, concs[-1]/4)
 
