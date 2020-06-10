@@ -21,8 +21,6 @@ from jaspr.charts import JasprChart
 from outlet import FunctionRegistry
 
 
-
-
 @app.route('/reset')
 def reset():
     """reset UI to the default"""
@@ -89,10 +87,10 @@ def report():
     """render the reports"""
     #The charting report is broken so we bypass it for now
     # to make progress on other reports
-    # jc = JasprChart()
-    # pngList = jc.get_pngs()
-    #return render_template('report.html', pngList=pngList)
-    return render_template ('report.html')
+    jc = JasprChart()
+    pngList = jc.get_pngs()
+    return render_template('report.html', pngList=pngList)
+    #return render_template ('report.html')
 
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):
@@ -111,7 +109,7 @@ def reportexcel():
     for sample_set in jm.sample_list:
         df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
         df.to_excel(writer, sheet_name=sample_set, index=False)
-    
+
     writer.close()
 
     output.seek(0)
