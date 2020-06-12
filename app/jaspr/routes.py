@@ -107,10 +107,33 @@ def reportexcel():
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
+    sampleList = ["Virus"]
+    for sample in jm.sample_list:
+        sampleList.append(sample)
+        
+    sampleList.append("VC")
+    sampleList.append("CC")
+        
+    #df = pd.DataFrame(columns=sampleList)
+
+    rowList = []
+    
     # loop sample sets
-    for sample_set in jm.sample_list:
-        df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
-        df.to_excel(writer, sheet_name=sample_set, index=False)
+    for experiment in jm.experiment_list:
+        rowAdd = []
+        rowAdd.append(experiment)
+        for sample in jm.sample_list:
+            rowAdd.append(jm.experiments[experiment]['data'][sample]['y_values'][0])
+            
+        rowAdd.append(jm.experiments[experiment]['cc'])
+        rowAdd.append(jm.experiments[experiment]['vc'])
+        
+        rowList.append(rowAdd)
+        
+        #df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
+    
+    df = pd.DataFrame(rowList, columns=sampleList)
+    df.to_excel(writer, sheet_name="FRA", index=False)
     
     writer.close()
 
