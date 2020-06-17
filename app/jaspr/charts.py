@@ -8,18 +8,40 @@ import numpy as np
 from uuid import uuid4
 
 
-from bokeh.plotting import figure
 from bokeh.embed import components
+from bokeh.io import export_png
 from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
-from bokeh.models import Label
+from bokeh.models import TickFormatter, Label, AdaptiveTicker, FixedTicker
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
-from bokeh.io import export_png
+from bokeh.plotting import figure
+from bokeh.util.compiler import TypeScript
 
 from jaspr.model import JasprModel
 from jaspr import app
 from outlet import FunctionRegistry
+
+
+TS_CODE = """
+import {TickFormatter} from "models/formatters/tick_formatter"
+
+export class AntigenicFormatter extends TickFormatter {
+    doFormat(ticks: string[] | number[]) {
+        let formatted = []
+        for (let tick of ticks) {
+            let titer = String(1 / Number(tick))
+            formatted.push(titer)
+        }
+    return formatted
+    }
+}
+"""
+
+
+class AntigenicFormatter(TickFormatter):
+
+    __implementation__ = TypeScript(TS_CODE)
 
 
 class JasprChart(object):
@@ -63,9 +85,13 @@ class JasprChart(object):
 
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
-            p.xaxis[0].ticker.base = 2
-            p.xaxis[0].ticker.mantissas = (5, )
-            p.xaxis[0].formatter.ticker = p.xaxis[0].ticker
+            p.xaxis.ticker = FixedTicker(ticks=sorted([1/40, 1/160, 1/640, 1/2560, 1/10240,
+                1/40960, 1/163840, 1/655360]))
+            #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
+            #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
+            p.xaxis.formatter = AntigenicFormatter()
+            p.xaxis.minor_tick_line_color = None
+            p.xaxis.major_label_orientation = .70
 
         y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
         p.circle(x='x_values', y=y_series, size=10,
@@ -129,15 +155,15 @@ class JasprChart(object):
 
     def get_pngs(self):
         png_list = []
-        for experiment in self.m.experiment_list:
-            self.m.curr_experiment = experiment
-            for sample in self.m.sample_list:
-                self.m.curr_sample = sample
-                p = self._create_chart()
-                p.toolbar_location=None
-                pngFile_temp = f"{uuid4()}.png"
-                export_png(p, filename=f"tmp/{pngFile_temp}")
-                png_list.append(pngFile_temp)
+        #for experiment in self.m.experiment_list:
+        #    self.m.curr_experiment = experiment
+        for sample in self.m.sample_list:
+            self.m.curr_sample = sample
+            p = self._create_chart()
+            p.toolbar_location=None
+            pngFile_temp = f"{uuid4()}.png"
+            export_png(p, filename=f"tmp/{pngFile_temp}")
+            png_list.append(pngFile_temp)
 
         return png_list
 
