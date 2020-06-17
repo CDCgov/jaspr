@@ -4,9 +4,13 @@ flask-debugtoolbar
 bokeh
 pandas
 xlrd
+xlsxwriter
 markdown
 scipy
 redis-py
 phantomjs
 selenium=3.14.1
 uwsgi
+firefox
+geckodriver
+nodejs
