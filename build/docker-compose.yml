@@ -27,7 +27,7 @@ services:
         context: .
         dockerfile: dockerfile-nginx
       ports:
-        - 80:80
+        - 180:80
       depends_on:
         - jaspr
 

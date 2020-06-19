@@ -63,7 +63,7 @@ class JasprCharts(object):
 
         if bBlankCorrected == True:
             print(f"Blankcorrected data returned because bBlankCorrected is {bBlankCorrected}")
-            return pd.DataFrame(np.array([xSeries, blankCorrectedYSeries]).T, 
+            return pd.DataFrame(np.array([xSeries, blankCorrectedYSeries]).T,
                                 index=chartIndex,
                                 columns = [xLabel,yLabel])
         else:
