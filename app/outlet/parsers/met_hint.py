@@ -132,6 +132,7 @@ class HintCx5Parser(HintBase, ParserRegistry):
 
         return experiments
 
+
 class HintCeligoParser(HintCx5Parser):
     name = 'hint_celigo'
     description = 'MET Celigo HINT parser'
@@ -139,9 +140,9 @@ class HintCeligoParser(HintCx5Parser):
     def _parse_csv(self, datafile):
         plates = []
         with ZipFile(datafile, 'r') as zf_handle:
-            for index, plate_name in enumerate(sorted(
+            for plate_name in sorted(
                     [name for name in zf_handle.namelist()
-                    if name.endswith('.csv')])):
+                    if name.endswith('.csv')]):
                 df = pd.read_csv(zf_handle.open(plate_name),
                         skiprows=67, index_col=None, nrows=8,
                         usecols=range(1, 13), header=None, dtype=np.float64)
