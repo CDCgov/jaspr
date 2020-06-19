@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # python imports
+import copy
 import itertools
 from collections import OrderedDict
 
@@ -105,13 +106,15 @@ class HintCx5Parser(HintBase, ParserRegistry):
         v_count = len(self.viruses)
         for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
+            print(v_count, s_index, v_count*s_index, v_count*(s_index+1))
             for v_index, (virus, row) in \
                     enumerate(zip(self.viruses,
                         grid[v_count*s_index:v_count*(s_index+1)])):
                 cc = mean_background[(v_count*s_index+v_index)//8]
                 vc = row[10] - cc
+                print(v_index, virus, cc, vc, row)
 
-                exp = experiments.get(virus, new_exp.copy())
+                exp = experiments.get(virus, copy.deepcopy(new_exp))
                 y_corrected = list(row - cc)
                 exp['data'][serum] = {
                     'x_values': self.dilutions[titer],

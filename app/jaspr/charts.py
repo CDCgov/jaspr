@@ -64,6 +64,7 @@ class JasprChart(object):
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
             p.xaxis[0].ticker.base = 2
+            p.xaxis[0].ticker.mantissas = (5, )
             p.xaxis[0].formatter.ticker = p.xaxis[0].ticker
 
         y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
@@ -127,15 +128,16 @@ class JasprChart(object):
         return components(widgetbox(title, data_table))
 
     def get_pngs(self):
-        curr_sample = self.m.curr_sample
         png_list = []
-        for new_sample in self.m.sample_list:
-            self.m.curr_sample = new_sample
-            p=self._create_chart()
-            p.toolbar_location=None
-            pngFile_temp = f"{uuid4()}.png"
-            export_png(p,filename=f"tmp/{pngFile_temp}")
-            png_list.append(pngFile_temp)
+        for experiment in self.m.experiment_list:
+            self.m.curr_experiment = experiment
+            for sample in self.m.sample_list:
+                self.m.curr_sample = sample
+                p = self._create_chart()
+                p.toolbar_location=None
+                pngFile_temp = f"{uuid4()}.png"
+                export_png(p, filename=f"tmp/{pngFile_temp}")
+                png_list.append(pngFile_temp)
 
         return png_list
 
