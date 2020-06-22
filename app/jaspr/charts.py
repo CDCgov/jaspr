@@ -13,7 +13,8 @@ from bokeh.io import export_png
 from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
 from bokeh.models.glyphs import Line
-from bokeh.models import TickFormatter, Label, AdaptiveTicker, FixedTicker
+from bokeh.models import TickFormatter, Label, AdaptiveTicker, FixedTicker, \
+        LogTickFormatter
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 from bokeh.plotting import figure
 from bokeh.util.compiler import TypeScript
@@ -30,7 +31,7 @@ export class AntigenicFormatter extends TickFormatter {
     doFormat(ticks: string[] | number[]) {
         let formatted = []
         for (let tick of ticks) {
-            let titer = String(1 / Number(tick))
+            let titer = String(1000000 * Number(tick))
             formatted.push(titer)
         }
     return formatted
@@ -85,12 +86,14 @@ class JasprChart(object):
 
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
-            p.xaxis.ticker = FixedTicker(ticks=sorted([1/40, 1/160, 1/640, 1/2560, 1/10240,
-                1/40960, 1/163840, 1/655360]))
+            #p.xaxis.ticker = FixedTicker(ticks=sorted([1/40, 1/160, 1/640, 1/2560, 1/10240,
+            #    1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
             p.xaxis.formatter = AntigenicFormatter()
-            p.xaxis.minor_tick_line_color = None
+            #p.xaxis.formatter = LogTickFormatter()
+            #p.xaxis.minor_tick_line_color = None
+            p.x_range.flipped = True
             p.xaxis.major_label_orientation = .70
 
         y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
@@ -113,6 +116,7 @@ class JasprChart(object):
 
             chart_labels = [fit_function.description]
             for key, value in labels.items():
+                value = int(float(value) * 1000000) if key == 'IC50' else value
                 chart_labels.append(f' - {key}: {value}')
 
             #add label

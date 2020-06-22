@@ -2,13 +2,8 @@
 
 # python imports
 import copy
-import itertools
-from collections import OrderedDict
-
 import pandas as pd
 import numpy as np
-
-from io import StringIO
 from zipfile import ZipFile
 
 # jaspr imports
@@ -81,8 +76,7 @@ class HintCx5Parser(HintBase, ParserRegistry):
     name = 'hint_cx5'
     description = 'MET CX5 HINT parser'
 
-    def _get_all_experiments(self, datafile):
-        experiments = {}
+    def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
 
         # Reshape our data to 12-long rows, and capture the last column
@@ -91,6 +85,11 @@ class HintCx5Parser(HintBase, ParserRegistry):
                 df['SelectedObjectCount'].to_numpy(),
                 (-1, 12)), [11], axis=1)
         grid = grid.astype('float64')
+        return grid, background
+
+    def _get_all_experiments(self, datafile):
+        experiments = {}
+        grid, background = self._parse_csv(datafile)
         mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
 
         new_exp = {
@@ -132,3 +131,21 @@ class HintCx5Parser(HintBase, ParserRegistry):
                     exp['results'][plugin_name][serum] = labels
 
         return experiments
+
+
+class HintCeligoParser(HintCx5Parser):
+    name = 'hint_celigo'
+    description = 'MET Celigo HINT parser'
+
+    def _parse_csv(self, datafile):
+        plates = []
+        with ZipFile(datafile, 'r') as zf_handle:
+            for plate_name in sorted(
+                    [name for name in zf_handle.namelist()
+                    if name.endswith('.csv')]):
+                df = pd.read_csv(zf_handle.open(plate_name),
+                        skiprows=67, index_col=None, nrows=8,
+                        usecols=range(1, 13), header=None, dtype=np.float64)
+                plates.append(df)
+        return np.split(np.reshape(pd.concat(plates,
+                ignore_index=True).to_numpy(), (-1, 12)), [11], axis=1)
