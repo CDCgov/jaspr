@@ -98,6 +98,75 @@ def report():
 def reportpngs(filename):
     return send_from_directory(f"/app/tmp", filename)
 
+@app.route('/reportOther')
+def reportOther():
+    """Generate Excel Report"""
+    jm=JasprModel()
+    
+    output=BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    
+    headerList = [" "]
+    secondHeader = ["Virus"]
+    for sample in jm.sample_list:
+        headerList.append(sample)
+        secondHeader.append("IC50")
+        headerList.append("")
+        secondHeader.append("Vmax")
+        headerList.append("")
+        secondHeader.append("VC")
+        
+    rowList = []
+    rowList.append(secondHeader)    
+    
+    for experiment in jm.experiment_list:
+        rowAdd = []
+        rowAdd.append(experiment)
+        for sample in jm.sample_list:
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['IC50'])
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['vc'])
+        
+        rowList.append(rowAdd)
+    
+    df = pd.DataFrame(rowList, columns = headerList)
+    df.to_excel(writer, sheet_name="Report", index=False)
+    
+    writer.close()
+    
+    output.seek(0)
+    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
+
+@app.route('/reportTiter')
+def reportTiter():
+    """Generate Excel Report"""
+    jm=JasprModel()
+    
+    output=BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    
+    headerList = ["Virus"]
+    for sample in jm.sample_list:
+        headerList.append(sample)
+        
+    rowList = []
+    
+    for experiment in jm.experiment_list:
+        rowAdd = []
+        rowAdd.append(experiment)
+        for sample in jm.sample_list:
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
+            
+        rowList.append(rowAdd)
+        
+    df = pd.DataFrame(rowList, columns=headerList)
+    df.to_excel(writer, sheet_name="Titer", index=False)
+    
+    writer.close()
+
+    output.seek(0)
+    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
+
 @app.route('/reportExcel')
 def reportexcel():
     """Generate Excel Report"""
