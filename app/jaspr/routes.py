@@ -98,7 +98,7 @@ def report():
 def reportpngs(filename):
     return send_from_directory(f"/app/tmp", filename)
 
-@app.route('/reportOther')
+@app.route('/reportResultAnalysis')
 def reportOther():
     """Generate Excel Report"""
     jm=JasprModel()
@@ -106,38 +106,43 @@ def reportOther():
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     
-    headerList = [" "]
-    secondHeader = ["Virus"]
+    headerList = ['Virus']
+    #secondHeader = ["Virus"]
     for sample in jm.sample_list:
-        headerList.append(sample)
-        secondHeader.append("IC50")
-        headerList.append("")
-        secondHeader.append("Vmax")
-        headerList.append("")
-        secondHeader.append("VC")
-        
+        headerList.append(sample + ', Titer')
+        headerList.append(sample + ', Fold')
+        headerList.append(sample + ', S/B')
+        #headerList.append(sample)
+        #secondHeader.append("Titer")
+        #headerList.append("")
+        #secondHeader.append("Fold")
+        #headerList.append("")
+        #secondHeader.append("S/B")
+
     rowList = []
-    rowList.append(secondHeader)    
+    #rowList.append(secondHeader)    
     
     for experiment in jm.experiment_list:
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['IC50'])
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['vc'])
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
+            rowAdd.append(10000/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']))
+            rowAdd.append(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['vc']))
         
         rowList.append(rowAdd)
     
     df = pd.DataFrame(rowList, columns = headerList)
-    df.to_excel(writer, sheet_name="Report", index=False)
+    a = df.columns.str.split(', ', expand=True).values
+    df.columns = pd.MultiIndex.from_tuples([('', x[0]) if pd.isnull(x[1]) else x for x in a])
+    df.to_excel(writer, sheet_name="Result Analysis")
     
     writer.close()
     
     output.seek(0)
-    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
+    return send_file(output, attachment_filename="reportResultAnalysis.xlsx", as_attachment=True)
 
-@app.route('/reportTiter')
+@app.route('/reportAntigenic')
 def reportTiter():
     """Generate Excel Report"""
     jm=JasprModel()
@@ -160,12 +165,12 @@ def reportTiter():
         rowList.append(rowAdd)
         
     df = pd.DataFrame(rowList, columns=headerList)
-    df.to_excel(writer, sheet_name="Titer", index=False)
+    df.to_excel(writer, sheet_name="Antigenic", index=False)
     
     writer.close()
 
     output.seek(0)
-    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
+    return send_file(output, attachment_filename="reportAntigenic.xlsx", as_attachment=True)
 
 @app.route('/reportExcel')
 def reportexcel():
