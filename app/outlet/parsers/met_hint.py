@@ -125,7 +125,10 @@ class HintCx5Parser(HintBase, ParserRegistry):
                 x_fit = self.dilutions[titer].copy()
                 x_fit[-1] = 0
                 for plugin_name in exp['results'].keys():
-                    labels = fit(plugin_name, x_fit, y_corrected)
+                    try:
+                        labels = fit(plugin_name, x_fit, y_corrected)
+                    except ValueError:
+                        labels = {plugin_name: 'regression failed'}
                     labels['cc'] = str(cc)
                     labels['vc'] = str(vc)
                     exp['results'][plugin_name][serum] = labels
