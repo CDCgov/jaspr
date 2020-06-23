@@ -11,22 +11,26 @@ RUN apt-get -y install gconf-service libxext6 libxfixes3 libxi6 \
     libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6\
     ca-certificates fonts-liberation lsb-release xdg-utils wget
 
+# update coda and install as much as possible of the jaspr packages
+# to install to our new env, activate the env, then use pip3 to install
+RUN conda update -n base -c defaults conda
+RUN conda create -y --name jaspr -c conda-forge flask blinker \
+    flask-debugtoolbar bokeh pandas xlrd xlsxwriter markdown scipy redis-py \
+    phantomjs selenium=3.14.1 uwsgi firefox geckodriver nodejs
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
+    pip install flask-session
+
 # Copy the current directory contents into the container at /build
 ADD . /build
 WORKDIR /build
 
-# update conda, create a new env, and install dependencies
+# create a new env, and install dependencies
 # docker reccomends don't apt-get upgrade if you can avoid it
-RUN conda update -n base -c defaults conda
-RUN conda create -y --name jaspr -c conda-forge --file requirements.txt
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
+    conda install -c conda-forge --file requirements.txt
 
 VOLUME /app
 WORKDIR /app
-
-# to install to our new env, activate the env, then use pip3 to install
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
-    pip install flask-session
-
 
 #CMD /bin/bash -i
 #CMD /bin/bash -i -c "pip install -e . "; uwsgi --ini app.ini
