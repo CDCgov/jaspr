@@ -93,7 +93,7 @@ class JasprChart(object):
             p.xaxis.formatter = AntigenicFormatter()
             #p.xaxis.formatter = LogTickFormatter()
             #p.xaxis.minor_tick_line_color = None
-            p.x_range.flipped = True
+            #p.x_range.flipped = True
             p.xaxis.major_label_orientation = .70
 
         y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
