@@ -90,8 +90,8 @@ class JasprChart(object):
             #    1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
-            p.xaxis.formatter = AntigenicFormatter()
-            #p.xaxis.formatter = LogTickFormatter()
+            #p.xaxis.formatter = AntigenicFormatter()
+            p.xaxis.formatter = LogTickFormatter()
             #p.xaxis.minor_tick_line_color = None
             #p.x_range.flipped = True
             p.xaxis.major_label_orientation = .70

@@ -12,7 +12,7 @@ class Logistic3(FunctionRegistry):
     description = '3-parameter logistic'
 
     def __init__(self, *args, **kwargs):
-        self.vmax_multiplier = 0.5
+        self.vmax_multiplier = 0.8
         super().__init__(*args, **kwargs)
 
     def _guess_params(self, concs, data):

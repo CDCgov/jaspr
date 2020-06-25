@@ -62,7 +62,7 @@ class HintBase(object):
             # set the no-sera concentration to three logs below the
             # actual last dilution
             self.dilutions[start_titer][-1] = \
-                    self.dilutions[start_titer][-1] / 4
+                    self.dilutions[start_titer][-1] / 8
 
     def _get_all_experiments(self, datafile):
         # override this function
@@ -115,15 +115,16 @@ class HintCx5Parser(HintBase, ParserRegistry):
 
                 exp = experiments.get(virus, copy.deepcopy(new_exp))
                 y_corrected = list(row - cc)
+                x_fit = self.dilutions[titer].copy()
+                x_fit[-1] = 0
                 exp['data'][serum] = {
                     'x_values': self.dilutions[titer],
+                    'x_fit': x_fit,
                     'y_values': list(row),
                     'y_corrected': y_corrected,
                 }
                 experiments[virus] = exp
 
-                x_fit = self.dilutions[titer].copy()
-                x_fit[-1] = 0
                 for plugin_name in exp['results'].keys():
                     try:
                         labels = fit(plugin_name, x_fit, y_corrected)
