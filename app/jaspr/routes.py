@@ -102,10 +102,10 @@ def reportpngs(filename):
 def reportOther():
     """Generate Excel Report"""
     jm=JasprModel()
-    
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    
+
     headerList = ['Virus']
     #secondHeader = ["Virus"]
     for sample in jm.sample_list:
@@ -120,25 +120,26 @@ def reportOther():
         #secondHeader.append("S/B")
 
     rowList = []
-    #rowList.append(secondHeader)    
-    
+    #rowList.append(secondHeader)
+
     for experiment in jm.experiment_list:
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
-            rowAdd.append(10000/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']))
-            rowAdd.append(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['vc']))
-        
+            rowAdd.append('')
+            #rowAdd.append(10000/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']))
+            rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['cc'])))
+
         rowList.append(rowAdd)
-    
+
     df = pd.DataFrame(rowList, columns = headerList)
     a = df.columns.str.split(', ', expand=True).values
     df.columns = pd.MultiIndex.from_tuples([('', x[0]) if pd.isnull(x[1]) else x for x in a])
     df.to_excel(writer, sheet_name="Result Analysis")
-    
+
     writer.close()
-    
+
     output.seek(0)
     return send_file(output, attachment_filename="reportResultAnalysis.xlsx", as_attachment=True)
 
@@ -146,27 +147,27 @@ def reportOther():
 def reportTiter():
     """Generate Excel Report"""
     jm=JasprModel()
-    
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    
+
     headerList = ["Virus"]
     for sample in jm.sample_list:
         headerList.append(sample)
-        
+
     rowList = []
-    
+
     for experiment in jm.experiment_list:
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
-            
+
         rowList.append(rowAdd)
-        
+
     df = pd.DataFrame(rowList, columns=headerList)
     df.to_excel(writer, sheet_name="Antigenic", index=False)
-    
+
     writer.close()
 
     output.seek(0)
@@ -184,31 +185,31 @@ def reportexcel():
     sampleList = ["Virus"]
     for sample in jm.sample_list:
         sampleList.append(sample)
-        
+
     sampleList.append("VC")
     sampleList.append("CC")
-        
+
     #df = pd.DataFrame(columns=sampleList)
 
     rowList = []
-    
+
     # loop sample sets
     for experiment in jm.experiment_list:
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
             rowAdd.append(jm.experiments[experiment]['data'][sample]['y_values'][0])
-            
+
         rowAdd.append(jm.experiments[experiment]['cc'])
         rowAdd.append(jm.experiments[experiment]['vc'])
-        
+
         rowList.append(rowAdd)
-        
+
         #df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
-    
+
     df = pd.DataFrame(rowList, columns=sampleList)
     df.to_excel(writer, sheet_name="FRA", index=False)
-    
+
     writer.close()
 
     output.seek(0)
