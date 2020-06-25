@@ -74,7 +74,7 @@ class JasprModel(object):
     @property
     def sample_list(self):
         return list(self.experiments[self.curr_experiment]['data'])
-        
+
     @property
     def curr_datasource(self):
         return ColumnDataSource(
@@ -82,8 +82,9 @@ class JasprModel(object):
 
     @property
     def x_array(self):
+        x_series = 'x_fit' if self.x_axis_type == 'log' else 'x_values'
         return np.asarray(
-                self.experiments[self.curr_experiment]['data'][self.curr_sample]['x_values'])
+                self.experiments[self.curr_experiment]['data'][self.curr_sample][x_series])
 
     @property
     def y_array(self):
