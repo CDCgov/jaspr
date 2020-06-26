@@ -129,7 +129,10 @@ def reportOther():
             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
             rowAdd.append('')
             #rowAdd.append(10000/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']))
-            rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['cc'])))
+            try:
+                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['cc'])))
+            except ZeroDivisionError:
+                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']))
 
         rowList.append(rowAdd)
 
