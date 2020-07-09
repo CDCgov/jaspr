@@ -31,7 +31,7 @@ export class AntigenicFormatter extends TickFormatter {
     doFormat(ticks: string[] | number[]) {
         let formatted = []
         for (let tick of ticks) {
-            let titer = String(1000000 * Number(tick))
+            let titer = (1000000 * Number(tick)).toFixed().toLocaleString()
             formatted.push(titer)
         }
     return formatted
@@ -90,8 +90,8 @@ class JasprChart(object):
             #    1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
-            #p.xaxis.formatter = AntigenicFormatter()
-            p.xaxis.formatter = LogTickFormatter()
+            p.xaxis.formatter = AntigenicFormatter()
+            #p.xaxis.formatter = LogTickFormatter()
             #p.xaxis.minor_tick_line_color = None
             #p.x_range.flipped = True
             p.xaxis.major_label_orientation = .70
