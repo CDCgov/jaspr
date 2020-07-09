@@ -31,7 +31,8 @@ export class AntigenicFormatter extends TickFormatter {
     doFormat(ticks: string[] | number[]) {
         let formatted = []
         for (let tick of ticks) {
-            let titer = (1000000 * Number(tick)).toFixed().toLocaleString()
+            let val = 1000000 * Number(tick)
+            let titer = String(val.toFixed())
             formatted.push(titer)
         }
     return formatted
