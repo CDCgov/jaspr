@@ -93,8 +93,8 @@ class HintCx5Parser(HintBase, ParserRegistry):
         mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
 
         new_exp = {
-            'x_axis_label': 'Dilution (conc)',
-            'y_axis_label': 'Infected Cells (count)',
+            'x_axis_label': 'Relative Dilution (ppm)',
+            'y_axis_label': 'Infected Cell Population',
             'data': {},
             'results': {
                 'logistic3': {},

@@ -144,7 +144,9 @@ def reportOther():
     writer.close()
 
     output.seek(0)
-    return send_file(output, attachment_filename="reportResultAnalysis.xlsx", as_attachment=True)
+    response = make_response(send_file(output, attachment_filename="reportResultAnalysis.xlsx", as_attachment=True))
+    response.headers['cache-control'] = 'no-cache'
+    return response
 
 @app.route('/reportAntigenic')
 def reportTiter():
@@ -174,7 +176,9 @@ def reportTiter():
     writer.close()
 
     output.seek(0)
-    return send_file(output, attachment_filename="reportAntigenic.xlsx", as_attachment=True)
+    response = make_response(send_file(output, attachment_filename="reportAntigenic.xlsx", as_attachment=True))
+    response.headers['cache-control'] = 'no-cache'
+    return response
 
 @app.route('/reportExcel')
 def reportexcel():
@@ -216,4 +220,6 @@ def reportexcel():
     writer.close()
 
     output.seek(0)
-    return send_file(output, attachment_filename="report.xlsx", as_attachment=True)
+    response = make_response(send_file(output, attachment_filename="report.xlsx", as_attachment=True))
+    response.headers['cache-control'] = 'no-cache'
+    return response
