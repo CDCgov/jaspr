@@ -87,14 +87,14 @@ class JasprChart(object):
 
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
-            #p.xaxis.ticker = FixedTicker(ticks=sorted([1/40, 1/160, 1/640, 1/2560, 1/10240,
-            #    1/40960, 1/163840, 1/655360]))
+            p.xaxis.ticker = FixedTicker(ticks=sorted([1/40, 1/160, 1/640, 1/2560, 1/10240,
+                1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
             p.xaxis.formatter = AntigenicFormatter()
             #p.xaxis.formatter = LogTickFormatter()
             #p.xaxis.minor_tick_line_color = None
-            #p.x_range.flipped = True
+            p.x_range.flipped = True
             p.xaxis.major_label_orientation = .70
 
         y_series = 'y_corrected' if self.m.blank_correction else 'y_values'
