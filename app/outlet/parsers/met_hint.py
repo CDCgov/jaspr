@@ -94,7 +94,7 @@ class HintCx5Parser(HintBase, ParserRegistry):
 
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
-            'y_axis_label': 'Infected Cell Population',
+            'y_axis_label': 'Infected Cell Population (ICP)',
             'data': {},
             'results': {
                 'logistic3': {},
