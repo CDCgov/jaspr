@@ -123,7 +123,7 @@ class JasprChart(object):
             #add label
             offset = 1
             for text in chart_labels[::-1]:
-                label = Label(x=10, y=offset*20,
+                label = Label(x=10, y=offset*20, y_offset=375,
                         x_units='screen', y_units='screen',
                         text=text, render_mode='css',
                         background_fill_color='white',
