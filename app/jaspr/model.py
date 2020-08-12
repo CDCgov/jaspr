@@ -12,6 +12,7 @@ Change log:
 import json
 import numpy as np
 from bokeh.models import ColumnDataSource
+from fractions import Fraction
 
 # flask imports
 from flask import session
@@ -76,9 +77,18 @@ class JasprModel(object):
         return list(self.experiments[self.curr_experiment]['data'])
 
     @property
+    def curr_datasource_fraction(self):
+        sample_data = self.experiments[self.curr_experiment]['data'][self.curr_sample]
+        
+        sample_data['x_values'] = [str(Fraction(str(a))) for a in sample_data['x_values']]
+        if ('x_fit' in sample_data):
+            sample_data['x_fit'] = [str(Fraction(str(a))) for a in sample_data['x_fit']]
+            
+        return ColumnDataSource(sample_data)
+
+    @property
     def curr_datasource(self):
-        return ColumnDataSource(
-            self.experiments[self.curr_experiment]['data'][self.curr_sample])
+        return ColumnDataSource(self.experiments[self.curr_experiment]['data'][self.curr_sample])
 
     @property
     def x_array(self):

@@ -7,7 +7,6 @@ from math import log2
 import numpy as np
 from uuid import uuid4
 
-
 from bokeh.embed import components
 from bokeh.io import export_png
 from bokeh.layouts import widgetbox
@@ -143,7 +142,7 @@ class JasprChart(object):
                 HTML string and JavaScript string
 
         """
-        source = self.m.curr_datasource
+        source = self.m.curr_datasource_fraction
 
         bcols = [TableColumn(field=c, title=c) for c in source.column_names]
 
