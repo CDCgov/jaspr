@@ -21,8 +21,6 @@ from jaspr.charts import JasprChart
 from outlet import FunctionRegistry
 
 
-
-
 @app.route('/reset')
 def reset():
     """reset UI to the default"""
@@ -78,11 +76,13 @@ def drawWidgetHTML():
     chart = JasprChart()
     return jsonify(chart())
 
+
 @app.route('/reportPNG', methods=["GET"])
 def reportPngs():
     jc = JasprChart()
     pngList = jc.get_pngs()
     return render_template('reportPNG.html', pngList=pngList)
+
 
 @app.route('/report', methods=["GET"])
 def report():
@@ -94,9 +94,11 @@ def report():
     #return render_template('report.html', pngList=pngList)
     return render_template ('report.html')
 
+
 @app.route('/reportpngs/<path:filename>')
 def reportpngs(filename):
     return send_from_directory(f"/app/tmp", filename)
+
 
 @app.route('/reportResultAnalysis')
 def reportOther():
@@ -107,7 +109,6 @@ def reportOther():
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
     headerList = ['Virus']
-    #secondHeader = ["Virus"]
     for sample in jm.sample_list:
         headerList.append(sample + ', Titer')
         headerList.append(sample + ', Fold')
@@ -120,7 +121,6 @@ def reportOther():
         #secondHeader.append("S/B")
 
     rowList = []
-    #rowList.append(secondHeader)
 
     for experiment in jm.experiment_list:
         rowAdd = []
@@ -132,8 +132,7 @@ def reportOther():
             try:
                 rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['cc'])))
             except ZeroDivisionError:
-                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']))
-
+                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])))
         rowList.append(rowAdd)
 
     df = pd.DataFrame(rowList, columns = headerList)
@@ -147,6 +146,7 @@ def reportOther():
     response = make_response(send_file(output, attachment_filename="reportResultAnalysis.xlsx", as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
+
 
 @app.route('/reportAntigenic')
 def reportTiter():
@@ -179,6 +179,7 @@ def reportTiter():
     response = make_response(send_file(output, attachment_filename="reportAntigenic.xlsx", as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
+
 
 @app.route('/reportExcel')
 def reportexcel():
