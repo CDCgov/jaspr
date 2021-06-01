@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 # file outlet/functions/linear.py
 
-"""A linear fitting function
+"""A linear fitting function"""
 
-
-
-"""
 
 from outlet import FunctionRegistry
+
 
 class LinearRegression(FunctionRegistry):
     # regression line
     name = 'linear'
     description = 'Linear'
+    loss = 'linear'
 
     def _guess_params(self, data, concs):
         """Initalial guesses for function parameters"""
@@ -33,3 +32,10 @@ class LinearRegression(FunctionRegistry):
             'slope': f'{slope:.3f}',
             'intercept': f'{intercept:.3f}',
         }
+
+
+class RobustLinearRegression(LinearRegression):
+    # regression line
+    name = 'robust_linear'
+    description = '(Robust) Linear'
+    loss = 'soft_l1'

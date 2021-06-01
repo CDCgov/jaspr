@@ -67,10 +67,17 @@ class FunctionRegistry(object, metaclass=PluginMount):
         soft_l1 loss func minimizes influence of outliers.  There are
         options to go to constrained fits as needed.
 
+        Loss options:
+            - linear: standard least squares
+            - soft_l1: smooth approximation of absolute value (try this!)
+            - huber: like soft_l1
+            - cauchy: signifcantly discounts outliers
+            - arctan: similar to cauchy
+
         """
         for params in self._guess_params(x_data, y_data):
             fit = least_squares(self._residuals, params,
-                    loss='soft_l1', x_scale='jac', f_scale=0.1,
+                    loss=self.loss, x_scale='jac', f_scale=0.1,
                     verbose=2, args=(x_data, y_data))
 
             #fit = least_squares(self._residuals, params, method='lm',

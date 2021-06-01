@@ -10,6 +10,7 @@ from outlet import FunctionRegistry
 class Logistic3(FunctionRegistry):
     name = 'logistic3'
     description = '3-parameter logistic'
+    loss = 'linear'
 
     def __init__(self, *args, **kwargs):
         self.vmax_multiplier = 0.8
@@ -49,9 +50,16 @@ class Logistic3(FunctionRegistry):
         }
 
 
+class RobustLogistic3(Logistic3):
+    name = 'robust_logistic3'
+    description = '(Robust) 3-parameter logistic'
+    loss = 'soft_l1'
+
+
 class Logistic4(Logistic3):
     name = 'logistic4'
     description = '4-parameter logistic'
+    loss = 'linear'
 
     def _guess_params(self, concs, data):
         """Generate initial guesses for fit params"""
@@ -90,3 +98,9 @@ class Logistic4(Logistic3):
             'Vmax': f'{Vmax:.0f}',
             'IC50': f'{Ki:.3g}',
         }
+
+
+class RobustLogistic4(Logistic4):
+    name = 'robust_logistic4'
+    description = '(Robust) 4-parameter logistic'
+    loss = 'soft_l1'
