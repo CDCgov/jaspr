@@ -11,8 +11,10 @@ Change log:
 # python imports
 import json
 import numpy as np
+import pandas as pd
 from bokeh.models import ColumnDataSource
 from fractions import Fraction
+import pprint
 
 # flask imports
 from flask import session
@@ -79,30 +81,43 @@ class JasprModel(object):
     @property
     def curr_datasource_fraction(self):
         sample_data = self.experiments[self.curr_experiment]['data'][self.curr_sample]
-        
+        import pprint
+        pprint.pprint(sample_data)
         sample_data['x_values'] = [str(Fraction(str(a))) for a in sample_data['x_values']]
         if ('x_fit' in sample_data):
             sample_data['x_fit'] = [str(Fraction(str(a))) for a in sample_data['x_fit']]
-            
+              
         return ColumnDataSource(sample_data)
 
     @property
     def curr_datasource(self):
+
         return ColumnDataSource(self.experiments[self.curr_experiment]['data'][self.curr_sample])
 
     @property
     def x_array(self):
         x_series = 'x_fit' if self.x_axis_type == 'log' else 'x_values'
+        
+        print("x_values:")
+        pprint.pprint(np.asarray(
+                self.experiments[self.curr_experiment]['data'][self.curr_sample][x_series]))
+
         return np.asarray(
                 self.experiments[self.curr_experiment]['data'][self.curr_sample][x_series])
 
     @property
     def y_array(self):
         y_series = 'y_corrected' if self.blank_correction else 'y_values'
+        
+        print("y_values:")
+        pprint.pprint(np.asarray(
+                self.experiments[self.curr_experiment]['data'][
+                        self.curr_sample][y_series]))
+
         return np.asarray(
                 self.experiments[self.curr_experiment]['data'][
                         self.curr_sample][y_series])
-
+    
     @property
     def x_axis_label(self):
         experiment = self.experiments[self.curr_experiment]

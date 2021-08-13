@@ -12,8 +12,10 @@ as they follow the documented pattern.
 """
 
 from scipy.optimize import least_squares
-from numpy import inf
+from scipy.optimize import fsolve
 
+from numpy import inf
+import pprint
 
 class PluginMount(type):
     """Metaclass for classes that are plugin mountpoints"""
@@ -85,8 +87,12 @@ class FunctionRegistry(object, metaclass=PluginMount):
 
             if fit.success:
                 # indicates we've converged, stop guessing
+                print("residuals:")
                 print (fit.fun)
+
                 break
+        # print("fit-")
+        # pprint.pprint(fit)
         return fit
 
 

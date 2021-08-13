@@ -11,7 +11,7 @@ from pandas import pandas as pd
 from io import BytesIO
 
 # flask imports
-from flask import render_template, request, \
+from flask import Flask, render_template, request, \
         jsonify, redirect, make_response, send_from_directory, send_file
 
 # local imports
@@ -20,6 +20,45 @@ from jaspr.model import JasprModel
 from jaspr.charts import JasprChart
 from outlet import FunctionRegistry
 
+# additional imports from api.py 6/10/21
+from datetime import datetime
+from tempfile import NamedTemporaryFile
+
+from outlet import ParserRegistry
+
+def save_tmpfile(upload_handle):
+    """Save uploaded files to /tmp"""
+    tmp_handle = NamedTemporaryFile(delete=False)
+    tmp_handle.close()
+    upload_handle.save(tmp_handle.name)
+    return tmp_handle.name
+
+
+@app.route('/updateConfigSetting', methods=['POST'])
+def updateConfigSetting():
+    jm = JasprModel()
+    for k, v in request.form.items():
+        jm.update_attribute(k, v)
+    return 'true'
+
+
+@app.route('/upload', methods = ['POST'])
+def upload():
+    datafile = save_tmpfile(request.files['datafile'])
+    keyfile = save_tmpfile(request.files['keyfile'])
+
+    jm = JasprModel()
+    settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+    jm = JasprModel().set_defaults(settings)
+        
+    return redirect("/", code=302)
+   
+
+@app.route("/ping", methods = ['GET'])
+def ping():
+    """Simple function for AJAX test"""
+    returnStr = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    return json.dumps(returnStr)
 
 @app.route('/reset')
 def reset():
@@ -166,6 +205,9 @@ def reportTiter():
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
+            import pprint
+            pprint.pprint(sample)
+            pprint.pprint (jm.experiments[experiment]['results'][jm.curr_function][sample])
             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
 
         rowList.append(rowAdd)
@@ -180,6 +222,43 @@ def reportTiter():
     response.headers['cache-control'] = 'no-cache'
     return response
 
+# Print Report for ICP = 1000 values
+@app.route('/reportICP1000')
+def reportICP():
+    """Generate Excel Report"""
+    import pprint
+    jm=JasprModel()
+    output=BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    headerList = ["Virus"]
+    
+    for sample in jm.sample_list:
+        headerList.append("Dilution")
+
+    rowList = []
+
+    for experiment in jm.experiment_list:
+        rowAdd = []
+        rowAdd.append(experiment)
+
+        for sample in jm.sample_list:
+            print("sample:")
+            pprint.pprint(sample)
+            pprint.pprint (jm.experiments[experiment]['results'])
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['ICP1000'])
+
+        rowList.append(rowAdd)
+
+    df = pd.DataFrame(rowList, columns=headerList)
+    df.to_excel(writer, sheet_name="ICP_1000", index=False)
+
+    writer.close()
+
+    output.seek(0)
+    response = make_response(send_file(output, attachment_filename="reportICP1000.xlsx", as_attachment=True))
+    response.headers['cache-control'] = 'no-cache'
+    return response
 
 @app.route('/reportExcel')
 def reportexcel():
