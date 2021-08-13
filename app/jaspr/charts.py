@@ -5,6 +5,7 @@
 
 from math import log2
 import numpy as np
+import pandas as pd
 from uuid import uuid4
 
 from bokeh.embed import components
@@ -21,6 +22,7 @@ from bokeh.util.compiler import TypeScript
 from jaspr.model import JasprModel
 from jaspr import app
 from outlet import FunctionRegistry
+import pprint
 
 
 TS_CODE = """
@@ -108,6 +110,37 @@ class JasprChart(object):
             x = get_x_spacing()
             y = fit_function._calculate(fit_result.x, x)
             labels = fit_function.labels(fit_result.x)
+
+            ## Find dilution @ ICP ~1000
+            pd.set_option("display.precision", 10)
+
+            print("x=")
+            #pprint.pprint(x)
+            print("y=")
+            #pprint.pprint(y)
+            y_rounded = np.around(y, decimals=0)
+            
+            #print(y_rounded)
+            #pprint.pprint(y_rounded)
+
+            pd.to_numeric(x)
+            pd.to_numeric(y_rounded)
+            
+            yx = pd.DataFrame({'y':y_rounded, 'x':x})
+            #print(yx)
+            
+            yx.astype(int)
+            #print(yx)
+
+            # # Add dilutions at ICP ~1000 to chart
+            #print("ICP_1000")
+            #ICP_1000 = yx.query("950 <= y <= 1050")
+            #print(ICP_1000)
+
+            #ICP1000 = fit_function(y[259])
+            #print('ICP1000=')
+            #pprint.pprint(ICP1000)            
+            
 
             lsource = ColumnDataSource({'x': x, 'y': y})
             glyph = Line(x='x', y='y', line_color='#3aaf13',

@@ -3,9 +3,9 @@
 """A standard logistic curve fitting function
 
 """
-
+from scipy.optimize import fsolve
 from outlet import FunctionRegistry
-
+import pprint
 
 class Logistic3(FunctionRegistry):
     name = 'logistic3'
@@ -22,7 +22,10 @@ class Logistic3(FunctionRegistry):
         for d, ki_guess in zip(data, concs):
             if d < vmax_guess:
                 yield (vmax_guess, ki_guess)
+               
         yield (vmax_guess, concs[-1]/4)
+        print("v_max guess")
+        pprint(vmax_guess)
 
     def _calculate(self, params, concs):
         """Evaluate rate as a function of concentration
@@ -49,12 +52,77 @@ class Logistic3(FunctionRegistry):
             'IC50': f'{Ki:.3g}',
         }
 
+    
 
 class RobustLogistic3(Logistic3):
     name = 'robust_logistic3'
     description = '(Robust) 3-parameter logistic'
     loss = 'soft_l1'
 
+class ICPRobustLogistic3(FunctionRegistry):
+    name = 'ICP_robust_logistic3'
+    description = 'ICP (Robust) 3-parameter logistic'
+    loss = 'soft_l1'
+
+    def __init__(self, *args, **kwargs):
+        self.vmax_multiplier = .95
+        super().__init__(*args, **kwargs)
+
+    def _guess_params(self, concs, data):
+        """Generate intial guesses for fit params"""
+        vmax_guess = max(data) * self.vmax_multiplier
+        for d, ki_guess in zip(data, concs):
+            if d < vmax_guess:
+                yield (vmax_guess, ki_guess)
+        yield (vmax_guess, concs[-1]/4)
+
+    def _calculate(self, params, concs):
+        """Evaluate rate as a function of concentration
+
+        * Vmax is the reaction rate when no inhibitor is present.
+
+        * Ki is the equilibrium constant for the interation between the
+          inhibitor and the enzyme.  It is equal to the concentration of
+          inhibitor where rate/Vmax = 1/2.  This is also known as IC50.
+
+        """
+        
+        Vmax = params[0]
+        Ki = params[1]
+        ICP1000 = -(1000*Ki)/(1000-Vmax)
+        # return Vmax / (1 + e**(-Ki*concs))
+        # return (Ki*((Vmax-concs)/Vmax))*concs
+        # pprint.pprint(Vmax * ((concs / (Ki + concs))))
+        fit = Vmax * (concs / (Ki + concs))
+        #print("Fit:")
+        #print(fit)
+        #print("Vmax:")
+        #print(Vmax)
+        
+        return Vmax * (concs / (Ki + concs))
+      
+    def labels(self, params):
+
+        print("params-")
+        pprint.pprint(params)
+        
+        Vmax = params[0]
+        Ki = params[1]
+        ICP1000 = -(1000*(params[1]))/(1000-(params[0]))
+
+        print("ICP1000=")
+        print(ICP1000)
+        
+        return {   
+            'ICP1000': f'{ICP1000:.10g}',
+           # 'Vmax': f'{Vmax:.0f}',
+           # 'IC50': f'{Ki:.3g}',
+        }
+        
+class ICP_Logistic3(ICPRobustLogistic3):
+    name = 'ICP_logistic3'
+    description = 'linear 3-parameter logistic'
+    loss = 'linear'
 
 class Logistic4(Logistic3):
     name = 'logistic4'
@@ -85,7 +153,7 @@ class Logistic4(Logistic3):
         h = params[2]
 
         return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
-
+    
     def labels(self, params):
         Vmax = params[0]
         Ki = params[1]
@@ -98,7 +166,6 @@ class Logistic4(Logistic3):
             'Vmax': f'{Vmax:.0f}',
             'IC50': f'{Ki:.3g}',
         }
-
 
 class RobustLogistic4(Logistic4):
     name = 'robust_logistic4'
