@@ -231,7 +231,7 @@ class ICPCeligoParser(HintCx5Parser):
         s_count = len(self.sera)
         
         print("s_count:")
-        pprint.pprint(s_count)
+        #pprint.pprint(s_count)
 
         for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
