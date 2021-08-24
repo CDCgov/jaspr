@@ -114,6 +114,7 @@ class JasprChart(object):
             ## Find dilution @ ICP ~1000
             pd.set_option("display.precision", 10)
 
+<<<<<<< HEAD
             #print("x=")
             #pprint.pprint(x)
             #print("y=")
@@ -125,6 +126,23 @@ class JasprChart(object):
             pd.to_numeric(y_rounded)    
             yx = pd.DataFrame({'y':y_rounded, 'x':x})
             #print(yx)
+=======
+            print("x=")
+            #pprint.pprint(x)
+            print("y=")
+            #pprint.pprint(y)
+            y_rounded = np.around(y, decimals=0)
+            
+            #print(y_rounded)
+            #pprint.pprint(y_rounded)
+
+            pd.to_numeric(x)
+            pd.to_numeric(y_rounded)
+            
+            yx = pd.DataFrame({'y':y_rounded, 'x':x})
+            #print(yx)
+            
+>>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
             yx.astype(int)
             #print(yx)
 
@@ -137,6 +155,10 @@ class JasprChart(object):
             #print('ICP1000=')
             #pprint.pprint(ICP1000)            
             
+<<<<<<< HEAD
+=======
+
+>>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
             lsource = ColumnDataSource({'x': x, 'y': y})
             glyph = Line(x='x', y='y', line_color='#3aaf13',
                     line_width=3, line_alpha=0.6)
