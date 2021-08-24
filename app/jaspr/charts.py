@@ -5,6 +5,7 @@
 
 from math import log2
 import numpy as np
+import pandas as pd
 from uuid import uuid4
 
 from bokeh.embed import components
@@ -21,6 +22,7 @@ from bokeh.util.compiler import TypeScript
 from jaspr.model import JasprModel
 from jaspr import app
 from outlet import FunctionRegistry
+import pprint
 
 
 TS_CODE = """
@@ -109,6 +111,32 @@ class JasprChart(object):
             y = fit_function._calculate(fit_result.x, x)
             labels = fit_function.labels(fit_result.x)
 
+            ## Find dilution @ ICP ~1000
+            pd.set_option("display.precision", 10)
+
+            #print("x=")
+            #pprint.pprint(x)
+            #print("y=")
+            #pprint.pprint(y)
+            y_rounded = np.around(y, decimals=0)
+            #print(y_rounded)
+            #pprint.pprint(y_rounded)
+            pd.to_numeric(x)
+            pd.to_numeric(y_rounded)    
+            yx = pd.DataFrame({'y':y_rounded, 'x':x})
+            #print(yx)
+            yx.astype(int)
+            #print(yx)
+
+            # # Add dilutions at ICP ~1000 to chart
+            #print("ICP_1000")
+            #ICP_1000 = yx.query("950 <= y <= 1050")
+            #print(ICP_1000)
+
+            #ICP1000 = fit_function(y[259])
+            #print('ICP1000=')
+            #pprint.pprint(ICP1000)            
+            
             lsource = ColumnDataSource({'x': x, 'y': y})
             glyph = Line(x='x', y='y', line_color='#3aaf13',
                     line_width=3, line_alpha=0.6)
@@ -120,7 +148,7 @@ class JasprChart(object):
                 chart_labels.append(f' - {key}: {value}')
 
             #add label
-            offset = 1
+            offset = 3
             for text in chart_labels[::-1]:
                 label = Label(x=10, y=offset*20, y_offset=375,
                         x_units='screen', y_units='screen',
@@ -129,7 +157,31 @@ class JasprChart(object):
                         background_fill_alpha=0.7)
                 p.add_layout(label)
                 offset += 1
-        return p
+
+            # - -
+            #print("Model:")
+            #pprint.pprint(plugin_name)
+
+            #jm=JasprModel()
+
+            #headerList = ["Virus"]
+            #for sample in jm.sample_list:
+            #    headerList.append(sample)
+        
+            #rowList = []
+
+            #for experiment in jm.experiment_list:
+            #    rowAdd = []
+            #    rowAdd.append(experiment)
+                #print("Experiment:")
+                #pprint.pprint(experiment)
+
+            #for sample in jm.sample_list:
+            #    print("sample:")
+            #    pprint.pprint(sample)
+            #    pprint.pprint (jm.experiments[experiment]['results'])
+                #pprint.pprint(sample)    
+            return p
 
     def _get_chart_component(self):
         return components(self._create_chart())
