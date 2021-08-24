@@ -208,10 +208,17 @@ def reportTiter():
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
+<<<<<<< HEAD
             viral_sample = (jm.experiments[experiment]['results'][jm.curr_function][sample])
             ERROR = "Regression Failed"
             titer = 'titer'
             rowAdd.append(viral_sample.get(titer, ERROR))
+=======
+            import pprint
+            pprint.pprint(sample)
+            pprint.pprint (jm.experiments[experiment]['results'][jm.curr_function][sample])
+            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
+>>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
 
         rowList.append(rowAdd)
 
@@ -259,8 +266,12 @@ def reportICP():
     writer.close()
 
     output.seek(0)
+<<<<<<< HEAD
 
     response = make_response(send_file(output, attachment_filename='reportICP1000_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+=======
+    response = make_response(send_file(output, attachment_filename="reportICP1000.xlsx", as_attachment=True))
+>>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
     response.headers['cache-control'] = 'no-cache'
     return response
 
