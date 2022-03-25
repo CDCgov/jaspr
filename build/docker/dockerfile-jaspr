@@ -1,0 +1,51 @@
+# gather miniconda
+FROM continuumio/miniconda3
+
+MAINTAINER Garrett Peterson "garrettp@yaharasoftware.com"
+
+RUN apt-get -y update
+RUN apt-get -y install gconf-service libxext6 libxfixes3 libxi6 \
+    libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 \
+    libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 \
+    libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
+    libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 \
+    libxss1 libxtst6 libnss3 libasound2 libatk1.0-0 libc6\
+    ca-certificates fonts-liberation lsb-release xdg-utils wget 
+
+# libappindicator1 - removed from above Dec-2021, did not play nice with
+#                    updated continuumio/miniconda3 container 
+
+############ use sed to convert http to https: \/ \/ ###########
+#
+#
+#
+#
+########### /\ /\ for https /\ /\ ########## 
+
+
+# update coda and install as much as possible of the jaspr packages
+# to install to our new env, activate the env, then use pip3 to install
+RUN conda update -n base -c defaults conda
+RUN conda create -y --name jaspr -c conda-forge flask=2.0.1 blinker=1.4 \
+    flask-debugtoolbar bokeh=2.3.3 pandas=1.3.1 xlrd=2.0.1 xlsxwriter markdown=3.3.4 scipy=1.7.0 redis-py \
+    phantomjs selenium=3.14.1 uwsgi=2.0.19.1 firefox geckodriver nodejs
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
+    pip install flask-session
+
+# Copy the current directory contents into the container at /build
+ADD . /build
+WORKDIR /build
+
+# create a new env, and install dependencies
+# docker reccomends don't apt-get upgrade if you can avoid it
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
+    conda install -c conda-forge --file requirements.txt
+
+VOLUME /app
+WORKDIR /app
+
+#CMD /bin/bash -i
+#CMD /bin/bash -i -c "pip install -e . "; uwsgi --ini app.ini
+CMD . /opt/conda/etc/profile.d/conda.sh && \
+    conda activate jaspr && pip install -e . && \
+    uwsgi --ini app.ini -H /opt/conda/envs/jaspr
