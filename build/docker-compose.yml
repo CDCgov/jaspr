@@ -4,7 +4,7 @@ services:
   jaspr:
       build:
         context: .
-        dockerfile: dockerfile-jaspr
+        dockerfile: docker/dockerfile-jaspr
       depends_on:
         - redis
       environment:
@@ -24,10 +24,20 @@ services:
   nginx:
       image: webapp-nginx
       build:
-        context: .
+        context: docker/nginx
         dockerfile: dockerfile-nginx
+      shm_size: 512m
+      environment:
+        - SSL_CERTIFICATE=${SSL_CERTIFICATE}
+        - DEPLOYMENT_DNS="${DEPLOYMENT_DNS:-localhost}"
       ports:
-        - 80:80
+        - "${JASPR_HTTPS_PORT:-80}:80"
+        - "${JASPR_HTTPS_PORT:-443}:443"
+      volumes:
+        - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
+        - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
+        - "${LETSENCRYPT_DATA_PATH:-./run/nginx/letsencrypt/data}:/data/letsencrypt"
+
       depends_on:
         - jaspr
 

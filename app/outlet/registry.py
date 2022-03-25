@@ -91,8 +91,8 @@ class FunctionRegistry(object, metaclass=PluginMount):
                 print (fit.fun)
 
                 break
-        # print("fit-")
-        # pprint.pprint(fit)
+        print("fit-")
+        pprint.pprint(fit)
         return fit
 
 

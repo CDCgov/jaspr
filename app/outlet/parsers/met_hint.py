@@ -2,11 +2,18 @@
 
 # python imports
 import copy
+from random import sample
+from re import X
+from tkinter import Y
+from tracemalloc import stop
 import pandas as pd
 import math
 import numpy as np
 from zipfile import ZipFile
 import pprint
+import scipy
+from scipy import stats, mean
+from decimal import Decimal
 # jaspr imports
 from outlet import ParserRegistry, FunctionRegistry
 
@@ -98,16 +105,7 @@ class HintCx5Parser(HintBase, ParserRegistry):
             'y_axis_label': 'Infected Cell Population (ICP)',
             'data': {},
             'results': {
-<<<<<<< HEAD
                 'robust_logistic4': {},
-=======
-                'logistic3': {},
-                'logistic4': {},
-                'robust_logistic3': {},
-                'robust_logistic4': {},
-                'ICP_logistic3': {},
-                'ICP_robust_logistic3': {}
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
             }
         }
 
@@ -115,11 +113,13 @@ class HintCx5Parser(HintBase, ParserRegistry):
         vpp = 8
         v_count = len(self.viruses)
         s_count = len(self.sera)
+
         for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
             for v_index, virus in enumerate(self.viruses):
                 # find the plate and position of a sample
                 plate_offset, position_offset = divmod(v_index, vpp)
+
                 row = grid[vpp * (plate_offset * s_count + s_index) \
                         + position_offset]
                 cc = mean_background[(v_count*s_index+v_index)//vpp]
@@ -174,7 +174,6 @@ class ICPCeligoParser(HintCx5Parser):
     description = 'Celigo ICP parser'
     skiprows = 97
 
-<<<<<<< HEAD
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         ICP_sera = {'Name': ["No Sera"], 'Starting titer': ["80"]}
@@ -187,8 +186,6 @@ class ICPCeligoParser(HintCx5Parser):
         return list(df['Name']), list(df['Starting titer']), \
                 df.to_dict('index')
 
-=======
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
     def __init__(self, keyfile, datafile):
         self.sera, self.starting_titers, sera_details = \
                 self._get_sera(keyfile)
@@ -204,7 +201,6 @@ class ICPCeligoParser(HintCx5Parser):
             'x_axis_type': 'log',
             'curr_function' : 'ICP_robust_logistic3',
             'experiments': self._get_all_experiments(datafile),
-<<<<<<< HEAD
             'sera': "sera_details",
             'viruses': virus_details,
         }
@@ -215,41 +211,26 @@ class ICPCeligoParser(HintCx5Parser):
     def _parse_csv(self, ICPdatafile):
         df = pd.read_csv(ICPdatafile)
         print(df)
-=======
-            'sera': sera_details,
-            'viruses': virus_details,
-        }
-
-#---
-    def _parse_csv(self, ICPdatafile):
-        df = pd.read_csv(ICPdatafile)
-
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
         # Reshape our data to 12-long rows, and capture the last column
         # as per-plate averaged background
         grid, background = np.split(np.reshape(
                 df['SelectedObjectCount'].to_numpy(),
                 (-1, 12)), [11], axis=1)
         grid = grid.astype('float64')
-        
+
         return grid, background
 
     def _get_all_experiments(self, ICPdatafile):
         experiments = {}
         grid, background = self._parse_csv(ICPdatafile)
-        
+        pprint.pprint("Look here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        pprint.pprint("grid:")
+        pprint.pprint(grid)
         mean_background = np.mean(np.reshape(background, (-1, 12)), axis=1)
-<<<<<<< HEAD
-        #print("background:")
-        #pprint.pprint(background)
-        #print("mean_background:")
-        #pprint.pprint(mean_background)    
-=======
         print("background:")
         pprint.pprint(background)
         print("mean_background:")
         pprint.pprint(mean_background)    
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
         
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
@@ -262,9 +243,10 @@ class ICPCeligoParser(HintCx5Parser):
 
         # viruses per plate = 12
         vpp = 12
+        print("self.viruses:")
+        pprint.pprint(self.viruses)
         v_count = len(self.viruses)
 
-<<<<<<< HEAD
         #print("v_count:")
         #pprint.pprint(v_count)
         
@@ -272,32 +254,22 @@ class ICPCeligoParser(HintCx5Parser):
         
         print("s_count:")
         pprint.pprint(s_count)
-=======
-        print("v_count:")
-        pprint.pprint(v_count)
+
+        print("self.viruses:")
+        pprint.pprint(self.viruses)
         
-        s_count = len(self.sera)
-        
-        print("s_count:")
-        #pprint.pprint(s_count)
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
+        print("self.sera:")
+        pprint.pprint(self.sera)
 
         for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
             for v_index, virus in enumerate(self.viruses):
                 # find the plate and position of a sample
                 plate_offset, position_offset = divmod(v_index, vpp)
-<<<<<<< HEAD
                 row = grid[vpp * (plate_offset * s_count + 0) \
                         + position_offset]
                 
                 cc = mean_background[(v_count* 0 +v_index)//vpp]
-=======
-                row = grid[vpp * (plate_offset * s_count + s_index) \
-                        + position_offset]
-                
-                cc = mean_background[(v_count*s_index+v_index)//vpp]
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
                 vc = row[6] - cc
                 
                 #print("v_index:")
@@ -311,25 +283,24 @@ class ICPCeligoParser(HintCx5Parser):
                 y_corrected = list(row - cc)
                 x_fit = self.dilutions[titer].copy()
 
-<<<<<<< HEAD
+                print("'x_values': self.dilutions[titer]")
+                pprint.pprint(self.dilutions[titer])
+                print("'x_fit': x_fit")
+                pprint.pprint(x_fit)
+                print("'y_values': list[row]")
+                #pprint.pprint(list[row])
+                print("'y_corrected': y_corrected")
+                pprint.pprint(y_corrected)
 
-
-=======
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
                 exp['data'][serum] = {
                     'x_values': self.dilutions[titer],
                     'x_fit': x_fit,
                     'y_values': list(row),
                     'y_corrected': y_corrected,
                 }
-<<<<<<< HEAD
                 
                 experiments[virus] = exp
                
-=======
-                experiments[virus] = exp
-
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
                 for plugin_name in exp['results'].keys():
                     try:
                         labels = fit(plugin_name, x_fit, y_corrected)
@@ -339,19 +310,7 @@ class ICPCeligoParser(HintCx5Parser):
                     labels['vc'] = str(vc)
                     
                     exp['results'][plugin_name][serum] = labels
-<<<<<<< HEAD
 
-        #print("labels:")
-        #pprint.pprint(exp['data'])
-        
-        #SeraLabels = exp['data']
-        #SeraLabels.clear()
-        #print("SeraLabels")
-        #pprint.pprint(SeraLabels)
-
-=======
-        pprint.pprint(experiments)
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
         return experiments
 
     def _get_dilutions(self, start_titer):
@@ -361,14 +320,6 @@ class ICPCeligoParser(HintCx5Parser):
         
             self.dilutions[start_titer][-1] = \
                     self.dilutions[start_titer][-1] 
-
-            #print("self.dilutions[start_titer]")
-            #pprint.pprint(self.dilutions[start_titer])
-            #print("self.dilutions")
-            #pprint.pprint(self.dilutions)
-            #print("[start_titer]")
-            #pprint.pprint(start_titer)    
-#---
 
     def _parse_csv(self, ICPdatafile):
         plates = []
@@ -384,13 +335,6 @@ class ICPCeligoParser(HintCx5Parser):
             data = np.split(np.reshape(pd.concat(plates,
                 ignore_index=True).to_numpy(), (-1, 12)), [11], axis=1)
 
-            #print("plates:")
-            #pprint.pprint(plates)
-            #print("data:")
-            #pprint.pprint(data)
-
-            #print("First Check....")
-
         ICPplates = []
         with ZipFile(ICPdatafile, 'r') as zf_handle:
             for plate_name in sorted(
@@ -400,50 +344,15 @@ class ICPCeligoParser(HintCx5Parser):
                         skiprows=self.skiprows, index_col=None, nrows=8,
                         usecols=range(1, 13), header=None, dtype=np.float64)
                 df_trans = pd.DataFrame.transpose(df)
-                #print("df_trans:")
-                #pprint.pprint(df_trans)
 
                 ICPplates.append(df_trans)
 
-            # data_ICP = np.split(np.reshape(pd.concat(ICPplates,
-            # ignore_index=True).to_numpy(), (-1, 8)), [7], axis=1)
-
-            # sample_data = pd.DataFrame.from_dict(sample_data)
-            # sample_data.sort_values(by=['x_fit'], ascending=False)
-
-            # print("sample_data:")
-            # pprint.pprint(sample_data)    
-            # print("sample_data[0]:")
-            # pprint.pprint(sample_data['x_fit']) 
 
             data_ICP = np.split(np.reshape(pd.concat(ICPplates,
             ignore_index=True).to_numpy(), (-1, 8)), [7], axis=1)
             
             sort_index = np.array([6, 5, 4, 3, 2, 1, 0])
          
-<<<<<<< HEAD
-
-=======
-            #print("data_ICP:")
-            #pprint.pprint(data_ICP)
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
-            
             data_ICP[0] = data_ICP[0][:,sort_index]
             
-            #print("data_ICP([0]):")
-            #pprint.pprint(data_ICP[0])
-
-            #print("data_ICP([1]):")
-            #pprint.pprint(data_ICP[1])
-
-            #print("data_ICP:")
-            #pprint.pprint(data_ICP)
-            
-<<<<<<< HEAD
-            #print("data_ICP:")
-            #pprint.pprint(data_ICP)
-
-=======
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
             return data_ICP
-
