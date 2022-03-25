@@ -6,7 +6,6 @@
 from scipy.optimize import fsolve
 from outlet import FunctionRegistry
 import pprint
-<<<<<<< HEAD
 
 from datetime import datetime
 from tempfile import NamedTemporaryFile
@@ -14,8 +13,6 @@ from outlet import ParserRegistry
 
 from io import BytesIO
 import time
-=======
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
 
 class Logistic3(FunctionRegistry):
     name = 'logistic3'
@@ -125,13 +122,8 @@ class ICPRobustLogistic3(FunctionRegistry):
         
         return {   
             'ICP1000': f'{ICP1000:.10g}',
-<<<<<<< HEAD
         #    'Vmax': f'{Vmax:.0f}',
         #    'IC50': f'{Ki:.3g}',
-=======
-           # 'Vmax': f'{Vmax:.0f}',
-           # 'IC50': f'{Ki:.3g}',
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
         }
         
 class ICP_Logistic3(ICPRobustLogistic3):
@@ -168,12 +160,8 @@ class Logistic4(Logistic3):
         h = params[2]
 
         return Vmax * (1 - (1 /(1 + pow(concs/Ki, -h))))
-<<<<<<< HEAD
 
 
-=======
-    
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
     def labels(self, params):
         Vmax = params[0]
         Ki = params[1]
@@ -188,7 +176,7 @@ class Logistic4(Logistic3):
             'titer': f'{titer:.0f}',
             'h': f'{h:.2f}',
             'Vmax': f'{Vmax:.0f}',
-            'IC50': f'{Ki:.3g}',
+            'ec50': f'{Ki:.5f}',
         }
     
     def model_convergence(self, params):
@@ -227,14 +215,8 @@ class Logistic4(Logistic3):
 
         convergence = make_response(send_file(output, attachment_filename='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
         response.headers['cache-control'] = 'no-cache'
-        return convergence    
+        return convergence     
 
-
-<<<<<<< HEAD
-    
-
-=======
->>>>>>> e86a7d8240cc7265ac1aafb799fa6cb49ddea55b
 class RobustLogistic4(Logistic4):
     name = 'robust_logistic4'
     description = '(Robust) 4-parameter logistic'

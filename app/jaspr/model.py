@@ -82,6 +82,7 @@ class JasprModel(object):
     def curr_datasource_fraction(self):
         sample_data = self.experiments[self.curr_experiment]['data'][self.curr_sample]
         import pprint
+        pprint.pprint("sample_data:")
         pprint.pprint(sample_data)
         sample_data['x_values'] = [str(Fraction(str(a))) for a in sample_data['x_values']]
         if ('x_fit' in sample_data):
@@ -122,6 +123,11 @@ class JasprModel(object):
     def x_axis_label(self):
         experiment = self.experiments[self.curr_experiment]
         return experiment['x_axis_label']
+
+    @property
+    def y_error(self):
+        experiment = self.experiments[self.curr_experiment]
+        return experiment['y_error']
 
     @property
     def y_axis_label(self):
@@ -181,11 +187,13 @@ class JasprModel(object):
         for experiment in jm.experiment_list:
             rowAdd = []
             rowAdd.append(experiment)
+            pprint.pprint("experiment:")
             pprint.pprint(experiment)
 
             for sample in jm.sample_list:
                 #print("sample:")
                 #pprint.pprint(sample)
+                pprint.pprint("jm.experiments-")
                 pprint.pprint (jm.experiments[experiment]['results'])
                 rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample])
 
