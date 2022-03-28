@@ -37,7 +37,11 @@ services:
         - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
         - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
         - "${LETSENCRYPT_DATA_PATH:-./run/nginx/letsencrypt/data}:/data/letsencrypt"
-
+      healthcheck:
+        test: ["CMD", "curl", "-sf", "--header", "Host: healthcheck.local", "localhost:80", "-o", "/dev/null"]
+        interval: 180s
+        timeout: 10s
+        retries: 3      
       depends_on:
         - jaspr
 

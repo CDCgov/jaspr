@@ -1,10 +1,51 @@
-# Dockerfile-nginx
-FROM nginx:latest
-# Nginx will listen on this port
+#############################################################
+# generate self-signed certificate (should only be used for #
+# dev usage and pre-letsencrypt)                            #
+#############################################################
+
+FROM nginx:latest as nginx_build
+
+# local APT mirror support #
+ARG APT_MIRROR_NAME=
+RUN if [ -n "$APT_MIRROR_NAME" ]; then sed -i.bak -E '/security/! s^https?://.+?/(debian|ubuntu)^http://'"$APT_MIRROR_NAME"'/\1^' /etc/apt/sources.list && grep '^deb' /etc/apt/sources.list; fi
+
+RUN apt-get update && apt-get install -y openssl
+WORKDIR /etc/ssl
+COPY --chown=root localhost.conf /root/localhost.conf
+RUN openssl req -batch -x509 -nodes -days 30 -newkey rsa:2048 -keyout localhost.key -out localhost.crt -config /root/localhost.conf
+
+#############################################################
+# install self-signed certificate and configurations        #
+#############################################################
+
+FROM nginx:latest as nginx
+
+# local APT mirror support #
+ARG APT_MIRROR_NAME=
+RUN if [ -n "$APT_MIRROR_NAME" ]; then sed -i.bak -E '/security/! s^https?://.+?/(debian|ubuntu)^http://'"$APT_MIRROR_NAME"'/\1^' /etc/apt/sources.list && grep '^deb' /etc/apt/sources.list; fi
+
+RUN apt-get update && apt-get install -y curl
+
+# restore APT mirror #
+RUN if [ -f /etc/apt/sources.list.bak ]; then mv /etc/apt/sources.list.bak /etc/apt/sources.list; fi
+
+# remove left over apt info #
+RUN rm -rf /var/lib/apt/lists/*
+
+# copy premade localhost certificate #
+COPY --from=nginx_build --chown=root /etc/ssl/localhost.key /etc/ssl/localhost.key
+COPY --from=nginx_build --chown=root /etc/ssl/localhost.crt /etc/ssl/localhost.crt
+
+# copy configurations #
+COPY --chown=root site.conf /etc/nginx/conf.d/site.conf
+COPY --chown=root healthcheck.conf /etc/nginx/conf.d/healthcheck.conf
+
+# setup script (will run each time the container is created) #
+COPY --chown=root setup.sh /root/setup.sh
+RUN chmod 0700 /root/setup.sh
+
 EXPOSE 80
-# Remove the default config file that
-# /etc/nginx/nginx.conf includes
-RUN rm /etc/nginx/conf.d/default.conf
-# We copy the requirements file in order to install
-# Python dependencies
-COPY jaspr.conf /etc/nginx/conf.d
+EXPOSE 443
+
+# this allows running the setup script and then nginx but still override and do things in the container administratively #
+CMD ["/bin/bash", "-c", "/root/setup.sh && nginx -g 'daemon off;'"]
