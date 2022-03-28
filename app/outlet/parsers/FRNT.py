@@ -225,6 +225,7 @@ class FRNT_VSS(HintCx5Parser):
         pprint.pprint(seraList)
         
         Xdata = [list(df['Starting Dilution']), list(df['Dilution Factor'])]
+
         pprint.pprint("Xdata")
         pprint.pprint(Xdata)
   
@@ -234,6 +235,23 @@ class FRNT_VSS(HintCx5Parser):
         res = [ele for ele in Starting_dilution for i in range(6)]
         pprint.pprint("res")
         pprint.pprint(res)
+
+        names = [list(df['Name'])]
+        names = pd.DataFrame(names)
+        names = pd.DataFrame.transpose(names)
+        pprint.pprint(names)
+        pools = [list(df['Pooled-Sera'])]
+        pools = pd.DataFrame(pools)
+        pools = pd.DataFrame.transpose(pools)
+
+        sera_pool = pd.concat([names, pools], axis=1)
+        sera_pool.columns = ['Name', 'Pools']
+        # sera_pool = sera_pool[['Name','Pools']].agg('-'.join, axis=1)
+        # sera_pool = pd.DataFrame(names, pools, columns=('Name', 'Pools'))
+        # sera_pool = sera_pool.Name.astype(str) + ' - ' + sera_pool.Pools.astype(str)
+        pprint.pprint("sera_pool")
+        pprint.pprint(sera_pool)
+
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, \
         df.to_dict('index')
