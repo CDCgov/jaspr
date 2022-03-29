@@ -1,5 +1,5 @@
 # gather miniconda
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:latest
 
 MAINTAINER Garrett Peterson "garrettp@yaharasoftware.com"
 
@@ -15,22 +15,16 @@ RUN apt-get -y install gconf-service libxext6 libxfixes3 libxi6 \
 # libappindicator1 - removed from above Dec-2021, did not play nice with
 #                    updated continuumio/miniconda3 container 
 
-############ use sed to convert http to https: \/ \/ ###########
-#
-#
-#
-#
-########### /\ /\ for https /\ /\ ########## 
-
-
 # update coda and install as much as possible of the jaspr packages
 # to install to our new env, activate the env, then use pip3 to install
 RUN conda update -n base -c defaults conda
 RUN conda create -y --name jaspr -c conda-forge flask=2.0.1 blinker=1.4 \
-    flask-debugtoolbar bokeh=2.3.3 pandas=1.3.1 xlrd=2.0.1 xlsxwriter markdown=3.3.4 scipy=1.7.0 redis-py \
+    bokeh=2.3.3 pandas=1.3.1 xlrd=2.0.1 xlsxwriter markdown=3.3.4 scipy=1.7.0 redis-py \
     phantomjs selenium=3.14.1 uwsgi=2.0.19.1 firefox geckodriver nodejs
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr && \
     pip install flask-session
+
+# flask-debugtoolbar - removed from above 3/29/2022, prevented app from building
 
 # Copy the current directory contents into the container at /build
 ADD . /build

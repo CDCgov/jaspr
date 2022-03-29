@@ -1,7 +1,7 @@
 """Main application package."""
 from flask import Flask
 from flask_session import Session
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 from openpyxl import Workbook
 import redis
 import os
@@ -26,7 +26,7 @@ for f in files:
     os.remove(f)
 
 Session(app)
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 #put these at the end (per Flask Documentation)
 import jaspr.routes
