@@ -9,3 +9,4 @@ app/tmp/
 Notes.html
 *.egg-info
 build/.env
+build/run/*
