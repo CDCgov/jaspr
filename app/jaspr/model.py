@@ -57,6 +57,7 @@ class JasprModel(object):
         context['function_list'] = self.function_list
         context['parser_list'] = self.parser_list
         context['sample_list'] = self.sample_list
+        # context['pooled_sera_list'] = self.pooled_sera_list
         return context
 
     @property
@@ -68,6 +69,11 @@ class JasprModel(object):
     def parser_list(self):
         """List file parsing plugins"""
         return list(ParserRegistry.plugins)
+
+    # @property
+    # def pooled_sera_list(self):
+    #     """List the CUIDs in pooled sera"""
+    #     return (list(self.experiments[self.curr_experiment]['pooled_sera']))
 
     @property
     def experiment_list(self):

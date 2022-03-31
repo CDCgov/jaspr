@@ -156,7 +156,7 @@ class FRNT_VSS(HintCx5Parser):
     skiprows = 1
 
     def __init__(self, keyfile, datafile):
-        self.sera, self.dilution_factors, self.starting_titers, self.Xdata, sera_details = \
+        self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, sera_details = \
                 self._get_sera(keyfile)
         self.viruses, virus_details = self._get_viruses(keyfile)
 
@@ -170,9 +170,10 @@ class FRNT_VSS(HintCx5Parser):
             'blank_correction': False,
             'x_axis_type': 'log',
             'curr_function' : 'logistic4',
-            'experiments': self._get_all_experiments(datafile),
+            'experiments': self._get_all_experiments(keyfile, datafile),
             'sera': self.sera,
             'viruses': virus_details,
+            'pooled_sera': self.pooled_CUIDs
         }
 
         print("self.data:")
@@ -240,20 +241,19 @@ class FRNT_VSS(HintCx5Parser):
         names = pd.DataFrame(names)
         names = pd.DataFrame.transpose(names)
         pprint.pprint(names)
-        pools = [list(df['Pooled-Sera'])]
-        pools = pd.DataFrame(pools)
-        pools = pd.DataFrame.transpose(pools)
-
-        sera_pool = pd.concat([names, pools], axis=1)
-        sera_pool.columns = ['Name', 'Pools']
-        # sera_pool = sera_pool[['Name','Pools']].agg('-'.join, axis=1)
-        # sera_pool = pd.DataFrame(names, pools, columns=('Name', 'Pools'))
-        # sera_pool = sera_pool.Name.astype(str) + ' - ' + sera_pool.Pools.astype(str)
+        pooled_CUIDs = [list(df['Pooled-Sera'])]
+        pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
+        pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
+        pooled_CUIDs.columns = ['Pooled CUIDs']
+        pprint.pprint("pools:")
+        pprint.pprint(pooled_CUIDs)
+        sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
+        sera_pool.columns = ['Name', 'Pooled CUIDs']
         pprint.pprint("sera_pool")
         pprint.pprint(sera_pool)
 
 
-        return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, \
+        return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
         df.to_dict('index')
 
     def _get_viruses(self, keyfile):
@@ -474,8 +474,26 @@ class FRNT_VSS(HintCx5Parser):
         # Arith_means= Arithmetic means of 6 replicates
         # SE_means= Standard Error of the means of 6 replicates
         
-    def _get_all_experiments(self, datafile):
+    def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
+
+        self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+
+        # df = pd.read_excel(keyfile, sheet_name='Sera')
+        # names = [list(df['Name'])]
+        # names = pd.DataFrame(names)
+        # names = pd.DataFrame.transpose(names)
+        # pprint.pprint(names)
+        # pooled_CUIDs = [list(df['Pooled-Sera'])]
+        # pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
+        # pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
+        # pooled_CUIDs.columns = ['Pooled CUIDs']
+        # pprint.pprint("pools:")
+        # pprint.pprint(pooled_CUIDs)
+        # sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
+        # sera_pool.columns = ['Name', 'Pooled CUIDs']
+        # pprint.pprint("sera_pool")
+        # pprint.pprint(sera_pool)
 
 ## -- All raw data no means \/ \/ \/ \/        
         # All_plates, N = self._parse_csv(datafile)
@@ -568,13 +586,14 @@ class FRNT_VSS(HintCx5Parser):
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
+            'pooled_sera': self.pooled_CUIDs,
             'data': {},
             'results': {
                 'logistic3': {},
                 'robust_logistic3': {},
                 'logistic4': {},
                 'robust_logistic4': {}
-            }
+            },
         }
 
         # viruses per plate = 1       
@@ -655,7 +674,7 @@ class FRNT_VSS(HintCx5Parser):
                         'x_values': self.dilutions[titer],
                         'x_fit': x_fit,
                         'y_values': list(row),
-                        'y_error': list(StandardError),
+                        'y_error': list(StandardError),                        
                     }
                     X= X+1
                     experiments[virus] = exp              
