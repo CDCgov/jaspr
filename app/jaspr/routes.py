@@ -481,8 +481,14 @@ def reportFRNTresults():
     """Generate Excel Report"""
     jm=JasprModel()
 
-    # pprint.pprint("The JASPR Model:")
-    # pprint.pprint(jm.experiments)
+    pprint.pprint("The JASPR Model:")
+    pprint.pprint(jm.experiments)
+    
+    for experiment in jm.experiment_list:
+        for sample in jm.sample_list:
+    
+            pprint.pprint("experiment")
+            pprint.pprint(jm.experiments[experiment])
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -495,8 +501,8 @@ def reportFRNTresults():
         headerList.append(', Vmax')
         headerList.append(', titer')
 
-    pprint.pprint("headerList")
-    pprint.pprint(headerList)
+    # pprint.pprint("headerList")
+    # pprint.pprint(headerList)
 
     rowList = []
     rowAdd = []
@@ -510,37 +516,96 @@ def reportFRNTresults():
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['h']])
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']])
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']])
+ 
+    # pprint.pprint("rowList")
+    # pprint.pprint(rowList)
+    pprint.pprint("** Break **")
     
-         
+    # pooledAdd = []
+    # pooledSERA = []
+    # # for experiment in jm.experiment_list:
+    # pooledSERA.append(pooledAdd)
+    #     # for sample in jm.sample_list:
+    # pprint.pprint("Here is the pooled_sera---------")  
+    # # pprint.pprint(list(jm.experiments[experiment]['pooled_sera']))
+    # pprint.pprint(jm.experiments[experiment]['pooled_sera'])
+    # pooledAdd.append([jm.experiments[experiment]['pooled_sera']])
+   
+    # pprint.pprint("pooledSERA")
+    # pprint.pprint(pooledSERA)
 
-    pprint.pprint("rowList")
-    pprint.pprint(rowList)
+    pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
+    pprint.pprint("pooled CUIDs")
+    pprint.pprint(pooled_CUIDs)    
+
+    pooled_CUIDs = pooled_CUIDs.T
+    del pooled_CUIDs["CSID"] 
+    del pooled_CUIDs["Starting Dilution"]
+    del pooled_CUIDs["Dilution Factor"]
+
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("pooled CUIDs transpose")
+            pprint.pprint(pooled_CUIDs)
+
+    CUIDs = pooled_CUIDs['CUID'].astype(str) + ", " + pooled_CUIDs['Pooled-Sera'].astype(str)
+    CUIDs = pd.DataFrame(CUIDs)
+    # CUIDs = [CUIDs.T]
+    pprint.pprint("just CUIDs")
+    pprint.pprint(CUIDs)
+
+    pooled_CUIDs['CUIDs'] = CUIDs
     
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("pooled CUIDs")
+            pprint.pprint(pooled_CUIDs)
+    del pooled_CUIDs["Name"] 
+    del pooled_CUIDs["CUID"]
+    del pooled_CUIDs["Pooled-Sera"]
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("pooled CUIDs transpose 2")
+            pprint.pprint(pooled_CUIDs)
+
+    sera_CUIDs = pooled_CUIDs['CUIDs'].values.tolist()
+    pprint.pprint(sera_CUIDs)
+
     Viruses = jm.experiment_list
-    pprint.pprint("Viruses")
-    pprint.pprint(Viruses)
+    # pprint.pprint("Viruses")
+    # pprint.pprint(Viruses)
     N_virus = len(jm.experiment_list)
-    pprint.pprint("N_viruses:")
-    pprint.pprint(N_virus)
+    # pprint.pprint("N_viruses:")
+    # pprint.pprint(N_virus)
     Sera = jm.sample_list
     pprint.pprint("Sera")
     pprint.pprint(Sera)
     N_sera = len(jm.sample_list)
-    pprint.pprint("N_sera:")
-    pprint.pprint(N_sera)
+    # pprint.pprint("N_sera:")
+    # pprint.pprint(N_sera)
     SeraLIST = list(itertools.chain.from_iterable(itertools.repeat(Sera, N_virus)))
     pprint.pprint("SeraLIST:")
     pprint.pprint(SeraLIST)
     VirusLIST = list(itertools.chain.from_iterable(itertools.repeat(Viruses, N_sera)))
     VirusLIST.sort()
-    pprint.pprint("VirusLIST:")
-    pprint.pprint(VirusLIST)
+    # pprint.pprint("VirusLIST:")
+    # pprint.pprint(VirusLIST)
+    
+    pooled_CUIDs = list(itertools.chain.from_iterable(itertools.repeat(sera_CUIDs, N_virus)))
+    # with pd.option_context('display.max_rows', None, 
+    #         'display.max_columns', None, 
+    #         'display.precision', 0,):
+    #         pprint.pprint("pooled CUIDs")
+    pprint.pprint(pooled_CUIDs)
 
     N = N_virus * N_sera
 
     data = np.array(rowList[0])
-    pprint.pprint("data as array:")
-    pprint.pprint(data)
+    # pprint.pprint("data as array:")
+    # pprint.pprint(data)
      
     data = np.reshape(data, (N,4))
 
@@ -548,14 +613,16 @@ def reportFRNTresults():
             'display.max_columns', None, 
             'display.precision', 0,):
             pprint.pprint("data_to_reshape()")
-            pprint.pprint(data)
+            # pprint.pprint(data)
 
     SeraLIST = pd.DataFrame(SeraLIST, columns=['Sera'])
     VirusLIST = pd.DataFrame(VirusLIST, columns=['Virus'])
     data = pd.DataFrame(data, columns=['ec50', 'h', 'Vmax', 'titer'])
+    pooled_CUIDs = pd.DataFrame(pooled_CUIDs, columns=['CUID(s)'])
 
     Combined = [SeraLIST, VirusLIST, data]
     data = pd.concat(Combined, axis=1)
+    data = pd.concat([data, pooled_CUIDs], axis=1 )
     with pd.option_context('display.max_rows', None, 
             'display.max_columns', None, 
             'display.precision', 0,):
