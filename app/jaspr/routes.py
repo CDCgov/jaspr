@@ -571,6 +571,18 @@ def reportFRNTresults():
             pprint.pprint("pooled CUIDs transpose 2")
             pprint.pprint(pooled_CUIDs)
 
+    pprint.pprint("look here--")
+    pooled_CUIDs = pooled_CUIDs['CUIDs'].str.replace(', nan','')
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("replace")
+            pprint.pprint(pooled_CUIDs)
+
+    pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
+    pooled_CUIDs.columns=['CUIDs']
+    pprint.pprint(pooled_CUIDs)
+
     sera_CUIDs = pooled_CUIDs['CUIDs'].values.tolist()
     pprint.pprint(sera_CUIDs)
 
@@ -581,14 +593,14 @@ def reportFRNTresults():
     # pprint.pprint("N_viruses:")
     # pprint.pprint(N_virus)
     Sera = jm.sample_list
-    pprint.pprint("Sera")
-    pprint.pprint(Sera)
+    # pprint.pprint("Sera")
+    # pprint.pprint(Sera)
     N_sera = len(jm.sample_list)
     # pprint.pprint("N_sera:")
     # pprint.pprint(N_sera)
     SeraLIST = list(itertools.chain.from_iterable(itertools.repeat(Sera, N_virus)))
-    pprint.pprint("SeraLIST:")
-    pprint.pprint(SeraLIST)
+    # pprint.pprint("SeraLIST:")
+    # pprint.pprint(SeraLIST)
     VirusLIST = list(itertools.chain.from_iterable(itertools.repeat(Viruses, N_sera)))
     VirusLIST.sort()
     # pprint.pprint("VirusLIST:")
@@ -618,18 +630,39 @@ def reportFRNTresults():
     SeraLIST = pd.DataFrame(SeraLIST, columns=['Sera'])
     VirusLIST = pd.DataFrame(VirusLIST, columns=['Virus'])
     data = pd.DataFrame(data, columns=['ec50', 'h', 'Vmax', 'titer'])
-    pooled_CUIDs = pd.DataFrame(pooled_CUIDs, columns=['CUID(s)'])
+    pooled_CUIDs = pd.DataFrame(pooled_CUIDs, columns=['CUID or Inv.ID-CUIDs for pools'])
 
     Combined = [SeraLIST, VirusLIST, data]
     data = pd.concat(Combined, axis=1)
-    data = pd.concat([data, pooled_CUIDs], axis=1 )
     with pd.option_context('display.max_rows', None, 
             'display.max_columns', None, 
             'display.precision', 0,):
             pprint.pprint("data")
             pprint.pprint(data)
 
-    data.to_excel(writer, sheet_name="FRNT Result Analysis")
+    sera_ = data['Sera'].str.split(' ', expand=True)
+    sera_ = pd.DataFrame(sera_)
+    sera_.columns=['Sera Number', 'Sera CUIDs']
+    pprint.pprint(sera_)
+    
+    virus_ = data['Virus'].str.split(' ', expand=True)
+    virus_ = pd.DataFrame(virus_)
+    virus_.columns=['Virus Number', 'Virus CUIDs']
+    pprint.pprint(virus_)
+
+    Combined2 = [sera_, virus_, data, pooled_CUIDs]
+    data2 = pd.concat(Combined2, axis=1)
+    del data2["Sera"]
+    del data2["Virus"]
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("data2")
+            pprint.pprint(data2)
+
+
+
+    data2.to_excel(writer, sheet_name="FRNT Result Analysis")
 
     writer.close()
 
