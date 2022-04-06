@@ -138,7 +138,7 @@ class Logistic4(Logistic3):
 
     def _guess_params(self, concs, data):
         """Generate initial guesses for fit params"""
-        h_guess = 1.0
+        h_guess = 0.5
         for vmax_guess, ki_guess in super()._guess_params(concs, data):
             yield(vmax_guess, ki_guess, h_guess)
 
