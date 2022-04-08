@@ -169,7 +169,7 @@ class FRNT_VSS(HintCx5Parser):
             'show_fit': True,
             'blank_correction': False,
             'x_axis_type': 'log',
-            'curr_function' : 'logistic4',
+            'curr_function': 'logistic4',
             'experiments': self._get_all_experiments(keyfile, datafile),
             'sera': self.sera,
             'viruses': virus_details,
@@ -187,8 +187,8 @@ class FRNT_VSS(HintCx5Parser):
         seraLabels = seraNames
 
         seraNames = pd.DataFrame(seraNames)
-        pprint.pprint("seraNames:")
-        pprint.pprint(seraNames)
+        # pprint.pprint("seraNames:")
+        # pprint.pprint(seraNames)
         
         seraCount = len(seraNames)
 
@@ -215,42 +215,42 @@ class FRNT_VSS(HintCx5Parser):
             sera = AllReplicates
         
         seraList.reset_index(inplace=True)
-        pprint.pprint(seraList)
+        # pprint.pprint(seraList)
         seraList = seraList.drop('index', 1)
         # seraList['index'] = 0
         seraList.set_index('0')
-        pprint.pprint(seraList)
+        # pprint.pprint(seraList)
         seraList = seraList.T
         seraList = pd.DataFrame(seraList)
         print(seraList.dtypes)
-        pprint.pprint(seraList)
+        # pprint.pprint(seraList)
         
         Xdata = [list(df['Starting Dilution']), list(df['Dilution Factor'])]
 
-        pprint.pprint("Xdata")
-        pprint.pprint(Xdata)
+        # pprint.pprint("Xdata")
+        # pprint.pprint(Xdata)
   
         Starting_dilution = list(df['Starting Dilution'])
         # pprint.pprint(Starting_dilution)
 
         res = [ele for ele in Starting_dilution for i in range(6)]
-        pprint.pprint("res")
-        pprint.pprint(res)
+        # pprint.pprint("res")
+        # pprint.pprint(res)
 
         names = [list(df['Name'])]
         names = pd.DataFrame(names)
         names = pd.DataFrame.transpose(names)
-        pprint.pprint(names)
+        # pprint.pprint(names)
         pooled_CUIDs = [list(df['Pooled-Sera'])]
         pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
         pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
         pooled_CUIDs.columns = ['Pooled CUIDs']
-        pprint.pprint("pools:")
-        pprint.pprint(pooled_CUIDs)
+        # pprint.pprint("pools:")
+        # pprint.pprint(pooled_CUIDs)
         sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
         sera_pool.columns = ['Name', 'Pooled CUIDs']
-        pprint.pprint("sera_pool")
-        pprint.pprint(sera_pool)
+        # pprint.pprint("sera_pool")
+        # pprint.pprint(sera_pool)
 
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
@@ -269,19 +269,19 @@ class FRNT_VSS(HintCx5Parser):
                             'display.max_columns', None, 
                             'display.precision', 0,):
             pprint.pprint("Xdata--Beginning")
-            pprint.pprint(Xdata)
+            # pprint.pprint(Xdata)
         
 
         X_data = pd.DataFrame(Xdata)
 
-        pprint.pprint("self.dilutions:")
-        pprint.pprint(self.dilutions)
+        # pprint.pprint("self.dilutions:")
+        # pprint.pprint(self.dilutions)
         Sera = (len(self.dilutions))
         col = Sera
         start_dilution = X_data.iat[0, col]
         dilution_factor = X_data.iat[1, col]
-        pprint.pprint("self.starting_titers")
-        pprint.pprint(self.starting_titers)
+        # pprint.pprint("self.starting_titers")
+        # pprint.pprint(self.starting_titers)
 
         if start_titer not in self.dilutions:
             self.dilutions[start_titer] = ([start_dilution, start_dilution/dilution_factor, \
@@ -291,8 +291,8 @@ class FRNT_VSS(HintCx5Parser):
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
 
-        pprint.pprint("self.dilutions[start_titer]")
-        pprint.pprint(self.dilutions[start_titer])
+        # pprint.pprint("self.dilutions[start_titer]")
+        # pprint.pprint(self.dilutions[start_titer])
 
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
@@ -300,7 +300,7 @@ class FRNT_VSS(HintCx5Parser):
                                 'display.max_columns', None, 
                                 'display.precision', 0,):
             pprint.pprint("df:")
-            pprint.pprint(df)
+            # pprint.pprint(df)
 
         VSS = df.groupby(["Plate"], as_index=False)
 
@@ -309,15 +309,15 @@ class FRNT_VSS(HintCx5Parser):
         N = len(RAWdata)
         # pprint.pprint("N= ")
         print("N= ", N)
-        pprint.pprint("plates:")
-        print(RAWdata)
+        # pprint.pprint("plates:")
+        # print(RAWdata)
         SEMs = np.empty([1,11])
         gmeans = np.empty([1,11])
         Ameans = np.empty([1,11])
         AllData = pd.DataFrame(columns=['','','','','','','','',''])
         AllData = AllData.to_numpy()
-        pprint.pprint("AllData:")
-        pprint.pprint(AllData)
+        # pprint.pprint("AllData:")
+        # pprint.pprint(AllData)
 
         Y = N
         X = N - Y
@@ -331,46 +331,46 @@ class FRNT_VSS(HintCx5Parser):
             Temp_plate = Temp_plate.drop('Row', 1)
             Temp_plate = Temp_plate.drop('Column', 1)
             Temp_plate = Temp_plate.drop('SpotTotalAreaCh2', 1)
-            print("Temp_plate before numpy=", Temp_plate)
+            # print("Temp_plate before numpy=", Temp_plate)
             Temp_plate = Temp_plate.to_numpy()
-            print("Temp_plate after numpy=", Temp_plate)
+            # print("Temp_plate after numpy=", Temp_plate)
             
             Plate_name = RAWdata.loc[X][0]
-            pprint.pprint("Plate_name:")
-            pprint.pprint(Plate_name)
-            print(type(Plate_name))
+            # pprint.pprint("Plate_name:")
+            # pprint.pprint(Plate_name)
+            # print(type(Plate_name))
 
             VirA = Plate_name[0:4]          
             SerA = Plate_name[4:7]
             SerB = Plate_name[8:11]
             VirA_SerA = VirA + SerA
             VirA_SerB = VirA + SerB
-            pprint.pprint('VirA_SerA----')
-            pprint.pprint(VirA_SerA)
-            pprint.pprint('VirA_SerB----')
-            pprint.pprint(VirA_SerB)
+            # pprint.pprint('VirA_SerA----')
+            # pprint.pprint(VirA_SerA)
+            # pprint.pprint('VirA_SerB----')
+            # pprint.pprint(VirA_SerB)
 
 
             Samples = ([VirA_SerA],[VirA_SerA],[VirA_SerA],[VirA_SerA],[VirA_SerA],[VirA_SerA], \
                        [VirA_SerB],[VirA_SerB],[VirA_SerB],[VirA_SerB],[VirA_SerB],[VirA_SerB] )
-            pprint.pprint("Samples:")
-            pprint.pprint(Samples)
+            # pprint.pprint("Samples:")
+            # pprint.pprint(Samples)
 
             Samples_mean =(VirA_SerA, VirA_SerB) 
             Viruses_mean =(VirA, VirA)
             Seras_mean =(SerA, SerB)
             
-            print("Temp_plate before reshape=", Temp_plate)
+            # print("Temp_plate before reshape=", Temp_plate)
             Temp_plate = Temp_plate.reshape(8,12)
-            print("Temp_plate=", Temp_plate)
+            # print("Temp_plate=", Temp_plate)
 
             data = np.array(np.transpose(Temp_plate))
             data = np.append(Samples, data, axis=1)
-            print("data=", data)
+            # print("data=", data)
 
             AllData = np.vstack ((AllData, data))
-            pprint.pprint("AllData:")
-            pprint.pprint(AllData)
+            # pprint.pprint("AllData:")
+            # pprint.pprint(AllData)
 
 ##-- calculate arithmatic means for 6 replicates \/ \/ \/ \/
             Amean1a = mean([Temp_plate[0,0], Temp_plate[0,1], \
@@ -518,70 +518,70 @@ class FRNT_VSS(HintCx5Parser):
 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
-        pprint.pprint("Arith_means:")      
-        pprint.pprint(Arith_means)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means)
         labels = np.delete(Arith_means, [1,2,3,4,5,6,7,8, 9, 10], axis=1)
         labels = pd.DataFrame(labels)
-        pprint.pprint("labels are here ---------------")
-        pprint.pprint(labels)
+        # pprint.pprint("labels are here ---------------")
+        # pprint.pprint(labels)
         data = np.delete(Arith_means, 0, axis=1)
-        pprint.pprint("data")
-        pprint.pprint(data)
+        # pprint.pprint("data")
+        # pprint.pprint(data)
         # data = data[np.argsort(data[:,0])]
         # pprint.pprint("data_sorted-[:,0]")
         # pprint.pprint(data)
         ind = np.lexsort((data[:,0],data[:,1]))
-        pprint.pprint("data_sorted-[:,0],[:,1]")
-        pprint.pprint(data[ind])
+        # pprint.pprint("data_sorted-[:,0],[:,1]")
+        # pprint.pprint(data[ind])
         data = data[ind]
         data = np.delete(data, 0, axis=1)
         data = np.delete(data, 0, axis=1)
-        pprint.pprint("Data type: data")
-        pprint.pprint(data.dtype)
+        # pprint.pprint("Data type: data")
+        # pprint.pprint(data.dtype)
         data = pd.DataFrame(data)
-        pprint.pprint("data")
-        pprint.pprint(data)
+        # pprint.pprint("data")
+        # pprint.pprint(data)
         data= data.astype(float)
         data = pd.DataFrame.to_numpy(data)
-        pprint.pprint("data")
-        pprint.pprint(data)
-        pprint.pprint("Arith_means:")      
-        pprint.pprint(Arith_means) 
+        # pprint.pprint("data")
+        # pprint.pprint(data)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means) 
 ## -- Arith_means /\ /\ /\
 
 ## -- SE_means \/ \/ \/
-        pprint.pprint("SE_means:")      
-        pprint.pprint(SE_means)      
+        # pprint.pprint("SE_means:")      
+        # pprint.pprint(SE_means)      
 
         error = np.delete(SE_means, 0, axis=1)
-        pprint.pprint("error")
-        pprint.pprint(error)
+        # pprint.pprint("error")
+        # pprint.pprint(error)
         # error = error[np.argsort(error[:,0])]
         # pprint.pprint("error_sorted-[:,0]")
         # pprint.pprint(error)
         ind = np.lexsort((error[:,0],error[:,1]))
-        pprint.pprint("error_sorted-[:,0],[:,1]")
-        pprint.pprint(error[ind])
+        # pprint.pprint("error_sorted-[:,0],[:,1]")
+        # pprint.pprint(error[ind])
         error = error[ind]
         error = np.delete(error, 0, axis=1)
         error = np.delete(error, 0, axis=1)
-        pprint.pprint("data type: error")
-        pprint.pprint(error.dtype)
+        # pprint.pprint("data type: error")
+        # pprint.pprint(error.dtype)
         error = pd.DataFrame(error)
-        pprint.pprint("error")
-        pprint.pprint(error)
+        # pprint.pprint("error")
+        # pprint.pprint(error)
         error= error.astype(float)
         error = pd.DataFrame.to_numpy(error)
-        pprint.pprint("error")
-        pprint.pprint(error)
-        pprint.pprint("Arith_means:")      
-        pprint.pprint(Arith_means)   
+        # pprint.pprint("error")
+        # pprint.pprint(error)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means)   
 ## -- SE_means /\ /\ /\
 
-        pprint.pprint("labels:")      
-        pprint.pprint(labels)  
-        pprint.pprint("data:")      
-        pprint.pprint(data)                 
+        # pprint.pprint("labels:")      
+        # pprint.pprint(labels)  
+        # pprint.pprint("data:")      
+        # pprint.pprint(data)                 
 
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
@@ -603,7 +603,7 @@ class FRNT_VSS(HintCx5Parser):
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("self.sera:")
-            pprint.pprint(self.sera)
+            # pprint.pprint(self.sera)
 
         v_count = len(self.viruses)
         vpp = 1
@@ -614,23 +614,23 @@ class FRNT_VSS(HintCx5Parser):
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("self.viruses:")
-            pprint.pprint(self.viruses)
+            # pprint.pprint(self.viruses)
 
         print("v_count:")
-        pprint.pprint(v_count)
+        # pprint.pprint(v_count)
         
         s_count = len(self.sera)
         
         print("s_count:")
-        pprint.pprint(s_count)
+        # pprint.pprint(s_count)
 
         data_count = len(data)
-        pprint.pprint("data_count:")
-        pprint.pprint(data_count)
+        # pprint.pprint("data_count:")
+        # pprint.pprint(data_count)
         X=0
 
-        pprint.pprint("data")
-        pprint.pprint(data)
+        # pprint.pprint("data")
+        # pprint.pprint(data)
 # - - - OG \/ \/ \/
         while X < data_count:
             for s_index, (titer, serum) in enumerate(

@@ -35,6 +35,7 @@ class JasprModel(object):
         self.x_axis_type = 'linear'
 
         # ui state settigns
+        self.curr_run = ''
         self.curr_experiment = ''
         self.curr_sample = ''
         self.curr_parser = ''
