@@ -4,8 +4,10 @@
 """Flask routes for browser based jaspr UI"""
 
 # python imports
+from fileinput import filename
 import json
 from operator import index
+from typing_extensions import Self
 from urllib.parse import unquote
 from pandas import pandas as pd
 import numpy as np
@@ -13,6 +15,9 @@ from io import BytesIO
 import time
 import pprint
 import itertools 
+import os.path
+import tempfile
+import glob
 
 # flask imports
 from flask import Flask, render_template, request, \
@@ -29,14 +34,17 @@ from datetime import datetime
 from tempfile import NamedTemporaryFile
 
 from outlet import ParserRegistry
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
 
 def save_tmpfile(upload_handle):
     """Save uploaded files to /tmp"""
     tmp_handle = NamedTemporaryFile(delete=False)
     tmp_handle.close()
     upload_handle.save(tmp_handle.name)
-    return tmp_handle.name
 
+    return tmp_handle.name
 
 @app.route('/updateConfigSetting', methods=['POST'])
 def updateConfigSetting():
@@ -45,11 +53,46 @@ def updateConfigSetting():
         jm.update_attribute(k, v)
     return 'true'
 
+#  # Original code \/ \/ \/ ###
+# @app.route('/upload', methods = ['POST'])
+# def upload():
+#     datafile = save_tmpfile(request.files['datafile'])
+#     keyfile = save_tmpfile(request.files['keyfile'])
+
+#     jm = JasprModel()
+#     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+#     jm = JasprModel().set_defaults(settings)
+        
+#     return redirect("/", code=302)
+#  # Original code /\ /\ /\ ###
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/upload', methods = ['POST'])
 def upload():
     datafile = save_tmpfile(request.files['datafile'])
     keyfile = save_tmpfile(request.files['keyfile'])
+    # pprint.pprint(datafile)
+    # pprint.pprint(keyfile)
+    # \/ \/ Capture Key File Name \/ \/ #
+    file = request.files['keyfile']
+    filename = secure_filename(file.filename)
+    tmp_folder = '/tmp'
+    # pprint.pprint(os.getcwd())
+    os.chdir('../tmp')
+    # pprint.pprint(os.getcwd())
+    file.save(filename)    
+    # pprint.pprint(os.getcwd())
+    os.chdir('../app')
+    # pprint.pprint(os.getcwd())
+
+    # pprint.pprint("file:")
+    # pprint.pprint(file)
+    # pprint.pprint("filename:")
+    # pprint.pprint(filename)    
+    # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
@@ -57,6 +100,29 @@ def upload():
         
     return redirect("/", code=302)
    
+# @app.route('/upload', methods = ['POST'])
+# def get_filename():
+#     datafile = save_tmpfile(request.files['datafile'])
+#     keyfile = save_tmpfile(request.files['keyfile'])
+#     pprint.pprint(datafile)
+#     pprint.pprint(keyfile)
+#     # \/ \/ Capture Key File Name \/ \/ #
+#     file = request.files['keyfile']
+#     filename = secure_filename(file.filename)
+#     # tmp = tempfile.TemporaryFile('w+t')
+#     # tmp.write(filename)
+
+#     pprint.pprint("file:")
+#     pprint.pprint(file)
+#     pprint.pprint("filename:")
+#     pprint.pprint(filename)    
+#     # /\ /\ Capture Key File Name /\ /\ #        
+
+#     jm = JasprModel()
+#     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+#     jm = JasprModel().set_defaults(settings)
+        
+#     return filename
 
 @app.route("/ping", methods = ['GET'])
 def ping():
@@ -481,14 +547,27 @@ def reportFRNTresults():
     """Generate Excel Report"""
     jm=JasprModel()
 
-    pprint.pprint("The JASPR Model:")
-    pprint.pprint(jm.experiments)
+    # pprint.pprint("The JASPR Model:")
+    # pprint.pprint(jm.experiments)
     
-    for experiment in jm.experiment_list:
-        for sample in jm.sample_list:
+    # for experiment in jm.experiment_list:
+    #     for sample in jm.sample_list:
     
-            pprint.pprint("experiment")
-            pprint.pprint(jm.experiments[experiment])
+            # pprint.pprint("experiment")
+            # pprint.pprint(jm.experiments[experiment])
+
+    pprint.pprint(os.getcwd())
+    os.chdir('../tmp')
+    pprint.pprint(os.getcwd())
+    filename = glob.glob('/tmp/*xlsx')
+    pprint.pprint(filename)
+    filename = max(filename, key=os.path.getctime)
+    pprint.pprint(filename)
+    testname = pd.DataFrame([filename], columns=['Test Name'])
+    testname = testname.replace(regex={'/tmp/':'', '.xlsx':''})
+    # filename = testname.append(filename)
+    pprint.pprint(testname)
+
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -535,8 +614,8 @@ def reportFRNTresults():
     # pprint.pprint(pooledSERA)
 
     pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
-    pprint.pprint("pooled CUIDs")
-    pprint.pprint(pooled_CUIDs)    
+    # pprint.pprint("pooled CUIDs")
+    # pprint.pprint(pooled_CUIDs)    
 
     pooled_CUIDs = pooled_CUIDs.T
     del pooled_CUIDs["CSID"] 
@@ -650,7 +729,7 @@ def reportFRNTresults():
     virus_.columns=['Virus Number', 'Virus CUIDs']
     pprint.pprint(virus_)
 
-    Combined2 = [sera_, virus_, data, pooled_CUIDs]
+    Combined2 = [testname, sera_, virus_, data, pooled_CUIDs]
     data2 = pd.concat(Combined2, axis=1)
     del data2["Sera"]
     del data2["Virus"]
@@ -660,7 +739,8 @@ def reportFRNTresults():
             pprint.pprint("data2")
             pprint.pprint(data2)
 
-
+    # pprint.pprint('filename')
+    # pprint.pprint(get_filename())
 
     data2.to_excel(writer, sheet_name="FRNT Result Analysis")
 
