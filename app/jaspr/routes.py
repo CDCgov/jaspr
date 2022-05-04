@@ -75,8 +75,7 @@ def allowed_file(filename):
 def upload():
     datafile = save_tmpfile(request.files['datafile'])
     keyfile = save_tmpfile(request.files['keyfile'])
-    # pprint.pprint(datafile)
-    # pprint.pprint(keyfile)
+
     # \/ \/ Capture Key File Name \/ \/ #
     file = request.files['keyfile']
     filename = secure_filename(file.filename)
@@ -88,11 +87,6 @@ def upload():
     # pprint.pprint(os.getcwd())
     os.chdir('../app')
     # pprint.pprint(os.getcwd())
-
-    # pprint.pprint("file:")
-    # pprint.pprint(file)
-    # pprint.pprint("filename:")
-    # pprint.pprint(filename)    
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
@@ -101,30 +95,6 @@ def upload():
         
     return redirect("/", code=302)
    
-# @app.route('/upload', methods = ['POST'])
-# def get_filename():
-#     datafile = save_tmpfile(request.files['datafile'])
-#     keyfile = save_tmpfile(request.files['keyfile'])
-#     pprint.pprint(datafile)
-#     pprint.pprint(keyfile)
-#     # \/ \/ Capture Key File Name \/ \/ #
-#     file = request.files['keyfile']
-#     filename = secure_filename(file.filename)
-#     # tmp = tempfile.TemporaryFile('w+t')
-#     # tmp.write(filename)
-
-#     pprint.pprint("file:")
-#     pprint.pprint(file)
-#     pprint.pprint("filename:")
-#     pprint.pprint(filename)    
-#     # /\ /\ Capture Key File Name /\ /\ #        
-
-#     jm = JasprModel()
-#     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
-#     jm = JasprModel().set_defaults(settings)
-        
-#     return filename
-
 @app.route("/ping", methods = ['GET'])
 def ping():
     """Simple function for AJAX test"""
@@ -597,20 +567,18 @@ def reportFRNTresults():
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']])
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']])
  
-    pprint.pprint("** Break **")
+    # pprint.pprint("** Break **")
 
     pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
 
     pooled_CUIDs = pooled_CUIDs.T
-    del pooled_CUIDs["CSID"] 
-    # del pooled_CUIDs["Starting Dilution"]
-    # del pooled_CUIDs["Dilution Factor"]
+    # del pooled_CUIDs["CSID"] 
  
-    with pd.option_context('display.max_rows', None, 
-            'display.max_columns', None, 
-            ):
-            pprint.pprint("pooled CUIDs transpose")
-            pprint.pprint(pooled_CUIDs)
+    # with pd.option_context('display.max_rows', None, 
+    #         'display.max_columns', None, 
+    #         ):
+    #         pprint.pprint("pooled CUIDs transpose")
+    #         pprint.pprint(pooled_CUIDs)
     Start_dilution = pooled_CUIDs['Starting Dilution'].astype(str)
     Start_dilution = pd.DataFrame(Start_dilution)
     Start_dilution = Start_dilution['Starting Dilution'].values.tolist()
@@ -619,49 +587,57 @@ def reportFRNTresults():
     Dilution_factor = pd.DataFrame(Dilution_factor)
     Dilution_factor = Dilution_factor['Dilution Factor'].values.tolist()
 
-    pprint.pprint(Start_dilution)
-    pprint.pprint(Dilution_factor)
+    Sera_CSIDs = pooled_CUIDs['CSID'].astype(str)
+    Sera_CSIDs = pd.DataFrame(Sera_CSIDs)
+    Sera_CSIDs = Sera_CSIDs['CSID'].values.tolist()
+
+    # pprint.pprint(Start_dilution)
+    # pprint.pprint(Dilution_factor)
+    # pprint.pprint(Sera_CSIDs)
 
     CUIDs = pooled_CUIDs['CUID'].astype(str) + ", " + pooled_CUIDs['Pooled-Sera'].astype(str)
     CUIDs = pd.DataFrame(CUIDs)
 
-    pprint.pprint("just CUIDs")
-    pprint.pprint(CUIDs)
+    # pprint.pprint("just CUIDs")
+    # pprint.pprint(CUIDs)
 
     pooled_CUIDs['CUIDs'] = CUIDs
     
-    with pd.option_context('display.max_rows', None, 
-            'display.max_columns', None, 
-            ):
-            pprint.pprint("pooled CUIDs")
-            pprint.pprint(pooled_CUIDs)
+    # with pd.option_context('display.max_rows', None, 
+    #         'display.max_columns', None, 
+    #         ):
+    #         pprint.pprint("pooled CUIDs")
+    #         pprint.pprint(pooled_CUIDs)
     del pooled_CUIDs["Name"] 
     del pooled_CUIDs["CUID"]
     del pooled_CUIDs["Pooled-Sera"]
-    with pd.option_context('display.max_rows', None, 
-            'display.max_columns', None, 
-            ):
-            pprint.pprint("pooled CUIDs transpose 2")
-            pprint.pprint(pooled_CUIDs)
+    # with pd.option_context('display.max_rows', None, 
+    #         'display.max_columns', None, 
+    #         ):
+    #         pprint.pprint("pooled CUIDs transpose 2")
+    #         pprint.pprint(pooled_CUIDs)
 
-    pprint.pprint("look here--")
+    # pprint.pprint("look here--")
     pooled_CUIDs = pooled_CUIDs['CUIDs'].str.replace(', nan','')
-    with pd.option_context('display.max_rows', None, 
-            'display.max_columns', None, 
-            'display.precision', 0,):
-            pprint.pprint("replace")
-            pprint.pprint(pooled_CUIDs)
+    # with pd.option_context('display.max_rows', None, 
+    #         'display.max_columns', None, 
+    #         'display.precision', 0,):
+    #         pprint.pprint("replace")
+    #         pprint.pprint(pooled_CUIDs)
 
     pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
     pooled_CUIDs.columns=['CUIDs']
-    pprint.pprint(pooled_CUIDs)
+    # pprint.pprint(pooled_CUIDs)
 
     sera_CUIDs = pooled_CUIDs['CUIDs'].values.tolist()
-    pprint.pprint(sera_CUIDs)
+    # pprint.pprint(sera_CUIDs)
 
     Viruses = jm.experiment_list
     # pprint.pprint("Viruses")
     # pprint.pprint(Viruses)
+    virus_CSIDs = jm.experiments[experiment]['virus_CSIDs']
+    pprint.pprint("virus_CSIDs")
+    pprint.pprint(virus_CSIDs)
     virus_type = jm.experiments[experiment]['virus_type']
     # pprint.pprint("virus_type")
     # pprint.pprint(virus_type)
@@ -684,29 +660,34 @@ def reportFRNTresults():
     # pprint.pprint("SeraLIST:")
     # pprint.pprint(SeraLIST)
     VirusLIST = list(itertools.chain.from_iterable(itertools.repeat(Viruses, N_sera)))
-    pprint.pprint("VirusLIST:")
-    pprint.pprint(VirusLIST)
+    # pprint.pprint("VirusLIST:")
+    # pprint.pprint(VirusLIST)
+    virus_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(virus_CSIDs, N_sera)))
+    pprint.pprint("virus_CSIDs")
+    pprint.pprint(virus_CSIDs)
     virus_type = list(itertools.chain.from_iterable(itertools.repeat(virus_type, N_sera)))
     pprint.pprint("virus_type")
     pprint.pprint(virus_type)
     target_activity = list(itertools.chain.from_iterable(itertools.repeat(target_activity, N_sera)))
-    pprint.pprint("target_activity")
-    pprint.pprint(target_activity)
+    # pprint.pprint("target_activity")
+    # pprint.pprint(target_activity)
     initial_activity = list(itertools.chain.from_iterable(itertools.repeat(initial_activity, N_sera)))
-    pprint.pprint("initial_activity")
-    pprint.pprint(initial_activity)
+    # pprint.pprint("initial_activity")
+    # pprint.pprint(initial_activity)
 
     pooled_CUIDs = list(itertools.chain.from_iterable(itertools.repeat(sera_CUIDs, N_virus)))
     Start_dilution = list(itertools.chain.from_iterable(itertools.repeat(Start_dilution, N_virus)))
     Dilution_factor = list(itertools.chain.from_iterable(itertools.repeat(Dilution_factor, N_virus)))
+    Sera_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(Sera_CSIDs, N_virus)))
     # with pd.option_context('display.max_rows', None, 
     #         'display.max_columns', None, 
     #         'display.precision', 0,):
     #         pprint.pprint("pooled CUIDs")
-    pprint.pprint(pooled_CUIDs)
-    pprint.pprint(Start_dilution)
-    pprint.pprint(Dilution_factor)
-    
+    # pprint.pprint(pooled_CUIDs)
+    # pprint.pprint(Start_dilution)
+    # pprint.pprint(Dilution_factor)
+    # pprint.pprint(Sera_CSIDs)
+
     N = N_virus * N_sera
 
     data = np.array(rowList[0])
@@ -723,10 +704,11 @@ def reportFRNTresults():
 
     SeraLIST = pd.DataFrame(SeraLIST, columns=['Sera'])
     VirusLIST = pd.DataFrame(VirusLIST, columns=['Virus'])
+    virus_CSIDs = pd.DataFrame(virus_CSIDs, columns=['Virus CSIDs'])
     virus_type = pd.DataFrame(virus_type, columns=['Virus type'])
     target_activity = pd.DataFrame(target_activity, columns=['Target activity'])
     initial_activity = pd.DataFrame(initial_activity, columns=['Initial activity'])
-    Virus_data = [VirusLIST, virus_type, target_activity, initial_activity]
+    Virus_data = [VirusLIST, virus_CSIDs, virus_type, target_activity, initial_activity]
     Virus_data = pd.concat(Virus_data, axis=1)
     Virus_data = Virus_data.sort_values(by=['Virus'])
     Virus_data = Virus_data.drop(['Virus'], axis=1)
@@ -745,6 +727,7 @@ def reportFRNTresults():
     pooled_CUIDs = pd.DataFrame(pooled_CUIDs, columns=['Sera CUIDs'])
     Start_dilution = pd.DataFrame(Start_dilution, columns=['Starting dilution'])
     Dilution_factor = pd.DataFrame(Dilution_factor, columns=['Dilution factor'])
+    Sera_CSIDs = pd.DataFrame(Sera_CSIDs, columns=['Sera CSIDs'])
 
     Combined = [SeraLIST, VirusLIST, data]
     data = pd.concat(Combined, axis=1)
@@ -771,7 +754,7 @@ def reportFRNTresults():
     Error = pd.DataFrame(columns=['Error'])
     Error = Error.replace({'Error': {'NaN':''}})
 
-    Combined2 = [sera_, pooled_CUIDs, Start_dilution, Dilution_factor, virus_, Virus_data, data, Error]
+    Combined2 = [sera_, pooled_CUIDs, Sera_CSIDs, Start_dilution, Dilution_factor, virus_, Virus_data, data, Error]
     data = pd.concat(Combined2, axis=1)
     del data["Sera"]
     del data["Virus"]
@@ -815,8 +798,8 @@ def reportFRNTresults():
     pprint.pprint('data')
     pprint.pprint(data)
 
-    labels = [['Sera Number', 'Sera CUIDs', 'Starting dilution', 'Dilution factor', \
-        'Virus Number', 'Virus CUIDs', 'Virus type', 'Target activity', \
+    labels = [['Sera Number', 'Sera CUIDs', 'Sera CSIDs', 'Starting dilution', 'Dilution factor', \
+        'Virus Number', 'Virus CUIDs', 'Virus CSIDs', 'Virus type', 'Target activity', \
         'Initial activity', 'ec50', 'h', 'Vmax', 'titer', 'Error']]  
 
     FRNTreport = Table + labels + data

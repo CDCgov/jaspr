@@ -158,7 +158,7 @@ class FRNT_VSS(HintCx5Parser):
     def __init__(self, keyfile, datafile):
         self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, sera_details = \
                 self._get_sera(keyfile)
-        self.viruses, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
+        self.viruses, self.virus_CSIDs, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
 
         self.dilutions = {}
 
@@ -174,6 +174,7 @@ class FRNT_VSS(HintCx5Parser):
             'sera': self.sera,
             'pooled_sera': self.pooled_CUIDs,
             'viruses': self.viruses,
+            'virus_CSIDs': self.virus_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'target_activity': self.target_activity
@@ -263,7 +264,8 @@ class FRNT_VSS(HintCx5Parser):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
         virus_CUID = [f"{row[0]} {row['CUID']}" 
                         for index, row in df.iterrows()]
-
+        virus_CSIDs = [f"{row['CSID']}" 
+                        for index, row in df.iterrows()]
         virus_type = [f"{row['Reference']}" 
                         for index, row in df.iterrows()]
         virus_type = [w.replace('Y', 'reference').replace('N', 'test') for w in virus_type]
@@ -273,7 +275,7 @@ class FRNT_VSS(HintCx5Parser):
         target_activity = [f"{row['Target FFU/mL']}" 
                         for index, row in df.iterrows()]
 
-        return virus_CUID, virus_type, initial_activity, target_activity, df.to_dict('index')
+        return virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
 
 #   self.viruses, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
 #         
@@ -607,6 +609,7 @@ class FRNT_VSS(HintCx5Parser):
             'y_axis_label': 'Infected Cell Population (ICP)',
             'pooled_sera': self.pooled_CUIDs,
             'viruses': self.viruses,
+            'virus_CSIDs': self.virus_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'target_activity': self.target_activity,
