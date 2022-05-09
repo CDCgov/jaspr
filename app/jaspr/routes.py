@@ -808,7 +808,7 @@ def reportFRNTresults():
     pprint.pprint(FRNTreport)
     # data.loc[-1] = ['Test type', test_type, "", "", "", "", "", "", "", "", "", "", "", "",]
 
-    FRNTreport.to_excel(writer, sheet_name="FRNT Result Analysis")
+    FRNTreport.to_excel(writer, sheet_name="FRNT Result Analysis", index=False, startrow = 0, header = False)
 
     writer.close()
 
