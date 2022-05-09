@@ -728,6 +728,7 @@ def reportFRNTresults():
     Start_dilution = pd.DataFrame(Start_dilution, columns=['Starting dilution'])
     Dilution_factor = pd.DataFrame(Dilution_factor, columns=['Dilution factor'])
     Sera_CSIDs = pd.DataFrame(Sera_CSIDs, columns=['Sera CSIDs'])
+    Sera_CSIDs = Sera_CSIDs.replace("nan","")
 
     Combined = [SeraLIST, VirusLIST, data]
     data = pd.concat(Combined, axis=1)
