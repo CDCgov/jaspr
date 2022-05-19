@@ -79,80 +79,9 @@ class HintBase(object):
     def __call__(self):
         return self.data
 
-
-class HintCx5Parser(HintBase, ParserRegistry):
-    name = 'hint_cx5'
-    description = 'CX5 HINT parser'
-
-    def _parse_csv(self, datafile):
-        df = pd.read_csv(datafile)
-
-        # Reshape our data to 12-long rows, and capture the last column
-        # as per-plate averaged background
-        grid, background = np.split(np.reshape(
-                df['SelectedObjectCount'].to_numpy(),
-                (-1, 12)), [11], axis=1)
-        grid = grid.astype('float64')
-        return grid, background, df
-
-    def _get_all_experiments(self, datafile):
-        experiments = {}
-        grid, background = self._parse_csv(datafile)
-        mean_background = np.mean(np.reshape(background, (-1, 8)), axis=1)
-
-        new_exp = {
-            'x_axis_label': 'Relative Dilution (ppm)',
-            'y_axis_label': 'Infected Cell Population (ICP)',
-            'data': {},
-            'results': {
-                'robust_logistic4': {},
-            }
-        }
-
-        # viruses per plate = 8
-        vpp = 8
-        v_count = len(self.viruses)
-        s_count = len(self.sera)
-
-        for s_index, (titer, serum) in enumerate(
-                zip(self.starting_titers, self.sera)):
-            for v_index, virus in enumerate(self.viruses):
-                # find the plate and position of a sample
-                plate_offset, position_offset = divmod(v_index, vpp)
-
-                row = grid[vpp * (plate_offset * s_count + s_index) \
-                        + position_offset]
-                cc = mean_background[(v_count*s_index+v_index)//vpp]
-                vc = row[10] - cc
-
-                exp = experiments.get(virus, copy.deepcopy(new_exp))
-                #y_corrected = list(row)
-                y_corrected = list(row - cc)
-                x_fit = self.dilutions[titer].copy()
-                x_fit[-1] = 0
-                exp['data'][serum] = {
-                    'x_values': self.dilutions[titer],
-                    'x_fit': x_fit,
-                    'y_values': list(row),
-                    'y_corrected': y_corrected,
-                }
-                experiments[virus] = exp
-
-                for plugin_name in exp['results'].keys():
-                    try:
-                        labels = fit(plugin_name, x_fit, y_corrected)
-                    except ValueError:
-                        labels = {plugin_name: 'regression failed'}
-                    labels['cc'] = str(cc)
-                    labels['vc'] = str(vc)
-                    exp['results'][plugin_name][serum] = labels
-
-        return experiments
-
-
-class FRNT_VSS(HintCx5Parser):
-    name = 'FRNT V-S-S'
-    description = 'FRNT V-S-S parser'
+class FRNT_VSS_Cx5(HintBase, ParserRegistry):
+    name = 'FRNT Virus-Sera-Sera Plate Layout Cx5'
+    description = 'FRNT V-S-S parser for raw data from Cx5 plate reader'
     skiprows = 1
 
     def __init__(self, keyfile, datafile):
@@ -180,9 +109,11 @@ class FRNT_VSS(HintCx5Parser):
             'target_activity': self.target_activity
         }
 
-        print("self.data:")
-        pprint.pprint(self.data)
-
+        # print("self.data:")
+        # pprint.pprint(self.data)
+  
+        # Get required information from Sera tab of Key File
+        # as defined in __init__
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         
@@ -259,7 +190,9 @@ class FRNT_VSS(HintCx5Parser):
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
         df.to_dict('index')
-
+        
+        # Get required information from Virus tab of Key File
+        # as defined in __init__
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
         virus_CUID = [f"{row[0]} {row['CUID']}" 
@@ -277,13 +210,8 @@ class FRNT_VSS(HintCx5Parser):
 
         return virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
 
-#   self.viruses, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
-#         
-
-        # return [f"{row[0]} {row['CUID']}" 
-        #                 for index, row in df.iterrows()], \
-        #                 df.to_dict('index')
-
+        # Get required information from Sera tab of Key File
+        # to define the Xdata from the start dilution and dilution factor
     def _get_dilutions(self, start_titer, Xdata):
 
         with pd.option_context('display.max_rows', None, 
@@ -312,9 +240,8 @@ class FRNT_VSS(HintCx5Parser):
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
 
-        # pprint.pprint("self.dilutions[start_titer]")
-        # pprint.pprint(self.dilutions[start_titer])
-
+        # Reshape data from the data file to fit into formatted rows
+        # required by _get_all_experiments() below.
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
         with pd.option_context('display.max_rows', None, 
@@ -481,7 +408,9 @@ class FRNT_VSS(HintCx5Parser):
         Arith_means = np.delete(Arith_means, obj=0, axis=0)
         SE_means = np.delete(SE_means, obj=0, axis=0)
         pprint.pprint("Here is all the data:")
+        np.set_printoptions(threshold=np.inf)
         pprint.pprint(All_plates)
+            
         pprint.pprint("Here are the Arith_means:")
         pprint.pprint(Arith_means)
         pprint.pprint("Here are the SE_means:")
@@ -490,31 +419,20 @@ class FRNT_VSS(HintCx5Parser):
 
         return Arith_means, SE_means
         # return the type of data that you want to use here, and 
-        # block/unblock the appropriate lines below to match
+        # block/unblock the appropriate lines below in
+        # _get_all_experiments() to match your desire.
         # All_plates= All Raw, unaveraged data
         # Arith_means= Arithmetic means of 6 replicates
         # SE_means= Standard Error of the means of 6 replicates
         
+        # This is where the data is organized for the functions to 
+        # use to perform calculations of interest
+        # function file located in app > outlet > functions
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
         self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
 
-        # df = pd.read_excel(keyfile, sheet_name='Sera')
-        # names = [list(df['Name'])]
-        # names = pd.DataFrame(names)
-        # names = pd.DataFrame.transpose(names)
-        # pprint.pprint(names)
-        # pooled_CUIDs = [list(df['Pooled-Sera'])]
-        # pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
-        # pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
-        # pooled_CUIDs.columns = ['Pooled CUIDs']
-        # pprint.pprint("pools:")
-        # pprint.pprint(pooled_CUIDs)
-        # sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
-        # sera_pool.columns = ['Name', 'Pooled CUIDs']
-        # pprint.pprint("sera_pool")
-        # pprint.pprint(sera_pool)
 
 ## -- All raw data no means \/ \/ \/ \/        
         # All_plates, N = self._parse_csv(datafile)
@@ -598,12 +516,7 @@ class FRNT_VSS(HintCx5Parser):
         # pprint.pprint("Arith_means:")      
         # pprint.pprint(Arith_means)   
 ## -- SE_means /\ /\ /\
-
-        # pprint.pprint("labels:")      
-        # pprint.pprint(labels)  
-        # pprint.pprint("data:")      
-        # pprint.pprint(data)                 
-
+            
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
@@ -651,39 +564,17 @@ class FRNT_VSS(HintCx5Parser):
         # pprint.pprint(s_count)
 
         data_count = len(data)
-        # pprint.pprint("data_count:")
-        # pprint.pprint(data_count)
+
         X=0
 
-        # pprint.pprint("data")
-        # pprint.pprint(data)
-# - - - OG \/ \/ \/
         while X < data_count:
             for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
                 for v_index, virus in enumerate(self.viruses):
-                # find the plate and position of a sample
-                    # plate_offset, position_offset = divmod(v_index, v_count)
-                    # pprint.pprint(divmod(v_index, v_count))
+
                     row = data[X]
                     StandardError = error[X]
-                    # pprint.pprint("v_index:")
-                    # pprint.pprint(v_index)          
 
-                    # pprint.pprint("virus")
-                    # pprint.pprint(virus)
-
-                    # pprint.pprint("vpp")
-                    # pprint.pprint(vpp)
-
-                    # pprint.pprint("s_count:")
-                    # pprint.pprint(s_count)
-
-                    # pprint.pprint("position_offset:")
-                    # pprint.pprint(position_offset)
-                
-                    # pprint.pprint("plate_offset:")
-                    # pprint.pprint(plate_offset)
                     print('X= ', X)
                     pprint.pprint("row")
                     pprint.pprint(row)
@@ -718,3 +609,199 @@ class FRNT_VSS(HintCx5Parser):
                     pprint.pprint("done...")                
 
         return experiments
+
+class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
+    name = 'FRNT Sera-Virus-Virus Plate Layout Cx5'
+    description = 'FRNT S-V-V parser for raw data from Cx5 plate reader'
+    skiprows = 1
+
+    def _get_all_experiments(self, keyfile, datafile):
+        experiments = {}
+
+        self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+
+
+## -- All raw data no means \/ \/ \/ \/        
+        # All_plates, N = self._parse_csv(datafile)
+        # pprint.pprint("All_plates:")      
+        # pprint.pprint(All_plates) 
+                
+        # labels = np.delete(All_plates, [1,2,3,4,5,6,7,8], axis=1)
+        # pprint.pprint("labels:")      
+        # pprint.pprint(labels)  
+        # labels = np.transpose(labels)
+        # pprint.pprint("labels:")      
+        # pprint.pprint(labels)  
+        # labels = pd.DataFrame(labels)
+        # pprint.pprint("labels:")      
+        # pprint.pprint(labels)  
+
+        # data = np.delete(All_plates, 0, axis=1)
+        # data = data.astype(int)
+        # data = data.tolist()
+
+## -- All raw data no means /\ /\ /\
+
+## -- Arith_means \/ \/ \/ \/        
+        Arith_means, SE_means = self._parse_csv(datafile)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means)
+        labels = np.delete(Arith_means, [1,2,3,4,5,6,7,8, 9, 10], axis=1)
+        labels = pd.DataFrame(labels)
+        # pprint.pprint("labels are here ---------------")
+        # pprint.pprint(labels)
+        data = np.delete(Arith_means, 0, axis=1)
+        # pprint.pprint("data")
+        # pprint.pprint(data)
+        # data = data[np.argsort(data[:,0])]
+        # pprint.pprint("data_sorted-[:,0]")
+        # pprint.pprint(data)
+        ind = np.lexsort((data[:,1],data[:,0]))
+        # pprint.pprint("data_sorted-[:,0],[:,1]")
+        # pprint.pprint(data[ind])
+        data = data[ind]
+
+        data = np.delete(data, 0, axis=1)
+        data = np.delete(data, 0, axis=1)
+
+        # pprint.pprint("Data type: data")
+        # pprint.pprint(data.dtype)
+        data = pd.DataFrame(data)
+        with pd.option_context('display.max_rows', None, 
+                                 'display.max_columns', None, 
+                                 'display.precision', 0,):        
+            pprint.pprint("data")
+            pprint.pprint(data)
+
+
+        
+        data= data.astype(float)
+        data = pd.DataFrame.to_numpy(data)
+        # pprint.pprint("data")
+        # pprint.pprint(data)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means) 
+## -- Arith_means /\ /\ /\
+
+## -- SE_means \/ \/ \/
+        # pprint.pprint("SE_means:")      
+        # pprint.pprint(SE_means)      
+
+        error = np.delete(SE_means, 0, axis=1)
+        # pprint.pprint("error")
+        # pprint.pprint(error)
+        # error = error[np.argsort(error[:,0])]
+        # pprint.pprint("error_sorted-[:,0]")
+        # pprint.pprint(error)
+        ind = np.lexsort((error[:,0],error[:,1]))
+        # pprint.pprint("error_sorted-[:,0],[:,1]")
+        # pprint.pprint(error[ind])
+        error = error[ind]
+        error = np.delete(error, 0, axis=1)
+        error = np.delete(error, 0, axis=1)
+        # pprint.pprint("data type: error")
+        # pprint.pprint(error.dtype)
+        error = pd.DataFrame(error)
+        # pprint.pprint("error")
+        # pprint.pprint(error)
+        error= error.astype(float)
+        error = pd.DataFrame.to_numpy(error)
+        # pprint.pprint("error")
+        # pprint.pprint(error)
+        # pprint.pprint("Arith_means:")      
+        # pprint.pprint(Arith_means)   
+## -- SE_means /\ /\ /\
+            
+        new_exp = {
+            'x_axis_label': 'Relative Dilution (ppm)',
+            'y_axis_label': 'Infected Cell Population (ICP)',
+            'pooled_sera': self.pooled_CUIDs,
+            'viruses': self.viruses,
+            'virus_CSIDs': self.virus_CSIDs,
+            'virus_type': self.virus_type,
+            'initial_activity': self.initial_activity,
+            'target_activity': self.target_activity,
+            'data': {},
+            'results': {
+                'logistic3': {},
+                'robust_logistic3': {},
+                'logistic4': {},
+                'robust_logistic4': {}
+            },
+        }
+
+        # viruses per plate = 1       
+        print("self.sera:")
+        pprint.pprint(self.sera)
+        with pd.option_context('display.max_rows', None, 
+                                 'display.max_columns', None, 
+                                 'display.precision', 0,):
+            pprint.pprint("self.sera:")
+            # pprint.pprint(self.sera)
+
+        v_count = len(self.viruses)
+        vpp = 1
+
+        print("self.viruses:")
+        pprint.pprint(self.viruses)
+        with pd.option_context('display.max_rows', None, 
+                                 'display.max_columns', None, 
+                                 'display.precision', 0,):
+            pprint.pprint("self.viruses:")
+            # pprint.pprint(self.viruses)
+
+        print("v_count:")
+        # pprint.pprint(v_count)
+        
+        s_count = len(self.sera)
+        
+        print("s_count:")
+        # pprint.pprint(s_count)
+
+        data_count = len(data)
+
+        X=0
+
+        while X < data_count:
+            for s_index, (titer, serum) in enumerate(
+                zip(self.starting_titers, self.sera)):
+                for v_index, virus in enumerate(self.viruses):
+
+                    row = data[X]
+                    StandardError = error[X]
+
+                    print('X= ', X)
+                    pprint.pprint("row")
+                    pprint.pprint(row)
+                    pprint.pprint("StandardError")
+                    pprint.pprint(StandardError)
+                    pprint.pprint(virus)
+                    pprint.pprint(serum)
+                    exp = experiments.get(virus, copy.deepcopy(new_exp))
+                    y_corrected = list(row)
+                    x_fit = self.dilutions[titer].copy()
+                    x_fit[-1] = 0
+
+                    exp['data'][serum] = {
+                        'x_values': self.dilutions[titer],
+                        'x_fit': x_fit,
+                        'y_values': list(row),
+                        'y_error': list(StandardError),                        
+                    }
+                    X= X+1
+                    experiments[virus] = exp              
+
+                    for plugin_name in exp['results'].keys():
+                        try:
+                            labels = fit(plugin_name, x_fit, y_corrected)
+                        except ValueError:
+                            labels = {plugin_name: 'regression failed'}
+                    
+                        exp['results'][plugin_name][serum] = labels
+
+                    if X == (data_count):
+                        break
+                    pprint.pprint("done...")                
+
+        return experiments
+
