@@ -1,18 +1,21 @@
-JASPR
 JASPR calculates titers from logistic fits on resistance assay data.
 
 Getting Started
 Instruction on how to get the project up and running.
 
-Potentially more thorough instructions should be created but there is a start available here: install.md
-
 Prerequisites
 Need to have docker and docker-compose installed on your local dev machine.
 
 Branch Strategy
-Core branches - master -- This is deployed on disc-prod - QA -- This is the primary branch on disc-qa
+CORE BRANCHES 
+-MASTER -- This is deployed on JASPR's PROD and QA servers 
+-- This is the primary branch on JASPR-prod: id-jaspr-prod-01.biotech.cdc.gov
 
-Any bug fixes or feature add should be developed in a new branch. Create your new branch based on the master branch. Once your branch is ready for testing, merge it into the QA branch and deploy it to disc-qa. Once testing on the QA branch is approved, merge the QA branch to master but make sure to not close/delete the QA branch.
+-
+Any bug fixes or feature add should be developed in a new branch. 
+Create your new branch based on the master branch. 
+Once your branch is ready for testing, merge it into the QA branch and deploy it to jaspr-qa. 
+Once testing on the QA branch is approved, merge the QA branch to master but make sure to not close/delete the QA branch.
 
 Testing
 Placeholder for any notes for any future automated testing
