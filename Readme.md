@@ -1,19 +1,20 @@
+# JASPR
 JASPR calculates titers from logistic fits on resistance assay data.
 
-Getting Started
+# Getting Started
 Instruction on how to get the project up and running.
 
-Prerequisites
+# Prerequisites
 Need to have docker and docker-compose installed on your local dev machine.
 
-Branch Strategy
-CORE BRANCHES 
-
-master -- This is deployed on jaspr's PROD and QA servers 
+# Branch Strategy
+# master -- This is deployed on jaspr's PROD and QA servers 
 -- This is the primary branch on jaspr-prod: id-jaspr-prod-01.biotech.cdc.gov
 
-jaspr_qa -- This is the QA branch used for testing
-Any bug fixes or feature add should be developed in a new branch. 
+# jaspr_qa 
+-- This is the QA branch used for testing
+
+# Any bug fixes or feature add should be developed in a new branch. 
 Create your new branch based on the master branch. 
 Once your branch is ready for testing, merge it into the QA branch and deploy it to the jaspr-qa server: id-disc-dev-02.biotech.cdc.gov
  
@@ -21,21 +22,23 @@ Once testing on the QA branch is approved, merge the QA branch to master but mak
 
 Then, update the jaspr-prod server with master branch.
 
-Testing
+# Testing
 Placeholder for any notes for any future automated testing
 
-Deployment
+# Deployment
 The production server and deployment is based on the master branch. 
 
-NOTE: Instructions for executing docker-compose build && docker-compose down && docker-compose up
+# NOTE: Starting the containers
+cd jaspr/build
+docker-compose build && docker-compose down && docker-compose up
 
-In QA: build/docker/dockerfile-jaspr
+# In QA: build/docker/dockerfile-jaspr
 Disable line 6: # RUN apt-get --allow-releaseinfo-change update
 
-In PROD: build/docker/dockerfile-jaspr
+# In PROD: build/docker/dockerfile-jaspr
 Enable line 6: RUN apt-get --allow-releaseinfo-change update
 
-Adding new features to JASPR
+# Adding new features to JASPR
 
 # git branch -a
 >   master
