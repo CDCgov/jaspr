@@ -39,6 +39,9 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
 
+def page_not_found(e):
+    return render_template('502.html'), 502
+
 def save_tmpfile(upload_handle):
     """Save uploaded files to /tmp"""
     tmp_handle = NamedTemporaryFile(delete=False)
@@ -116,6 +119,10 @@ def upload_file():
 
     return render_template('upload.html', **jm.context)
 
+@app.route('/error502')
+def error502():
+    jm = JasprModel()
+    return render_template('502.html', **jm.context)
 
 @app.route('/settings')
 def settings():
@@ -745,8 +752,11 @@ def reportFRNTresults():
     
     virus_ = data['Virus'].str.split(' ', expand=True)
     virus_ = pd.DataFrame(virus_)
-    virus_.columns=['Virus Number', 'Virus CUIDs']
-    # pprint.pprint(virus_)
+    # virus_.columns=['Virus Number', 'Virus CUIDs']
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, ):
+            pprint.pprint('virus_')
+            pprint.pprint(virus_)
 
     with pd.option_context('display.max_rows', None, 
             'display.max_columns', None, ):
@@ -766,6 +776,17 @@ def reportFRNTresults():
             pprint.pprint("data")
             pprint.pprint(data)
 
+    data['h'] = pd.to_numeric(data['h'])
+    data.loc[data['h'] <= 0.5, 'Error'] = 'h <= 0.5'
+    data.loc[data['h'] >= 2.0, 'Error'] = 'h >= 2.0'
+
+    with pd.option_context('display.max_rows', None, 
+            'display.max_columns', None, 
+            'display.precision', 0,):
+            pprint.pprint("data")
+            pprint.pprint(data)    
+
+    pprint.pprint('testname')
     pprint.pprint(testname) 
     test_type = testname['Test Name'].str[:4]
     test_type = test_type.values.tolist()
@@ -792,8 +813,11 @@ def reportFRNTresults():
     # Table = pd.DataFrame(Table)
     pprint.pprint('Table')
     pprint.pprint(Table)
-
+    FRNT_date = str(test_date)
     pprint.pprint(data.columns)
+
+    pprint.pprint('data')
+    pprint.pprint(data)
 
     data = data.values.tolist()
     pprint.pprint('data')
@@ -814,7 +838,7 @@ def reportFRNTresults():
     writer.close()
 
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename='reportFRNTresults' + str(datetime.now().strftime('%m_%d_%Y')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, attachment_filename='FRNT-'+ FluLIMS_run +'-Results-' + FRNT_date +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 

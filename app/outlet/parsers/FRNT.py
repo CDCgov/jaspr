@@ -23,7 +23,6 @@ def fit(plugin_name, x_data, y_data):
     result = fitter(x_data, y_data)
     return fitter.labels(result.x)
 
-
 class HintBase(object):
     """A base class for HINT parsers
 
@@ -83,7 +82,6 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
     name = 'FRNT Virus-Sera-Sera Plate Layout Cx5'
     description = 'FRNT V-S-S parser for raw data from Cx5 plate reader'
     skiprows = 1
-
     def __init__(self, keyfile, datafile):
         self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, sera_details = \
                 self._get_sera(keyfile)
@@ -109,11 +107,9 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
             'target_activity': self.target_activity
         }
 
-        # print("self.data:")
-        # pprint.pprint(self.data)
-  
-        # Get required information from Sera tab of Key File
-        # as defined in __init__
+        print("self.data:")
+        pprint.pprint(self.data)
+
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         
@@ -190,9 +186,7 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
         df.to_dict('index')
-        
-        # Get required information from Virus tab of Key File
-        # as defined in __init__
+
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
         virus_CUID = [f"{row[0]} {row['CUID']}" 
@@ -210,8 +204,13 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
 
         return virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
 
-        # Get required information from Sera tab of Key File
-        # to define the Xdata from the start dilution and dilution factor
+#   self.viruses, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
+#         
+
+        # return [f"{row[0]} {row['CUID']}" 
+        #                 for index, row in df.iterrows()], \
+        #                 df.to_dict('index')
+
     def _get_dilutions(self, start_titer, Xdata):
 
         with pd.option_context('display.max_rows', None, 
@@ -240,8 +239,9 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
                 start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
 
-        # Reshape data from the data file to fit into formatted rows
-        # required by _get_all_experiments() below.
+        # pprint.pprint("self.dilutions[start_titer]")
+        # pprint.pprint(self.dilutions[start_titer])
+
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
         with pd.option_context('display.max_rows', None, 
@@ -408,9 +408,7 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         Arith_means = np.delete(Arith_means, obj=0, axis=0)
         SE_means = np.delete(SE_means, obj=0, axis=0)
         pprint.pprint("Here is all the data:")
-        np.set_printoptions(threshold=np.inf)
         pprint.pprint(All_plates)
-            
         pprint.pprint("Here are the Arith_means:")
         pprint.pprint(Arith_means)
         pprint.pprint("Here are the SE_means:")
@@ -419,20 +417,31 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
 
         return Arith_means, SE_means
         # return the type of data that you want to use here, and 
-        # block/unblock the appropriate lines below in
-        # _get_all_experiments() to match your desire.
+        # block/unblock the appropriate lines below to match
         # All_plates= All Raw, unaveraged data
         # Arith_means= Arithmetic means of 6 replicates
         # SE_means= Standard Error of the means of 6 replicates
         
-        # This is where the data is organized for the functions to 
-        # use to perform calculations of interest
-        # function file located in app > outlet > functions
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
         self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
 
+        # df = pd.read_excel(keyfile, sheet_name='Sera')
+        # names = [list(df['Name'])]
+        # names = pd.DataFrame(names)
+        # names = pd.DataFrame.transpose(names)
+        # pprint.pprint(names)
+        # pooled_CUIDs = [list(df['Pooled-Sera'])]
+        # pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
+        # pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
+        # pooled_CUIDs.columns = ['Pooled CUIDs']
+        # pprint.pprint("pools:")
+        # pprint.pprint(pooled_CUIDs)
+        # sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
+        # sera_pool.columns = ['Name', 'Pooled CUIDs']
+        # pprint.pprint("sera_pool")
+        # pprint.pprint(sera_pool)
 
 ## -- All raw data no means \/ \/ \/ \/        
         # All_plates, N = self._parse_csv(datafile)
@@ -516,7 +525,12 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         # pprint.pprint("Arith_means:")      
         # pprint.pprint(Arith_means)   
 ## -- SE_means /\ /\ /\
-            
+
+        # pprint.pprint("labels:")      
+        # pprint.pprint(labels)  
+        # pprint.pprint("data:")      
+        # pprint.pprint(data)                 
+
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
@@ -564,17 +578,39 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         # pprint.pprint(s_count)
 
         data_count = len(data)
-
+        # pprint.pprint("data_count:")
+        # pprint.pprint(data_count)
         X=0
 
+        # pprint.pprint("data")
+        # pprint.pprint(data)
+# - - - OG \/ \/ \/
         while X < data_count:
             for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
                 for v_index, virus in enumerate(self.viruses):
-
+                # find the plate and position of a sample
+                    # plate_offset, position_offset = divmod(v_index, v_count)
+                    # pprint.pprint(divmod(v_index, v_count))
                     row = data[X]
                     StandardError = error[X]
+                    # pprint.pprint("v_index:")
+                    # pprint.pprint(v_index)          
 
+                    # pprint.pprint("virus")
+                    # pprint.pprint(virus)
+
+                    # pprint.pprint("vpp")
+                    # pprint.pprint(vpp)
+
+                    # pprint.pprint("s_count:")
+                    # pprint.pprint(s_count)
+
+                    # pprint.pprint("position_offset:")
+                    # pprint.pprint(position_offset)
+                
+                    # pprint.pprint("plate_offset:")
+                    # pprint.pprint(plate_offset)
                     print('X= ', X)
                     pprint.pprint("row")
                     pprint.pprint(row)
