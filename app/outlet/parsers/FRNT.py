@@ -183,6 +183,13 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         # pprint.pprint("sera_pool")
         # pprint.pprint(sera_pool)
 
+        pprint.pprint("seraLabels:")
+        pprint.pprint(seraLabels)
+        # pprint.pprint(
+        # pprint.pprint(        
+        # pprint.pprint(
+        # pprint.pprint(    
+        # pprint.pprint(
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
         df.to_dict('index')
