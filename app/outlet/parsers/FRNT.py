@@ -158,15 +158,15 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         
         Xdata = [list(df['Starting Dilution']), list(df['Dilution Factor'])]
 
-        # pprint.pprint("Xdata")
-        # pprint.pprint(Xdata)
+        pprint.pprint("Xdata")
+        pprint.pprint(Xdata)
   
         Starting_dilution = list(df['Starting Dilution'])
         # pprint.pprint(Starting_dilution)
 
         res = [ele for ele in Starting_dilution for i in range(6)]
-        # pprint.pprint("res")
-        # pprint.pprint(res)
+        pprint.pprint("res")
+        pprint.pprint(res)
 
         names = [list(df['Name'])]
         names = pd.DataFrame(names)
@@ -180,16 +180,20 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         # pprint.pprint(pooled_CUIDs)
         sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
         sera_pool.columns = ['Name', 'Pooled CUIDs']
-        # pprint.pprint("sera_pool")
-        # pprint.pprint(sera_pool)
+        pprint.pprint("sera_pool")
+        pprint.pprint(sera_pool)
 
         pprint.pprint("seraLabels:")
         pprint.pprint(seraLabels)
-        # pprint.pprint(
-        # pprint.pprint(        
-        # pprint.pprint(
-        # pprint.pprint(    
-        # pprint.pprint(
+        pprint.pprint('Dilution Factor')
+        pprint.pprint(list(df['Dilution Factor']))        
+        pprint.pprint('Starting Dilution')
+        pprint.pprint(list(df['Starting Dilution']))    
+        pprint.pprint('Xdata')
+        pprint.pprint(Xdata)
+        pprint.pprint('pooled_CUIDs')
+        pprint.pprint(pooled_CUIDs)
+
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
         df.to_dict('index')
@@ -224,9 +228,9 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
                             'display.max_columns', None, 
                             'display.precision', 0,):
             pprint.pprint("Xdata--Beginning")
-            # pprint.pprint(Xdata)
+            pprint.pprint(Xdata)
         
-
+        pprint.pprint(Xdata)
         X_data = pd.DataFrame(Xdata)
 
         # pprint.pprint("self.dilutions:")
@@ -234,20 +238,24 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
         Sera = (len(self.dilutions))
         col = Sera
         start_dilution = X_data.iat[0, col]
+        pprint.pprint('start_dilution')
+        pprint.pprint(start_dilution)
         dilution_factor = X_data.iat[1, col]
-        # pprint.pprint("self.starting_titers")
-        # pprint.pprint(self.starting_titers)
+        pprint.pprint('dilution_factor')
+        pprint.pprint(dilution_factor)
+        pprint.pprint("self.starting_titers")
+        pprint.pprint(self.starting_titers)
 
-        if start_titer not in self.dilutions:
-            self.dilutions[start_titer] = ([start_dilution, start_dilution/dilution_factor, \
-                start_dilution/dilution_factor/dilution_factor, start_dilution/dilution_factor/dilution_factor/dilution_factor, \
-                start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
-                start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
-                start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
-                start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
 
-        # pprint.pprint("self.dilutions[start_titer]")
-        # pprint.pprint(self.dilutions[start_titer])
+        self.dilutions[start_titer] = ([start_dilution, start_dilution/dilution_factor, \
+            start_dilution/dilution_factor/dilution_factor, start_dilution/dilution_factor/dilution_factor/dilution_factor, \
+            start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
+            start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
+            start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
+            start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
+
+        pprint.pprint("self.dilutions[start_titer]")
+        pprint.pprint(self.dilutions[start_titer])
 
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
@@ -328,37 +336,37 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
             # pprint.pprint(AllData)
 
 ##-- calculate arithmatic means for 6 replicates \/ \/ \/ \/
-            Amean1a = mean([Temp_plate[0,0], Temp_plate[0,1], \
+            Amean1a = np.nanmean([Temp_plate[0,0], Temp_plate[0,1], \
                             Temp_plate[0,2], Temp_plate[0,3], Temp_plate[0,4], Temp_plate[0,5]])
-            Amean2a = mean([Temp_plate[1,0], Temp_plate[1,1], \
+            Amean2a = np.nanmean([Temp_plate[1,0], Temp_plate[1,1], \
                             Temp_plate[1,2], Temp_plate[1,3], Temp_plate[1,4], Temp_plate[1,5]])
-            Amean3a = mean([Temp_plate[2,0], Temp_plate[2,1], \
+            Amean3a = np.nanmean([Temp_plate[2,0], Temp_plate[2,1], \
                             Temp_plate[2,2], Temp_plate[2,3], Temp_plate[2,4], Temp_plate[2,5]])
-            Amean4a = mean([Temp_plate[3,0], Temp_plate[3,1], \
+            Amean4a = np.nanmean([Temp_plate[3,0], Temp_plate[3,1], \
                             Temp_plate[3,2], Temp_plate[3,3], Temp_plate[3,4], Temp_plate[3,5]])
-            Amean5a = mean([Temp_plate[4,0], Temp_plate[4,1], \
+            Amean5a = np.nanmean([Temp_plate[4,0], Temp_plate[4,1], \
                             Temp_plate[4,2], Temp_plate[4,3], Temp_plate[4,4], Temp_plate[4,5]])
-            Amean6a = mean([Temp_plate[5,0], Temp_plate[5,1], \
+            Amean6a = np.nanmean([Temp_plate[5,0], Temp_plate[5,1], \
                             Temp_plate[5,2], Temp_plate[5,3], Temp_plate[5,4], Temp_plate[5,5]])
-            Amean7a = mean([Temp_plate[6,0], Temp_plate[6,1], \
+            Amean7a = np.nanmean([Temp_plate[6,0], Temp_plate[6,1], \
                             Temp_plate[6,2], Temp_plate[6,3], Temp_plate[6,4], Temp_plate[6,5]])
-            Amean8a = mean([Temp_plate[7,0], Temp_plate[7,1], \
+            Amean8a = np.nanmean([Temp_plate[7,0], Temp_plate[7,1], \
                             Temp_plate[7,2], Temp_plate[7,3], Temp_plate[7,4], Temp_plate[7,5]])                
-            Amean1b = mean([Temp_plate[0,6], Temp_plate[0,7], \
+            Amean1b = np.nanmean([Temp_plate[0,6], Temp_plate[0,7], \
                             Temp_plate[0,8], Temp_plate[0,9], Temp_plate[0,10], Temp_plate[0,11]])
-            Amean2b = mean([Temp_plate[1,6], Temp_plate[1,7], \
+            Amean2b = np.nanmean([Temp_plate[1,6], Temp_plate[1,7], \
                             Temp_plate[1,8], Temp_plate[1,9], Temp_plate[1,10], Temp_plate[1,11]])
-            Amean3b = mean([Temp_plate[2,6], Temp_plate[2,7], \
+            Amean3b = np.nanmean([Temp_plate[2,6], Temp_plate[2,7], \
                             Temp_plate[2,8], Temp_plate[2,9], Temp_plate[2,10], Temp_plate[2,11]])
-            Amean4b = mean([Temp_plate[3,6], Temp_plate[3,7], \
+            Amean4b = np.nanmean([Temp_plate[3,6], Temp_plate[3,7], \
                             Temp_plate[3,8], Temp_plate[3,9], Temp_plate[3,10], Temp_plate[3,11]])
-            Amean5b = mean([Temp_plate[4,6], Temp_plate[4,7], \
+            Amean5b = np.nanmean([Temp_plate[4,6], Temp_plate[4,7], \
                             Temp_plate[4,8], Temp_plate[4,9], Temp_plate[4,10], Temp_plate[4,11]])
-            Amean6b = mean([Temp_plate[5,6], Temp_plate[5,7], \
+            Amean6b = np.nanmean([Temp_plate[5,6], Temp_plate[5,7], \
                             Temp_plate[5,8], Temp_plate[5,9], Temp_plate[5,10], Temp_plate[5,11]])
-            Amean7b = mean([Temp_plate[6,6], Temp_plate[6,7], \
+            Amean7b = np.nanmean([Temp_plate[6,6], Temp_plate[6,7], \
                             Temp_plate[6,8], Temp_plate[6,9], Temp_plate[6,10], Temp_plate[6,11]])
-            Amean8b = mean([Temp_plate[7,6], Temp_plate[7,7], \
+            Amean8b = np.nanmean([Temp_plate[7,6], Temp_plate[7,7], \
                             Temp_plate[7,8], Temp_plate[7,9], Temp_plate[7,10], Temp_plate[7,11]])         
             AmeansA = np.array([Samples_mean[0],Viruses_mean[0], Seras_mean[0], Amean1a,Amean2a,Amean3a,Amean4a,Amean5a,Amean6a,Amean7a,Amean8a], ndmin=2)
             AmeansB = np.array([Samples_mean[1],Viruses_mean[1], Seras_mean[1], Amean1b,Amean2b,Amean3b,Amean4b,Amean5b,Amean6b,Amean7b,Amean8b], ndmin=2)
@@ -367,37 +375,37 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
 ##-- calculate arithmatic means for 6 replicates /\ /\ /\ /\  
 ##-- calculate standard error of the means for 6 replicates \/ \/ \/ \/
             SEM1a = stats.sem([Temp_plate[0,0], Temp_plate[0,1], \
-                            Temp_plate[0,2], Temp_plate[0,3], Temp_plate[0,4], Temp_plate[0,5]])
+                            Temp_plate[0,2], Temp_plate[0,3], Temp_plate[0,4], Temp_plate[0,5]], nan_policy='omit')
             SEM2a = stats.sem([Temp_plate[1,0], Temp_plate[1,1], \
-                            Temp_plate[1,2], Temp_plate[1,3], Temp_plate[1,4], Temp_plate[1,5]])
+                            Temp_plate[1,2], Temp_plate[1,3], Temp_plate[1,4], Temp_plate[1,5]], nan_policy='omit')
             SEM3a = stats.sem([Temp_plate[2,0], Temp_plate[2,1], \
-                            Temp_plate[2,2], Temp_plate[2,3], Temp_plate[2,4], Temp_plate[2,5]])
+                            Temp_plate[2,2], Temp_plate[2,3], Temp_plate[2,4], Temp_plate[2,5]], nan_policy='omit')
             SEM4a = stats.sem([Temp_plate[3,0], Temp_plate[3,1], \
-                            Temp_plate[3,2], Temp_plate[3,3], Temp_plate[3,4], Temp_plate[3,5]])
+                            Temp_plate[3,2], Temp_plate[3,3], Temp_plate[3,4], Temp_plate[3,5]], nan_policy='omit')
             SEM5a = stats.sem([Temp_plate[4,0], Temp_plate[4,1], \
-                            Temp_plate[4,2], Temp_plate[4,3], Temp_plate[4,4], Temp_plate[4,5]])
+                            Temp_plate[4,2], Temp_plate[4,3], Temp_plate[4,4], Temp_plate[4,5]], nan_policy='omit')
             SEM6a = stats.sem([Temp_plate[5,0], Temp_plate[5,1], \
-                            Temp_plate[5,2], Temp_plate[5,3], Temp_plate[5,4], Temp_plate[5,5]])
+                            Temp_plate[5,2], Temp_plate[5,3], Temp_plate[5,4], Temp_plate[5,5]], nan_policy='omit')
             SEM7a = stats.sem([Temp_plate[6,0], Temp_plate[6,1], \
-                            Temp_plate[6,2], Temp_plate[6,3], Temp_plate[6,4], Temp_plate[6,5]])
+                            Temp_plate[6,2], Temp_plate[6,3], Temp_plate[6,4], Temp_plate[6,5]], nan_policy='omit')
             SEM8a = stats.sem([Temp_plate[7,0], Temp_plate[7,1], \
-                            Temp_plate[7,2], Temp_plate[7,3], Temp_plate[7,4], Temp_plate[7,5]])                
+                            Temp_plate[7,2], Temp_plate[7,3], Temp_plate[7,4], Temp_plate[7,5]], nan_policy='omit')                
             SEM1b = stats.sem([Temp_plate[0,6], Temp_plate[0,7], \
-                            Temp_plate[0,8], Temp_plate[0,9], Temp_plate[0,10], Temp_plate[0,11]])
+                            Temp_plate[0,8], Temp_plate[0,9], Temp_plate[0,10], Temp_plate[0,11]], nan_policy='omit')
             SEM2b = stats.sem([Temp_plate[1,6], Temp_plate[1,7], \
-                            Temp_plate[1,8], Temp_plate[1,9], Temp_plate[1,10], Temp_plate[1,11]])
+                            Temp_plate[1,8], Temp_plate[1,9], Temp_plate[1,10], Temp_plate[1,11]], nan_policy='omit')
             SEM3b = stats.sem([Temp_plate[2,6], Temp_plate[2,7], \
-                            Temp_plate[2,8], Temp_plate[2,9], Temp_plate[2,10], Temp_plate[2,11]])
+                            Temp_plate[2,8], Temp_plate[2,9], Temp_plate[2,10], Temp_plate[2,11]], nan_policy='omit')
             SEM4b = stats.sem([Temp_plate[3,6], Temp_plate[3,7], \
-                            Temp_plate[3,8], Temp_plate[3,9], Temp_plate[3,10], Temp_plate[3,11]])
+                            Temp_plate[3,8], Temp_plate[3,9], Temp_plate[3,10], Temp_plate[3,11]], nan_policy='omit')
             SEM5b = stats.sem([Temp_plate[4,6], Temp_plate[4,7], \
-                            Temp_plate[4,8], Temp_plate[4,9], Temp_plate[4,10], Temp_plate[4,11]])
+                            Temp_plate[4,8], Temp_plate[4,9], Temp_plate[4,10], Temp_plate[4,11]], nan_policy='omit')
             SEM6b = stats.sem([Temp_plate[5,6], Temp_plate[5,7], \
-                            Temp_plate[5,8], Temp_plate[5,9], Temp_plate[5,10], Temp_plate[5,11]])
+                            Temp_plate[5,8], Temp_plate[5,9], Temp_plate[5,10], Temp_plate[5,11]], nan_policy='omit')
             SEM7b = stats.sem([Temp_plate[6,6], Temp_plate[6,7], \
-                            Temp_plate[6,8], Temp_plate[6,9], Temp_plate[6,10], Temp_plate[6,11]])
+                            Temp_plate[6,8], Temp_plate[6,9], Temp_plate[6,10], Temp_plate[6,11]], nan_policy='omit')
             SEM8b = stats.sem([Temp_plate[7,6], Temp_plate[7,7], \
-                            Temp_plate[7,8], Temp_plate[7,9], Temp_plate[7,10], Temp_plate[7,11]])         
+                            Temp_plate[7,8], Temp_plate[7,9], Temp_plate[7,10], Temp_plate[7,11]], nan_policy='omit')         
             SEMA = np.array([Samples_mean[0],Viruses_mean[0], Seras_mean[0],SEM1a,SEM2a,SEM3a,SEM4a,SEM5a,SEM6a,SEM7a,SEM8a], ndmin=2)
             SEMB = np.array([Samples_mean[1],Viruses_mean[1], Seras_mean[1],SEM1b,SEM2b,SEM3b,SEM4b,SEM5b,SEM6b,SEM7b,SEM8b], ndmin=2)
             SEMs = np.append(SEMs, SEMA, axis=0)
@@ -563,7 +571,7 @@ class FRNT_VSS_Cx5(HintBase, ParserRegistry):
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("self.sera:")
-            # pprint.pprint(self.sera)
+            pprint.pprint(self.sera)
 
         v_count = len(self.viruses)
         vpp = 1
@@ -824,6 +832,9 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
                     y_corrected = list(row)
                     x_fit = self.dilutions[titer].copy()
                     x_fit[-1] = 0
+                    pprint.pprint('Herex_fit-------------->')
+                    pprint.pprint(x_fit)
+
 
                     exp['data'][serum] = {
                         'x_values': self.dilutions[titer],
