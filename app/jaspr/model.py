@@ -214,7 +214,7 @@ class JasprModel(object):
 
         output.seek(0)
 
-        convergence = make_response(send_file(output, attachment_filename='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+        convergence = make_response(send_file(output, download_name='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
         response.headers['cache-control'] = 'no-cache'
         return convergence
 

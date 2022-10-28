@@ -232,7 +232,7 @@ def reportOther():
     writer.close()
 
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename='reportResultAnalysis' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='reportResultAnalysis' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -268,7 +268,7 @@ def reportTiter():
     writer.close()
 
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename='reportAntigenic' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='reportAntigenic' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -307,7 +307,7 @@ def reportICP():
 
     output.seek(0)
 
-    response = make_response(send_file(output, attachment_filename='reportICP1000_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='reportICP1000_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -351,7 +351,7 @@ def reportexcel():
     writer.close()
 
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename='report' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='report' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -395,7 +395,7 @@ def reportExperiment_Full():
 
     output.seek(0)
 
-    response = make_response(send_file(output, attachment_filename='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -439,7 +439,7 @@ def reportFRNT_Full():
 
     output.seek(0)
 
-    response = make_response(send_file(output, attachment_filename='FRNT_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='FRNT_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -516,7 +516,7 @@ def reportFRNT_Titers():
 
     output.seek(0)
 
-    response = make_response(send_file(output, attachment_filename='FRNT_Titers_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='FRNT_Titers_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -838,7 +838,7 @@ def reportFRNTresults():
     writer.close()
 
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename='FRNT-'+ FluLIMS_run +'-Results-' + FRNT_date +'.xlsx', as_attachment=True))
+    response = make_response(send_file(output, download_name='FRNT-'+ FluLIMS_run +'-Results-' + FRNT_date +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
 
@@ -879,7 +879,7 @@ def reportFRNTresults():
 #     writer.close()
 
 #     output.seek(0)
-#     response = make_response(send_file(output, attachment_filename='reportFRNTresults' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
+#     response = make_response(send_file(output, download_name='reportFRNTresults' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
 #     response.headers['cache-control'] = 'no-cache'
 #     return response
 # # This produces the report Viruses X Sera /\ /\ /\ /\  ##    
