@@ -38,8 +38,8 @@ class FRNTBase(object):
         self.viruses, virus_details = self._get_viruses(keyfile)
 
         self.dilutions = {}
-        for titer in self.starting_titers:
-            self._get_dilutions(titer)
+        for serum_X in self.starting_titers:
+            self._get_dilutions(serum_X)
 
         self.data = {
             'show_fit': True,
@@ -89,8 +89,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
         self.dilutions = {}
 
-        for titer in self.starting_titers:
-            self._get_dilutions(titer, Xdata=self.Xdata)
+        for serum_X in self.starting_titers:
+            self._get_dilutions(serum_X, Xdata=self.Xdata)
 
         self.data = {
             'show_fit': True,
@@ -225,30 +225,46 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         
         pprint.pprint(Xdata)
         X_data = pd.DataFrame(Xdata)
+        
+        Shape = X_data.shape
+        Y = Shape[1]
+        pprint.pprint("Y")
+        pprint.pprint(Y)
 
-        # pprint.pprint("self.dilutions:")
-        # pprint.pprint(self.dilutions)
+
+        pprint.pprint("self.dilutions:")
+        pprint.pprint(self.dilutions)
         Sera = (len(self.dilutions))
-        col = Sera
-        start_dilution = X_data.iat[0, col]
-        pprint.pprint('start_dilution')
-        pprint.pprint(start_dilution)
-        dilution_factor = X_data.iat[1, col]
-        pprint.pprint('dilution_factor')
-        pprint.pprint(dilution_factor)
-        pprint.pprint("self.starting_titers")
-        pprint.pprint(self.starting_titers)
+        X = Sera
+        pprint.pprint("X= ")
+        pprint.pprint(X)
 
+        while X <= (Y-1):
+            start_dilution = X_data.iat[0, X]
+            pprint.pprint('start_dilution')
+            pprint.pprint(start_dilution)
+            dilution_factor = X_data.iat[1, X]
+            pprint.pprint('dilution_factor')
+            pprint.pprint(dilution_factor)
+            pprint.pprint("self.starting_titers")
+            pprint.pprint(self.starting_titers)
+            serum_X = X
 
-        self.dilutions[start_titer] = ([start_dilution, start_dilution/dilution_factor, \
+            self.dilutions[serum_X] = ([start_dilution, start_dilution/dilution_factor, \
             start_dilution/dilution_factor/dilution_factor, start_dilution/dilution_factor/dilution_factor/dilution_factor, \
             start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
             start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor, \
             start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor,
             start_dilution/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor/dilution_factor])
 
-        pprint.pprint("self.dilutions[start_titer]")
-        pprint.pprint(self.dilutions[start_titer])
+            X = (X+1)
+     
+            if X == (Y):
+                break
+            pprint.pprint("self.dilutions[serum_X]")
+            pprint.pprint(self.dilutions[serum_X])
+            pprint.pprint(self.dilutions)
+        # raise
 
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
@@ -256,7 +272,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                                 'display.max_columns', None, 
                                 'display.precision', 0,):
             pprint.pprint("df:")
-            pprint.pprint(df)
+            # pprint.pprint(df)
 
         VSS = df.groupby(["Plate"], as_index=False)
 
@@ -270,7 +286,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("RAWdata:")
-            pprint.pprint(RAWdata)
+            # pprint.pprint(RAWdata)
 
         SEMs = np.empty([1,11])
         gmeans = np.empty([1,11])
@@ -281,7 +297,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("AllData:")
-            pprint.pprint(AllData)
+            # pprint.pprint(AllData)
 
 
         Y = N
@@ -290,7 +306,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
             # print("Plate", RAWdata.loc[X][0])
             Temp_plate = VSS.get_group(RAWdata.loc[X][0])
-            print("Temp_plate=", Temp_plate)
+            # print("Temp_plate=", Temp_plate)
             Temp_plate = Temp_plate.drop('Plate', 1)
             Temp_plate = Temp_plate.drop('Well', 1)
             Temp_plate = Temp_plate.drop('Row', 1)
@@ -298,7 +314,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             Temp_plate = Temp_plate.drop('SpotTotalAreaCh2', 1)
             # print("Temp_plate before numpy=", Temp_plate)
             Temp_plate = Temp_plate.to_numpy()
-            print("Temp_plate after numpy=", Temp_plate)
+            # print("Temp_plate after numpy=", Temp_plate)
             
             Plate_name = RAWdata.loc[X][0]
             pprint.pprint("Plate_name:")
@@ -444,6 +460,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
         self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
 
+        pprint.pprint(self.starting_titers)
+
         # df = pd.read_excel(keyfile, sheet_name='Sera')
         # names = [list(df['Name'])]
         # names = pd.DataFrame(names)
@@ -567,8 +585,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         }
 
         # viruses per plate = 1       
-        print("self.sera:")
-        pprint.pprint(self.sera)
+
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
@@ -592,11 +609,11 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         s_count = len(self.sera)
         
         print("s_count:")
-        # pprint.pprint(s_count)
+        pprint.pprint(s_count)
 
         data_count = len(data)
-        # pprint.pprint("data_count:")
-        # pprint.pprint(data_count)
+        pprint.pprint("data_count:")
+        pprint.pprint(data_count)
         X=0
 
         # pprint.pprint("data")
@@ -620,8 +637,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                     # pprint.pprint("vpp")
                     # pprint.pprint(vpp)
 
-                    # pprint.pprint("s_count:")
-                    # pprint.pprint(s_count)
+                    pprint.pprint("s_count:")
+                    pprint.pprint(s_count)
 
                     # pprint.pprint("position_offset:")
                     # pprint.pprint(position_offset)
@@ -629,19 +646,33 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                     # pprint.pprint("plate_offset:")
                     # pprint.pprint(plate_offset)
                     print('X= ', X)
-                    pprint.pprint("row")
-                    pprint.pprint(row)
-                    pprint.pprint("StandardError")
-                    pprint.pprint(StandardError)
-                    pprint.pprint(virus)
-                    pprint.pprint(serum)
+                    
+                    # pprint.pprint("row")
+                    # pprint.pprint(row)
+                    # pprint.pprint("StandardError")
+                    # pprint.pprint(StandardError)
+                    # pprint.pprint(virus)
+                    # pprint.pprint("serum= ")
+                    # pprint.pprint(serum)
+                    # pprint.pprint("serum index= ")
+                    # pprint.pprint(self.sera.index(serum))
+                    serum_X = self.sera.index(serum)
+
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
-                    x_fit = self.dilutions[titer].copy()
+                    x_values = self.dilutions[serum_X]
+                    pprint.pprint("x_values =")
+                    pprint.pprint(x_values)
+                    x_fit = self.dilutions[serum_X].copy()
+                    pprint.pprint("x-fit= ")
+                    pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
-
+                    pprint.pprint("x-fit= ")
+                    pprint.pprint(x_fit)    
+                    pprint.pprint("x_values =")
+                    pprint.pprint(x_values)
                     exp['data'][serum] = {
-                        'x_values': self.dilutions[titer],
+                        'x_values': x_values,
                         'x_fit': x_fit,
                         'y_values': list(row),
                         'y_error': list(StandardError),                        
@@ -808,16 +839,23 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
                     pprint.pprint(StandardError)
                     pprint.pprint(virus)
                     pprint.pprint(serum)
+                    
+                    serum_X = self.sera.index(serum)
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
-                    x_fit = self.dilutions[titer].copy()
+                    x_values = self.dilutions[serum_X]
+                    pprint.pprint("x_values =")
+                    pprint.pprint(x_values)
+                    x_fit = self.dilutions[serum_X].copy()
+                    pprint.pprint("x-fit= ")
+                    pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
                     pprint.pprint('Herex_fit-------------->')
                     pprint.pprint(x_fit)
 
 
                     exp['data'][serum] = {
-                        'x_values': self.dilutions[titer],
+                        'x_values': x_values,
                         'x_fit': x_fit,
                         'y_values': list(row),
                         'y_error': list(StandardError),                        
@@ -1026,7 +1064,9 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         Arith_means = np.delete(Arith_means, obj=0, axis=0)
         SE_means = np.delete(SE_means, obj=0, axis=0)
         pprint.pprint("Here is all the data:")
-        pprint.pprint(All_plates)
+        with np.printoptions(threshold=np.inf):
+            pprint.pprint(All_plates)
+        # pprint.pprint(All_plates)
         pprint.pprint("Here are the Arith_means:")
         pprint.pprint(Arith_means)
         pprint.pprint("Here are the SE_means:")
@@ -1156,11 +1196,11 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         s_count = len(self.sera)
         
         print("s_count:")
-        # pprint.pprint(s_count)
+        pprint.pprint(s_count)
 
         data_count = len(data)
-        # pprint.pprint("data_count:")
-        # pprint.pprint(data_count)
+        pprint.pprint("data_count:")
+        pprint.pprint(data_count)
         X=0
 
         # pprint.pprint("data")
@@ -1224,5 +1264,5 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
                     if X == (data_count):
                         break
                     pprint.pprint("done...")                
-
+                    pprint.pprint(experiments)
         return experiments
