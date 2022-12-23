@@ -79,7 +79,7 @@ class FRNTBase(object):
         return self.data
 
 class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
-    name = 'FRNT Virus-Sera-Sera Plate Layout Cx5'
+    name = 'FRNT Virus-Serum-Serum Plate Layout Cx5'
     description = 'FRNT V-S-S parser for raw data from Cx5 plate reader'
     skiprows = 1
     def __init__(self, keyfile, datafile):
@@ -695,7 +695,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         return experiments
 
 class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
-    name = 'FRNT Sera-Virus-Virus Plate Layout Cx5'
+    name = 'FRNT Serum-Virus-Virus Plate Layout Cx5'
     description = 'FRNT S-V-V parser for raw data from Cx5 plate reader'
     skiprows = 1
 
@@ -878,7 +878,7 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         return experiments
 
 class FRNT_Cytation7(FRNT_VSS_Cx5):
-    name = 'FRNT Virus-Sera-Sera Plate Layout Cytation7'
+    name = 'FRNT Virus-Serum-Serum Plate Layout Cytation7'
     description = 'FRNT V-S-S parser for raw data from Cytation7 plate reader'
     skiprows = 15
 
@@ -1239,13 +1239,23 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
                     pprint.pprint(StandardError)
                     pprint.pprint(virus)
                     pprint.pprint(serum)
+                    serum_X = self.sera.index(serum)
+
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
-                    x_fit = self.dilutions[titer].copy()
+                    x_values = self.dilutions[serum_X]
+                    pprint.pprint("x_values =")
+                    pprint.pprint(x_values)
+                    x_fit = self.dilutions[serum_X].copy()
+                    pprint.pprint("x-fit= ")
+                    pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
-
+                    pprint.pprint("x-fit= ")
+                    pprint.pprint(x_fit)    
+                    pprint.pprint("x_values =")
+                    pprint.pprint(x_values)
                     exp['data'][serum] = {
-                        'x_values': self.dilutions[titer],
+                        'x_values': x_values,
                         'x_fit': x_fit,
                         'y_values': list(row),
                         'y_error': list(StandardError),                        
@@ -1264,5 +1274,5 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
                     if X == (data_count):
                         break
                     pprint.pprint("done...")                
-                    pprint.pprint(experiments)
+
         return experiments
