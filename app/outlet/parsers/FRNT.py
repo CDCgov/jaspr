@@ -98,6 +98,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             'x_axis_type': 'log',
             'curr_function': 'logistic4',
             'experiments': self._get_all_experiments(keyfile, datafile),
+            # 'plate_layout': self.Plate_layout,
             'sera': self.sera,
             'pooled_sera': self.pooled_CUIDs,
             'viruses': self.viruses,
@@ -109,7 +110,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
         print("self.data:")
         pprint.pprint(self.data)
-
+        
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         
@@ -200,6 +201,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
+        # Plate_layout = [f"{row[0]} {row['Format (VSS/SVV)']}" 
+        #                 for index, row in df.iterrows()]
         virus_CUID = [f"{row[0]} {row['CUID']}" 
                         for index, row in df.iterrows()]
         virus_CSIDs = [f"{row['CSID']}" 
@@ -214,7 +217,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                         for index, row in df.iterrows()]
 
         return virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
-
+        raise
     def _get_dilutions(self, start_titer, Xdata):
 
         with pd.option_context('display.max_rows', None, 
