@@ -525,26 +525,26 @@ def reportFRNTresults():
     """Generate Excel Report"""
     jm=JasprModel()
 
-    # pprint.pprint("The JASPR Model:")
-    # pprint.pprint(jm.experiments)
+    pprint.pprint("The JASPR Model:")
+    pprint.pprint(jm.experiments)
     
     # for experiment in jm.experiment_list:
     #     for sample in jm.sample_list:
     
-            # pprint.pprint("experiment")
-            # pprint.pprint(jm.experiments[experiment])
+    #         pprint.pprint("experiment")
+    #         pprint.pprint(jm.experiments[experiment])
 
-    pprint.pprint(os.getcwd())
+    # pprint.pprint(os.getcwd())
     os.chdir('../tmp')
-    pprint.pprint(os.getcwd())
+    # pprint.pprint(os.getcwd())
     filename = glob.glob('/tmp/*xlsx')
-    pprint.pprint(filename)
+    # pprint.pprint(filename)
     filename = max(filename, key=os.path.getctime)
-    pprint.pprint(filename)
+    # pprint.pprint(filename)
     testname = pd.DataFrame([filename], columns=['Test Name'])
     testname = testname.replace(regex={'/tmp/':'', '.xlsx':''})
     # filename = testname.append(filename)
-    pprint.pprint(testname)
+    # pprint.pprint(testname)
 
 
     output=BytesIO()
@@ -574,10 +574,7 @@ def reportFRNTresults():
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']])
             rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']])
  
-    # pprint.pprint("** Break **")
-
     pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
-
     pooled_CUIDs = pooled_CUIDs.T
     # del pooled_CUIDs["CSID"] 
  
@@ -643,8 +640,8 @@ def reportFRNTresults():
     # pprint.pprint("Viruses")
     # pprint.pprint(Viruses)
     virus_CSIDs = jm.experiments[experiment]['virus_CSIDs']
-    pprint.pprint("virus_CSIDs")
-    pprint.pprint(virus_CSIDs)
+    # pprint.pprint("virus_CSIDs")
+    # pprint.pprint(virus_CSIDs)
     virus_type = jm.experiments[experiment]['virus_type']
     # pprint.pprint("virus_type")
     # pprint.pprint(virus_type)
@@ -654,6 +651,10 @@ def reportFRNTresults():
     initial_activity = jm.experiments[experiment]['initial_activity']
     # pprint.pprint("initial_activity")
     # pprint.pprint(initial_activity)
+    plate_layout = jm.experiments[experiment]['plate_layout']
+    plate_layout = plate_layout[0]
+    # pprint.pprint("plate_layout")
+    # pprint.pprint(plate_layout)
     N_virus = len(jm.experiment_list)
     # pprint.pprint("N_viruses:")
     # pprint.pprint(N_virus)
@@ -670,11 +671,11 @@ def reportFRNTresults():
     # pprint.pprint("VirusLIST:")
     # pprint.pprint(VirusLIST)
     virus_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(virus_CSIDs, N_sera)))
-    pprint.pprint("virus_CSIDs")
-    pprint.pprint(virus_CSIDs)
+    # pprint.pprint("virus_CSIDs")
+    # pprint.pprint(virus_CSIDs)
     virus_type = list(itertools.chain.from_iterable(itertools.repeat(virus_type, N_sera)))
-    pprint.pprint("virus_type")
-    pprint.pprint(virus_type)
+    # pprint.pprint("virus_type")
+    # pprint.pprint(virus_type)
     target_activity = list(itertools.chain.from_iterable(itertools.repeat(target_activity, N_sera)))
     # pprint.pprint("target_activity")
     # pprint.pprint(target_activity)
@@ -801,7 +802,6 @@ def reportFRNTresults():
     FluLIMS_run = testname['Test Name'].str[9:13]
     FluLIMS_run = FluLIMS_run.values.tolist()
     FluLIMS_run = (','.join(FluLIMS_run))    
-    pprint.pprint(FluLIMS_run) 
 
     Table = [['Test type', test_type], \
             ['Protocol version', 2021], \
@@ -809,8 +809,9 @@ def reportFRNTresults():
             ['Test date', test_date], \
             ['FluLIMS run', FluLIMS_run], \
             ['Activity units', 'FFU / 25µL'], \
+            ['Plate layout', plate_layout],     
             []    ]
-    # Table = pd.DataFrame(Table)
+
     pprint.pprint('Table')
     pprint.pprint(Table)
     FRNT_date = str(test_date)
@@ -831,8 +832,6 @@ def reportFRNTresults():
     FRNTreport = pd.DataFrame(FRNTreport)
     pprint.pprint('FRNTreport')
     pprint.pprint(FRNTreport)
-    # data.loc[-1] = ['Test type', test_type, "", "", "", "", "", "", "", "", "", "", "", "",]
-
 
     FRNTreport.to_excel(writer, sheet_name="FRNT Result Analysis", index=False, startrow = 0, header = False)
 
