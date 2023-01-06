@@ -85,7 +85,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
     def __init__(self, keyfile, datafile):
         self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, sera_details = \
                 self._get_sera(keyfile)
-        self.viruses, self.virus_CSIDs, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
+        self.plate_layout, self.viruses, self.virus_CSIDs, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
 
         self.dilutions = {}
 
@@ -98,7 +98,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             'x_axis_type': 'log',
             'curr_function': 'logistic4',
             'experiments': self._get_all_experiments(keyfile, datafile),
-            # 'plate_layout': self.Plate_layout,
+            'plate_layout': self.plate_layout,
             'sera': self.sera,
             'pooled_sera': self.pooled_CUIDs,
             'viruses': self.viruses,
@@ -110,7 +110,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
         print("self.data:")
         pprint.pprint(self.data)
-        
+         
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         
@@ -154,8 +154,6 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         # pprint.pprint(seraList)
         seraList = seraList.T
         seraList = pd.DataFrame(seraList)
-        print(seraList.dtypes)
-        # pprint.pprint(seraList)
         
         Xdata = [list(df['Starting Dilution']), list(df['Dilution Factor'])]
 
@@ -201,9 +199,9 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
-        # Plate_layout = [f"{row[0]} {row['Format (VSS/SVV)']}" 
-        #                 for index, row in df.iterrows()]
-        virus_CUID = [f"{row[0]} {row['CUID']}" 
+        plate_layout = [f"{row['Format (VSS/SVV)']}" 
+                        for index, row in df.iterrows()]
+        virus_CUID = [f"{row['Name']} {row['CUID']}" 
                         for index, row in df.iterrows()]
         virus_CSIDs = [f"{row['CSID']}" 
                         for index, row in df.iterrows()]
@@ -216,8 +214,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         target_activity = [f"{row['Target FFU/mL']}" 
                         for index, row in df.iterrows()]
 
-        return virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
-        raise
+        return plate_layout, virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
+        
     def _get_dilutions(self, start_titer, Xdata):
 
         with pd.option_context('display.max_rows', None, 
@@ -461,47 +459,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
-
-        pprint.pprint(self.starting_titers)
-
-        # df = pd.read_excel(keyfile, sheet_name='Sera')
-        # names = [list(df['Name'])]
-        # names = pd.DataFrame(names)
-        # names = pd.DataFrame.transpose(names)
-        # pprint.pprint(names)
-        # pooled_CUIDs = [list(df['Pooled-Sera'])]
-        # pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
-        # pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
-        # pooled_CUIDs.columns = ['Pooled CUIDs']
-        # pprint.pprint("pools:")
-        # pprint.pprint(pooled_CUIDs)
-        # sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
-        # sera_pool.columns = ['Name', 'Pooled CUIDs']
-        # pprint.pprint("sera_pool")
-        # pprint.pprint(sera_pool)
-
-## -- All raw data no means \/ \/ \/ \/        
-        # All_plates, N = self._parse_csv(datafile)
-        # pprint.pprint("All_plates:")      
-        # pprint.pprint(All_plates) 
-                
-        # labels = np.delete(All_plates, [1,2,3,4,5,6,7,8], axis=1)
-        # pprint.pprint("labels:")      
-        # pprint.pprint(labels)  
-        # labels = np.transpose(labels)
-        # pprint.pprint("labels:")      
-        # pprint.pprint(labels)  
-        # labels = pd.DataFrame(labels)
-        # pprint.pprint("labels:")      
-        # pprint.pprint(labels)  
-
-        # data = np.delete(All_plates, 0, axis=1)
-        # data = data.astype(int)
-        # data = data.tolist()
-
-## -- All raw data no means /\ /\ /\
-
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+ 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
         # pprint.pprint("Arith_means:")      
@@ -562,12 +521,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         # pprint.pprint(error)
         # pprint.pprint("Arith_means:")      
         # pprint.pprint(Arith_means)   
-## -- SE_means /\ /\ /\
-
-        # pprint.pprint("labels:")      
-        # pprint.pprint(labels)  
-        # pprint.pprint("data:")      
-        # pprint.pprint(data)                 
+## -- SE_means /\ /\ /\           
 
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
@@ -577,7 +531,9 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             'virus_CSIDs': self.virus_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
+            'plate_layout': self.plate_layout,
             'target_activity': self.target_activity,
+            'start_dilution_and_factor': start_dilution_and_factor,
             'data': {},
             'results': {
                 'logistic3': {},
@@ -595,16 +551,11 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             pprint.pprint("self.sera:")
             pprint.pprint(self.sera)
 
-        v_count = len(self.viruses)
-        vpp = 1
-
-        print("self.viruses:")
-        pprint.pprint(self.viruses)
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
             pprint.pprint("self.viruses:")
-            # pprint.pprint(self.viruses)
+            pprint.pprint(self.viruses)
 
         print("v_count:")
         # pprint.pprint(v_count)
@@ -705,7 +656,7 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
@@ -785,6 +736,7 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
             'virus_CSIDs': self.virus_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
+            'plate_layout': self.plate_layout,
             'target_activity': self.target_activity,
             'data': {},
             'results': {
@@ -1086,7 +1038,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, eagle, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
@@ -1163,6 +1115,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
             'virus_CSIDs': self.virus_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
+            'plate_layout': self.plate_layout,
             'target_activity': self.target_activity,
             'data': {},
             'results': {
