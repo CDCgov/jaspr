@@ -781,6 +781,9 @@ def reportFRNTresults():
     data.loc[data['h'] <= 0.5, 'Error'] = 'h <= 0.5'
     data.loc[data['h'] >= 2.0, 'Error'] = 'h >= 2.0'
 
+    data['Vmax'] = pd.to_numeric(data['Vmax'])
+    data.loc[data['Vmax'] < 40, 'Error'] = 'low input FFU (Vmax < 40)'
+
     with pd.option_context('display.max_rows', None, 
             'display.max_columns', None, 
             'display.precision', 0,):
