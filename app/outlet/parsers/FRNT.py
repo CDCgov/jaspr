@@ -2,18 +2,10 @@
 
 # python imports
 import copy
-from random import sample
-from re import X
-from tkinter import Y
-from tracemalloc import stop
 import pandas as pd
-import math
 import numpy as np
-from zipfile import ZipFile
 import pprint
-import scipy
-from scipy import stats, mean
-from decimal import Decimal
+from scipy import stats
 # jaspr imports
 from outlet import ParserRegistry, FunctionRegistry
 
@@ -83,9 +75,11 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
     description = 'FRNT V-S-S parser for raw data from Cx5 plate reader'
     skiprows = 1
     def __init__(self, keyfile, datafile):
-        self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, sera_details = \
-                self._get_sera(keyfile)
-        self.plate_layout, self.viruses, self.virus_CSIDs, self.virus_type, self.initial_activity, self.target_activity, virus_details = self._get_viruses(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, self.Xdata, self.pooled_CUIDs, \
+            self.pooled_in_FluLIMS, sera_details = self._get_sera(keyfile)
+        self.plate_layout, self.viruses, self.virus_CSIDs, self.virus_pooled_FluLIMS, self.virus_pooled_ELIMs, \
+            self.virus_pooled_CSIDs, self.virus_type, self.initial_activity, self.target_activity, \
+                virus_details = self._get_viruses(keyfile)
 
         self.dilutions = {}
 
@@ -100,9 +94,12 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             'experiments': self._get_all_experiments(keyfile, datafile),
             'plate_layout': self.plate_layout,
             'sera': self.sera,
-            'pooled_sera': self.pooled_CUIDs,
+            'pooled_sera': self.pooled_in_FluLIMS,
             'viruses': self.viruses,
             'virus_CSIDs': self.virus_CSIDs,
+            'virus_pooled_FluLIMS': self.virus_pooled_FluLIMS, 
+            'virus_pooled_ELIMS': self.virus_pooled_ELIMs, 
+            'virus_pooled_CSIDs': self.virus_pooled_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'target_activity': self.target_activity
@@ -171,17 +168,27 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         names = pd.DataFrame(names)
         names = pd.DataFrame.transpose(names)
         # pprint.pprint(names)
-        pooled_CUIDs = [list(df['Pooled-Sera'])]
+        pooled_CUIDs = [list(df['CUIDs in Pool'])]
         pooled_CUIDs = pd.DataFrame(pooled_CUIDs)
         pooled_CUIDs = pd.DataFrame.transpose(pooled_CUIDs)
         pooled_CUIDs.columns = ['Pooled CUIDs']
+
+        pooled_in_FluLIMS = [list(df['Pooled in FluLIMS'])]
+        pooled_in_FluLIMS = pd.DataFrame(pooled_in_FluLIMS)
+        pooled_in_FluLIMS = pd.DataFrame.transpose(pooled_in_FluLIMS)
+        pooled_in_FluLIMS.columns = ['Pooled in FluLIMS']
         # pprint.pprint("pools:")
         # pprint.pprint(pooled_CUIDs)
-        sera_pool = pd.concat([names, pooled_CUIDs], axis=1)
-        sera_pool.columns = ['Name', 'Pooled CUIDs']
+        sera_pool = pd.concat([names, pooled_CUIDs, pooled_in_FluLIMS], axis=1)
+        sera_pool.columns = ['Name', 'Pooled CUIDs', 'Pooled in FluLIMS']
         pprint.pprint("sera_pool")
         pprint.pprint(sera_pool)
-
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     pprint.pprint("sera_pool")
+        #     pprint.pprint(sera_pool)
+        
         pprint.pprint("seraLabels:")
         pprint.pprint(seraLabels)
         pprint.pprint('Dilution Factor')
@@ -195,7 +202,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
-        df.to_dict('index')
+        pooled_in_FluLIMS, df.to_dict('index'), 
 
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
@@ -204,6 +211,12 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         virus_CUID = [f"{row['Name']} {row['CUID']}" 
                         for index, row in df.iterrows()]
         virus_CSIDs = [f"{row['CSID']}" 
+                        for index, row in df.iterrows()]
+        virus_pooled_FluLIMS = [f"{row['Pooled in FluLIMS']}" 
+                        for index, row in df.iterrows()]
+        virus_pooled_ELIMs = [f"{row['Pooled in ELIMS']}" 
+                        for index, row in df.iterrows()]
+        virus_pooled_CSIDs = [f"{row['CUIDs in Pool']}" 
                         for index, row in df.iterrows()]
         virus_type = [f"{row['Reference']}" 
                         for index, row in df.iterrows()]
@@ -214,7 +227,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         target_activity = [f"{row['Target FFU/mL']}" 
                         for index, row in df.iterrows()]
 
-        return plate_layout, virus_CUID, virus_CSIDs, virus_type, initial_activity, target_activity, df.to_dict('index')
+        return plate_layout, virus_CUID, virus_CSIDs, virus_pooled_FluLIMS, virus_pooled_ELIMs, virus_pooled_CSIDs,\
+            virus_type, initial_activity, target_activity, df.to_dict('index')
         
     def _get_dilutions(self, start_titer, Xdata):
 
@@ -459,7 +473,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, \
+            self.pooled_CUIDs, self.pooled_in_FluLIMS = self._get_sera(keyfile)
  
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
@@ -526,9 +541,12 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
-            'pooled_sera': self.pooled_CUIDs,
+            'pooled_sera': self.pooled_in_FluLIMS,
             'viruses': self.viruses,
             'virus_CSIDs': self.virus_CSIDs,
+            'virus_pooled_FluLIMS': self.virus_pooled_FluLIMS, 
+            'virus_pooled_ELIMS': self.virus_pooled_ELIMs, 
+            'virus_pooled_CSIDs': self.virus_pooled_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'plate_layout': self.plate_layout,
@@ -656,7 +674,8 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, \
+            self.pooled_CUIDs, self.pooled_in_FluLIMS = self._get_sera(keyfile)
 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
@@ -731,13 +750,17 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
-            'pooled_sera': self.pooled_CUIDs,
+            'pooled_sera': self.pooled_in_FluLIMS,
             'viruses': self.viruses,
             'virus_CSIDs': self.virus_CSIDs,
+            'virus_pooled_FluLIMS': self.virus_pooled_FluLIMS, 
+            'virus_pooled_ELIMS': self.virus_pooled_ELIMs, 
+            'virus_pooled_CSIDs': self.virus_pooled_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'plate_layout': self.plate_layout,
             'target_activity': self.target_activity,
+            'start_dilution_and_factor': start_dilution_and_factor,
             'data': {},
             'results': {
                 'logistic3': {},
@@ -1038,7 +1061,8 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
     def _get_all_experiments(self, keyfile, datafile):
         experiments = {}
 
-        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, self.Xdata, self.pooled_CUIDs = self._get_sera(keyfile)
+        self.sera, self.dilution_factors, self.starting_titers, start_dilution_and_factor, \
+            self.Xdata, self.pooled_CUIDs, self.pooled_in_FluLIMS = self._get_sera(keyfile)
 
 ## -- Arith_means \/ \/ \/ \/        
         Arith_means, SE_means = self._parse_csv(datafile)
@@ -1110,13 +1134,17 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         new_exp = {
             'x_axis_label': 'Relative Dilution (ppm)',
             'y_axis_label': 'Infected Cell Population (ICP)',
-            'pooled_sera': self.pooled_CUIDs,
+            'pooled_sera': self.pooled_in_FluLIMS,
             'viruses': self.viruses,
             'virus_CSIDs': self.virus_CSIDs,
+            'virus_pooled_FluLIMS': self.virus_pooled_FluLIMS, 
+            'virus_pooled_ELIMS': self.virus_pooled_ELIMs, 
+            'virus_pooled_CSIDs': self.virus_pooled_CSIDs,
             'virus_type': self.virus_type,
             'initial_activity': self.initial_activity,
             'plate_layout': self.plate_layout,
             'target_activity': self.target_activity,
+            'start_dilution_and_factor': start_dilution_and_factor,
             'data': {},
             'results': {
                 'logistic3': {},

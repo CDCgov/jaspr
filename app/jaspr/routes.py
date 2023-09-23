@@ -576,13 +576,14 @@ def reportFRNTresults():
  
     pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
     pooled_CUIDs = pooled_CUIDs.T
-    # del pooled_CUIDs["CSID"] 
- 
-    # with pd.option_context('display.max_rows', None, 
-    #         'display.max_columns', None, 
-    #         ):
-    #         pprint.pprint("pooled CUIDs transpose")
-    #         pprint.pprint(pooled_CUIDs)
+
+
+    with pd.option_context('display.max_rows', None, 
+                             'display.max_columns', None, 
+                             'display.precision', 0,):
+        pprint.pprint("pooled_CUIDs")
+        pprint.pprint(pooled_CUIDs)
+
     Start_dilution = pooled_CUIDs['Starting Dilution'].astype(str)
     Start_dilution = pd.DataFrame(Start_dilution)
     Start_dilution = Start_dilution['Starting Dilution'].values.tolist()
@@ -595,11 +596,15 @@ def reportFRNTresults():
     Sera_CSIDs = pd.DataFrame(Sera_CSIDs)
     Sera_CSIDs = Sera_CSIDs['CSID'].values.tolist()
 
+    Pooled_FluLIMS = pooled_CUIDs['Pooled in FluLIMS'].astype(str)
+    Pooled_FluLIMS = pd.DataFrame(Pooled_FluLIMS)
+    Pooled_FluLIMS = Pooled_FluLIMS['Pooled in FluLIMS'].values.tolist()
+
     # pprint.pprint(Start_dilution)
     # pprint.pprint(Dilution_factor)
     # pprint.pprint(Sera_CSIDs)
 
-    CUIDs = pooled_CUIDs['CUID'].astype(str) + ", " + pooled_CUIDs['Pooled-Sera'].astype(str)
+    CUIDs = pooled_CUIDs['CUID'].astype(str) + ", " + pooled_CUIDs['CUIDs in Pool'].astype(str)
     CUIDs = pd.DataFrame(CUIDs)
 
     # pprint.pprint("just CUIDs")
@@ -614,7 +619,6 @@ def reportFRNTresults():
     #         pprint.pprint(pooled_CUIDs)
     del pooled_CUIDs["Name"] 
     del pooled_CUIDs["CUID"]
-    del pooled_CUIDs["Pooled-Sera"]
     # with pd.option_context('display.max_rows', None, 
     #         'display.max_columns', None, 
     #         ):
@@ -642,6 +646,12 @@ def reportFRNTresults():
     virus_CSIDs = jm.experiments[experiment]['virus_CSIDs']
     # pprint.pprint("virus_CSIDs")
     # pprint.pprint(virus_CSIDs)
+    virus_pooled_FluLIMS = jm.experiments[experiment]['virus_pooled_FluLIMS']
+   
+    virus_pooled_ELIMs = jm.experiments[experiment]['virus_pooled_ELIMS']
+
+    virus_pooled_CSIDs = jm.experiments[experiment]['virus_pooled_CSIDs']
+
     virus_type = jm.experiments[experiment]['virus_type']
     # pprint.pprint("virus_type")
     # pprint.pprint(virus_type)
@@ -673,6 +683,12 @@ def reportFRNTresults():
     virus_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(virus_CSIDs, N_sera)))
     # pprint.pprint("virus_CSIDs")
     # pprint.pprint(virus_CSIDs)
+    virus_pooled_FluLIMS = list(itertools.chain.from_iterable(itertools.repeat(virus_pooled_FluLIMS, N_sera)))
+
+    virus_pooled_ELIMs = list(itertools.chain.from_iterable(itertools.repeat(virus_pooled_ELIMs, N_sera)))
+
+    virus_pooled_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(virus_pooled_CSIDs, N_sera)))
+
     virus_type = list(itertools.chain.from_iterable(itertools.repeat(virus_type, N_sera)))
     # pprint.pprint("virus_type")
     # pprint.pprint(virus_type)
@@ -687,6 +703,7 @@ def reportFRNTresults():
     Start_dilution = list(itertools.chain.from_iterable(itertools.repeat(Start_dilution, N_virus)))
     Dilution_factor = list(itertools.chain.from_iterable(itertools.repeat(Dilution_factor, N_virus)))
     Sera_CSIDs = list(itertools.chain.from_iterable(itertools.repeat(Sera_CSIDs, N_virus)))
+    Pooled_FluLIMS = list(itertools.chain.from_iterable(itertools.repeat(Pooled_FluLIMS, N_virus)))
     # with pd.option_context('display.max_rows', None, 
     #         'display.max_columns', None, 
     #         'display.precision', 0,):
@@ -713,10 +730,15 @@ def reportFRNTresults():
     SeraLIST = pd.DataFrame(SeraLIST, columns=['Sera'])
     VirusLIST = pd.DataFrame(VirusLIST, columns=['Virus'])
     virus_CSIDs = pd.DataFrame(virus_CSIDs, columns=['Virus CSIDs'])
+    virus_pooled_FluLIMS = pd.DataFrame(virus_pooled_FluLIMS, columns=['Virus Pooled in FluLIMS'])
+    virus_pooled_ELIMs = pd.DataFrame(virus_pooled_ELIMs, columns=['Virus Pooled in ELIMS'])
+    virus_pooled_CSIDs = pd.DataFrame(virus_pooled_CSIDs, columns=['Virus CUIDs in Pool'])
     virus_type = pd.DataFrame(virus_type, columns=['Virus type'])
     target_activity = pd.DataFrame(target_activity, columns=['Target activity'])
     initial_activity = pd.DataFrame(initial_activity, columns=['Initial activity'])
-    Virus_data = [VirusLIST, virus_CSIDs, virus_type, target_activity, initial_activity]
+
+    Virus_data = [VirusLIST, virus_CSIDs, virus_pooled_FluLIMS, virus_pooled_ELIMs, virus_pooled_CSIDs, \
+                virus_type, target_activity, initial_activity]
     Virus_data = pd.concat(Virus_data, axis=1)
     Virus_data = Virus_data.sort_values(by=['Virus'])
     Virus_data = Virus_data.drop(['Virus'], axis=1)
@@ -737,6 +759,7 @@ def reportFRNTresults():
     Dilution_factor = pd.DataFrame(Dilution_factor, columns=['Dilution factor'])
     Sera_CSIDs = pd.DataFrame(Sera_CSIDs, columns=['Sera CSIDs'])
     Sera_CSIDs = Sera_CSIDs.replace("nan","")
+    Pooled_FluLIMS= pd.DataFrame(Pooled_FluLIMS, columns=['Sera Pooled in FluLIMS'])
 
     Combined = [SeraLIST, VirusLIST, data]
     data = pd.concat(Combined, axis=1)
@@ -766,7 +789,8 @@ def reportFRNTresults():
     Error = pd.DataFrame(columns=['Error'])
     Error = Error.replace({'Error': {'NaN':''}})
 
-    Combined2 = [sera_, pooled_CUIDs, Sera_CSIDs, Start_dilution, Dilution_factor, virus_, Virus_data, data, Error]
+    Combined2 = [sera_, pooled_CUIDs, Sera_CSIDs, Pooled_FluLIMS, Start_dilution, \
+                 Dilution_factor, virus_, Virus_data, data, Error]
     data = pd.concat(Combined2, axis=1)
     del data["Sera"]
     del data["Virus"]
@@ -827,8 +851,8 @@ def reportFRNTresults():
     pprint.pprint('data')
     pprint.pprint(data)
 
-    labels = [['Sera Number', 'Sera CUIDs', 'Sera CSIDs', 'Starting dilution', 'Dilution factor', \
-        'Virus Number', 'Virus CUIDs', 'Virus CSIDs', 'Virus type', 'Target activity', \
+    labels = [['Sera Number', 'Sera CUIDs', 'Sera CSIDs', 'Sera Pooled in FluLIMS', 'Starting dilution', 'Dilution factor', \
+        'Virus Number', 'Virus CUIDs', 'Virus CSIDs', 'Virus Pooled in FluLIMS', 'Virus Pooled in ELIMS', 'Virus CUIDs in Pool', 'Virus type', 'Target activity', \
         'Initial activity', 'ec50', 'h', 'Vmax', 'titer', 'Error']]  
 
     FRNTreport = Table + labels + data
