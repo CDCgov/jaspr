@@ -2,9 +2,10 @@ version: '3.3'
 
 services:
   jaspr:
+      container_name: jaspr
       build:
         context: .
-        dockerfile: docker/dockerfile-jaspr
+        dockerfile: build/docker/dockerfile-jaspr
       depends_on:
         - redis
       environment:
@@ -24,7 +25,7 @@ services:
   nginx:
       image: webapp-nginx
       build:
-        context: docker/nginx
+        context: build/docker/nginx
         dockerfile: dockerfile-nginx
       shm_size: 512m
       environment:

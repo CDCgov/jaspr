@@ -1,7 +1,7 @@
 flask
 blinker
 flask-debugtoolbar
-bokeh=2.3.3
+bokeh
 pandas
 xlrd
 xlsxwriter
@@ -9,7 +9,7 @@ markdown
 scipy
 redis-py
 phantomjs
-selenium=3.14.1
+selenium
 uwsgi
 firefox
 geckodriver
