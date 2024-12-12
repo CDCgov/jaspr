@@ -14,7 +14,7 @@ from bokeh.io import export_png
 from bokeh.layouts import column as widgetbox
 from bokeh.models import ColumnDataSource, Whisker
 from bokeh.models.glyphs import Line
-from bokeh.models.layouts import Column
+
 from bokeh.models import TickFormatter, Label, AdaptiveTicker, FixedTicker, \
         LogTickFormatter
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
