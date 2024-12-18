@@ -10,3 +10,4 @@ Notes.html
 *.egg-info
 build/.env
 build/run/*
+.env
