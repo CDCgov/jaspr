@@ -33,8 +33,9 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
 # flask-debugtoolbar - removed from above 3/29/2022, prevented app from building
 
 # Copy the current directory contents into the container at /build
-ADD . /build
-WORKDIR /build
+ADD requirements.txt .
+ADD ./build /build
+#WORKDIR /build
 
 # create a new env, and install dependencies
 # docker reccomends don't apt-get upgrade if you can avoid it
