@@ -1,6 +1,6 @@
 # JASPR
 JASPR calculates titers from logistic fits on resistance assay data.
-Access JASPR at https://jaspr.biotech.cdc.gov/
+Access JASPR-PROD at https://jaspr.biotech.cdc.gov/ and JASPR-QA at https://jaspr-qa.biotech.cdc.gov/
 
 # Getting Started
 Instruction on how to get the project up and running.
