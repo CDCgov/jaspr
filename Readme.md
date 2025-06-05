@@ -1,22 +1,23 @@
 # JASPR
 JASPR calculates titers from logistic fits on resistance assay data.
+Access JASPR at https://jaspr.biotech.cdc.gov/
 
 # Getting Started
 Instruction on how to get the project up and running.
 
 # Prerequisites
-Need to have docker and docker-compose installed on your local dev machine.
+Need to have podman and podman-compose installed on your machine.
 
 # Branch Strategy
 # master -- This is deployed on jaspr's PROD and QA servers 
--- This is the primary branch on jaspr-prod: id-jaspr-prod-01.biotech.cdc.gov
+-- This is the primary branch on jaspr-prod: id-jaspr-prod-02.biotech.cdc.gov
 
 # jaspr_qa 
 -- This is the QA branch used for testing
 
 # Any bug fixes or feature add should be developed in a new branch. 
 Create your new branch based on the master branch. 
-Once your branch is ready for testing, merge it into the QA branch and deploy it to the jaspr-qa server: id-disc-dev-02.biotech.cdc.gov
+Once your branch is ready for testing, merge it into the QA branch and deploy it to the jaspr-qa server: id-jaspr-qa-01.biotech.cdc.gov
  
 Once testing on the QA branch is approved, merge the QA branch to master but make sure to not close/delete the QA branch.
 
@@ -29,14 +30,8 @@ Placeholder for any notes for any future automated testing
 The production server and deployment is based on the master branch. 
 
 # NOTE: Starting the containers
-cd jaspr/build
-docker-compose build && docker-compose down && docker-compose up
-
-# In QA: build/docker/dockerfile-jaspr
-Disable line 6: # RUN apt-get --allow-releaseinfo-change update
-
-# In PROD: build/docker/dockerfile-jaspr
-Enable line 6: RUN apt-get --allow-releaseinfo-change update
+cd ../../../var/JASPR
+podman-compose build && podman-compose down && podman-compose up
 
 # Adding new features to JASPR
 
@@ -66,7 +61,7 @@ git merge feature
 # push changes to BitBucket
 git push origin jaspr_qa
 
-LOG IN to the jaspr-qa environment: id-disc-dev-02.biotech.cdc.gov
+LOG IN to the jaspr-qa environment: id-jaspr-qa-01.biotech.cdc.gov
 
 # pull jaspr_qa branch to jaspr-qa environment
 sudo su jaspr
@@ -79,7 +74,7 @@ cd jaspr
 git checkout master
 
 # pull jaspr_qa from Bitbucket
-git fetch bitbucket jaspr_qa:jaspr_qa
+git fetch origin jaspr_qa:jaspr_qa
 
 # move to jaspr_qa branch
 git branch
@@ -100,13 +95,13 @@ git push origin master
 # pull master branch to jaspr-prod environment
 
 git checkout jaspr_qa
-git fetch bitbucket master
+git fetch origin master
 git checkout master
 
 sudo su jaspr
 cd ~ 
 
 cd jaspr_qa/build
-docker-compose build && docker-compose down && docker-compose up
+podman-compose build && podman-compose down && podman-compose up
 
-# Conduct feature and regression testing to verify things are working as expceted.
+# Conduct feature and regression testing to verify things are working as expected.
