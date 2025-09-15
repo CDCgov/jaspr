@@ -21,7 +21,7 @@ Access JASPR-PROD at https://jaspr.biotech.cdc.gov/ and JASPR-QA at https://jasp
 
 ### License Standard Notice
 
-The current configuration of DISC runs in Podman containers on RHEL8 OS VMs hosted by SciComp.
+The current configuration of JASPR runs in Podman containers on RHEL8 OS VMs hosted by SciComp.
 
 ### Branch Strategy Notice
 
@@ -51,6 +51,7 @@ cd ../../../var/JASPR
 podman-compose build && podman-compose down && podman-compose up
 
 =======
+
 
 
 
