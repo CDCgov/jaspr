@@ -9,4 +9,4 @@ pandoc index.md -f markdown -t html -s -o ..\static\help\index.html
 pandoc install.md -f markdown -t html -s -o ..\static\help\install.html
 pandoc jaspr_configuration.md -f markdown -t html -s -o ..\static\help\jaspr_configuration.html
 pandoc license.md -f markdown -t html -s -o ..\static\help\license.html
-cp "jaspr Software Agreement 2010.doc" ..\static\help
+cp "JASPR License.docx" ..\static\help
