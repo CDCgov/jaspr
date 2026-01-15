@@ -4,31 +4,24 @@
 """Flask routes for browser based jaspr UI"""
 
 # python imports
-from fileinput import filename
 import json
-from mimetypes import init
-from operator import index
-from typing_extensions import Self
 from urllib.parse import unquote
 from pandas import pandas as pd
 import numpy as np
 from io import BytesIO
-import time
 import pprint
 import itertools 
 import os.path
-import tempfile
 import glob
 
 # flask imports
 from flask import Flask, render_template, request, \
-        jsonify, redirect, make_response, send_from_directory, send_file
+        jsonify, redirect, make_response, send_from_directory, send_file, session
 
 # local imports
 from jaspr import app
 from jaspr.model import JasprModel
 from jaspr.charts import JasprChart
-from outlet import FunctionRegistry
 
 # additional imports from api.py 6/10/21
 from datetime import datetime
@@ -108,8 +101,7 @@ def ping():
 def reset():
     """reset UI to the default"""
     JasprModel().ensure_session(reset=True)
-    response = make_response("<div>clearing session</div>")
-    response.set_cookie(app.session_cookie_name, expires=0)
+    session.clear()
     return redirect('/', code=302)
 
 
