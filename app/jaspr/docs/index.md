@@ -30,7 +30,6 @@ License
 -------
 
 *  [jaspr license information](license.html)
-*  [jaspr Software Agreement 2010](jaspr%20Software%20Agreement%202010.doc)
 
 Other Information
 -----------------
