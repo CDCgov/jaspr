@@ -12,7 +12,7 @@ import numpy as np
 from zipfile import ZipFile
 import pprint
 import scipy
-from scipy import stats, mean
+from scipy import stats
 from decimal import Decimal
 # jaspr imports
 from outlet import ParserRegistry, FunctionRegistry
