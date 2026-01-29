@@ -1,0 +1,50 @@
+# Start from the same base as your current jaspr image
+FROM continuumio/miniconda3:latest
+
+# System packages we need in the single container
+RUN apt-get -y update && \
+    apt-get -y install nginx redis-server supervisor curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# --- App build (copy what dockerfile-jaspr already does) ---
+COPY environment.yml .
+RUN conda env create -f environment.yml
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
+    conda install python=3.9 && \
+    pip install "async-timeout==3.0.1" && \
+    pip install flask-session
+
+ADD requirements.txt .
+ADD ./build /build
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
+    conda install -c conda-forge --file requirements.txt
+
+# App runtime location (matches existing image)
+VOLUME /app
+WORKDIR /app
+
+# --- Nginx config + setup script (copied from your nginx image layout) ---
+# These config paths are the ones used by your nginx Dockerfile today:
+#   site.conf -> /etc/nginx/conf.d/site.conf
+#   healthcheck.conf -> /etc/nginx/conf.d/healthcheck.conf
+#   setup.sh -> /root/setup.sh
+# (see nginx Dockerfile snippet) :contentReference[oaicite:2]{index=2}
+COPY build/docker/nginx/site.conf /etc/nginx/conf.d/site.conf
+COPY build/docker/nginx/healthcheck.conf /etc/nginx/conf.d/healthcheck.conf
+COPY build/docker/nginx/setup.sh /root/setup.sh
+RUN chmod 0700 /root/setup.sh
+
+# Copy localhost cert inputs used by setup.sh (localhost.conf content exists) :contentReference[oaicite:3]{index=3}
+COPY build/docker/nginx/localhost.conf /root/localhost.conf
+RUN mkdir -p /etc/ssl && \
+    openssl req -batch -x509 -nodes -days 30 -newkey rsa:2048 \
+      -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt \
+      -config /root/localhost.conf
+
+# Supervisor config + entrypoint
+COPY build/docker/single/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY build/docker/single/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 80 443
+CMD ["/entrypoint.sh"]

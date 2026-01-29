@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  jaspr_single:
+    container_name: jaspr_single
+    build:
+      context: .
+      dockerfile: build/docker/dockerfile-single
+    environment:
+      - FLASK_APP=jaspr
+      - FLASK_DEBUG=True
+      - FLASK_ENV=development
+      # single-container redis lives inside the same container
+      - REDIS_HOST=127.0.0.1
+      # nginx setup.sh uses these
+      - SSL_CERTIFICATE=${SSL_CERTIFICATE}
+      - DEPLOYMENT_DNS="${DEPLOYMENT_DNS:-localhost}"
+    image: cdcflu/jaspr:single
+    tty: true
+    volumes:
+      # same mount as your existing jaspr service :contentReference[oaicite:3]{index=3}
+      - ${CODESHARE}:/app
+      # same credential mounts as your existing nginx service :contentReference[oaicite:4]{index=4}
+      - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
+      - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
+      - "${LETSENCRYPT_DATA_PATH:-./run/nginx/letsencrypt/data}:/data/letsencrypt"
+    ports:
+      - "${JASPR_HTTP_PORT:-80}:80"
+      - "${JASPR_HTTPS_PORT:-443}:443"
