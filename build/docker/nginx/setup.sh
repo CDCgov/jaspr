@@ -33,3 +33,6 @@ mkdir -p /opt/health
 tmp="$(mktemp /opt/health/index.html.XXXXXX)"
 date > "$tmp"
 mv -f "$tmp" /opt/health/index.html
+
+# remove default site to avoid duplicate default_server on :80
+rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default || true
