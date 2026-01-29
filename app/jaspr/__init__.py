@@ -12,7 +12,8 @@ app = Flask(__name__)
 app.secret_key = b'HoleyMoleyRocky'
 app.config['TESTING'] = True
 app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = redis.from_url('redis://redis:6379')
+redis_host = os.getenv("REDIS_HOST", "redis")  # "redis" in multi-container; "127.0.0.1" in single-container
+app.config['SESSION_REDIS'] = redis.from_url(f"redis://{redis_host}:6379")
 
 #allow intercepts without stopping while debugging
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
