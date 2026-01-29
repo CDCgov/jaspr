@@ -31,6 +31,7 @@ RUN if [ -f /etc/apt/sources.list.bak ]; then mv /etc/apt/sources.list.bak /etc/
 
 # remove left over apt info #
 RUN rm -rf /var/lib/apt/lists/*
+RUN rm -f /etc/nginx/sites-enabled/default || true
 
 # copy premade localhost certificate #
 COPY --from=nginx_build --chown=root /etc/ssl/localhost.key /etc/ssl/localhost.key

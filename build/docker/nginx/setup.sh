@@ -29,10 +29,7 @@ else
 fi
 
 # setup health check #
-mkdir /opt/health ||:
-rm /opt/health/index.html ||:
-touch /opt/health/index.html
-date >> /opt/health/index.html
-
-# hotpatch NGINX to access /scicomp share files
-# sed -E -i 's/user\s+nginx/user root/' /etc/nginx/nginx.conf
+mkdir -p /opt/health
+tmp="$(mktemp /opt/health/index.html.XXXXXX)"
+date > "$tmp"
+mv -f "$tmp" /opt/health/index.html
