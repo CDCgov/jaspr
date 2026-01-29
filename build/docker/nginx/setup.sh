@@ -1,15 +1,8 @@
 #! /bin/bash
 set -e
 
-# setup basic auth? #
-# if [ -z "${AUTH_USER}" -o -z "${AUTH_PASS}" ]
-# then
-#     echo "SETUP: No basic auth is being setup" 1>&2
-# else
-#     echo "SETUP: Using basic auth for nginx, user: ${AUTH_USER}" 1>&2
-#     AUTH_CREDENTIAL="$(echo "${AUTH_PASS}" | openssl passwd -apr1 -noverify -stdin)"
-#     echo "${AUTH_USER}:${AUTH_CREDENTIAL}" > /etc/nginx/.htpasswd
-# fi
+# remove default site to avoid duplicate default_server on :80
+rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default || true
 
 # link active certificate #
 if [ -f "/credentials/ssl/${SSL_CERTIFICATE}.key" ]
@@ -33,6 +26,3 @@ mkdir -p /opt/health
 tmp="$(mktemp /opt/health/index.html.XXXXXX)"
 date > "$tmp"
 mv -f "$tmp" /opt/health/index.html
-
-# remove default site to avoid duplicate default_server on :80
-rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default || true

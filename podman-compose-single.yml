@@ -10,6 +10,7 @@ services:
       - FLASK_APP=jaspr
       - FLASK_DEBUG=True
       - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
       # single-container redis lives inside the same container
       - REDIS_HOST=127.0.0.1
       # nginx setup.sh uses these
