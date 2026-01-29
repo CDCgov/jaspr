@@ -41,6 +41,10 @@ RUN mkdir -p /etc/ssl && \
       -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt \
       -config /root/localhost.conf
 
+RUN mkdir -p /var/log/uwsgi && \
+    touch /var/log/uwsgi/uwsgi.log && \
+    chmod 644 /var/log/uwsgi/uwsgi.log
+
 # Supervisor config + entrypoint
 COPY build/docker/single/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY build/docker/single/entrypoint.sh /entrypoint.sh
