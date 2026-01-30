@@ -106,7 +106,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         }
 
         print("self.data:")
-        pprint.pprint(self.data)
+        # pprint.pprint(self.data)
          
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
@@ -154,15 +154,15 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         
         Xdata = [list(df['Starting Dilution']), list(df['Dilution Factor'])]
 
-        pprint.pprint("Xdata")
-        pprint.pprint(Xdata)
+        # pprint.pprint("Xdata")
+        # pprint.pprint(Xdata)
   
         Starting_dilution = list(df['Starting Dilution'])
         # pprint.pprint(Starting_dilution)
 
         res = [ele for ele in Starting_dilution for i in range(6)]
-        pprint.pprint("res")
-        pprint.pprint(res)
+        # pprint.pprint("res")
+        # pprint.pprint(res)
 
         names = [list(df['Name'])]
         names = pd.DataFrame(names)
@@ -181,24 +181,20 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         # pprint.pprint(pooled_CUIDs)
         sera_pool = pd.concat([names, pooled_CUIDs, pooled_in_FluLIMS], axis=1)
         sera_pool.columns = ['Name', 'Pooled CUIDs', 'Pooled in FluLIMS']
-        pprint.pprint("sera_pool")
-        pprint.pprint(sera_pool)
-        # with pd.option_context('display.max_rows', None, 
-        #                          'display.max_columns', None, 
-        #                          'display.precision', 0,):
-        #     pprint.pprint("sera_pool")
-        #     pprint.pprint(sera_pool)
+        # pprint.pprint("sera_pool")
+        # pprint.pprint(sera_pool)
+
         
-        pprint.pprint("seraLabels:")
-        pprint.pprint(seraLabels)
-        pprint.pprint('Dilution Factor')
-        pprint.pprint(list(df['Dilution Factor']))        
-        pprint.pprint('Starting Dilution')
-        pprint.pprint(list(df['Starting Dilution']))    
-        pprint.pprint('Xdata')
-        pprint.pprint(Xdata)
-        pprint.pprint('pooled_CUIDs')
-        pprint.pprint(pooled_CUIDs)
+        # pprint.pprint("seraLabels:")
+        # pprint.pprint(seraLabels)
+        # pprint.pprint('Dilution Factor')
+        # pprint.pprint(list(df['Dilution Factor']))        
+        # pprint.pprint('Starting Dilution')
+        # pprint.pprint(list(df['Starting Dilution']))    
+        # pprint.pprint('Xdata')
+        # pprint.pprint(Xdata)
+        # pprint.pprint('pooled_CUIDs')
+        # pprint.pprint(pooled_CUIDs)
 
 
         return seraLabels, list(df['Dilution Factor']), list(df['Starting Dilution']), Xdata, pooled_CUIDs, \
@@ -235,34 +231,34 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         with pd.option_context('display.max_rows', None, 
                             'display.max_columns', None, 
                             'display.precision', 0,):
-            pprint.pprint("Xdata--Beginning")
-            pprint.pprint(Xdata)
+            # pprint.pprint("Xdata--Beginning")
+            # pprint.pprint(Xdata)
         
-        pprint.pprint(Xdata)
+        # pprint.pprint(Xdata)
         X_data = pd.DataFrame(Xdata)
         
         Shape = X_data.shape
         Y = Shape[1]
-        pprint.pprint("Y")
-        pprint.pprint(Y)
+        # pprint.pprint("Y")
+        # pprint.pprint(Y)
 
 
-        pprint.pprint("self.dilutions:")
-        pprint.pprint(self.dilutions)
+        # pprint.pprint("self.dilutions:")
+        # pprint.pprint(self.dilutions)
         Sera = (len(self.dilutions))
         X = Sera
-        pprint.pprint("X= ")
-        pprint.pprint(X)
+        # pprint.pprint("X= ")
+        # pprint.pprint(X)
 
         while X <= (Y-1):
             start_dilution = X_data.iat[0, X]
-            pprint.pprint('start_dilution')
-            pprint.pprint(start_dilution)
+            # pprint.pprint('start_dilution')
+            # pprint.pprint(start_dilution)
             dilution_factor = X_data.iat[1, X]
-            pprint.pprint('dilution_factor')
-            pprint.pprint(dilution_factor)
-            pprint.pprint("self.starting_titers")
-            pprint.pprint(self.starting_titers)
+            # pprint.pprint('dilution_factor')
+            # pprint.pprint(dilution_factor)
+            # pprint.pprint("self.starting_titers")
+            # pprint.pprint(self.starting_titers)
             serum_X = X
 
             self.dilutions[serum_X] = ([start_dilution, start_dilution/dilution_factor, \
@@ -276,9 +272,9 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
      
             if X == (Y):
                 break
-            pprint.pprint("self.dilutions[serum_X]")
-            pprint.pprint(self.dilutions[serum_X])
-            pprint.pprint(self.dilutions)
+            # pprint.pprint("self.dilutions[serum_X]")
+            # pprint.pprint(self.dilutions[serum_X])
+            # pprint.pprint(self.dilutions)
         # raise
 
     def _parse_csv(self, datafile):
@@ -296,7 +292,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         # pprint.pprint("N= ")
         print("Number of plates= ", N)
         pprint.pprint("plates:")
-        print(RAWdata)
+        # print(RAWdata)
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
@@ -311,7 +307,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("AllData:")
+            # pprint.pprint("AllData:")
             # pprint.pprint(AllData)
 
 
@@ -332,9 +328,9 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             # print("Temp_plate after numpy=", Temp_plate)
             
             Plate_name = RAWdata.loc[X][0]
-            pprint.pprint("Plate_name:")
-            pprint.pprint(Plate_name)
-            print(type(Plate_name))
+            # pprint.pprint("Plate_name:")
+            # pprint.pprint(Plate_name)
+            # print(type(Plate_name))
 
             VirA = Plate_name[0:4]          
             SerA = Plate_name[4:7]
@@ -455,12 +451,12 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
         Arith_means = np.delete(Arith_means, obj=0, axis=0)
         SE_means = np.delete(SE_means, obj=0, axis=0)
-        pprint.pprint("Here is all the data:")
-        pprint.pprint(All_plates)
-        pprint.pprint("Here are the Arith_means:")
-        pprint.pprint(Arith_means)
-        pprint.pprint("Here are the SE_means:")
-        pprint.pprint(SE_means)
+        # pprint.pprint("Here is all the data:")
+        # pprint.pprint(All_plates)
+        # pprint.pprint("Here are the Arith_means:")
+        # pprint.pprint(Arith_means)
+        # pprint.pprint("Here are the SE_means:")
+        # pprint.pprint(SE_means)
 
 
         return Arith_means, SE_means
@@ -566,14 +562,14 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("self.sera:")
-            pprint.pprint(self.sera)
+            # pprint.pprint("self.sera:")
+            # pprint.pprint(self.sera)
 
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("self.viruses:")
-            pprint.pprint(self.viruses)
+            # pprint.pprint("self.viruses:")
+            # pprint.pprint(self.viruses)
 
         print("v_count:")
         # pprint.pprint(v_count)
@@ -581,11 +577,11 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         s_count = len(self.sera)
         
         print("s_count:")
-        pprint.pprint(s_count)
+        # pprint.pprint(s_count)
 
         data_count = len(data)
-        pprint.pprint("data_count:")
-        pprint.pprint(data_count)
+        # pprint.pprint("data_count:")
+        # pprint.pprint(data_count)
         X=0
 
         # pprint.pprint("data")
@@ -609,8 +605,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                     # pprint.pprint("vpp")
                     # pprint.pprint(vpp)
 
-                    pprint.pprint("s_count:")
-                    pprint.pprint(s_count)
+                    # pprint.pprint("s_count:")
+                    # pprint.pprint(s_count)
 
                     # pprint.pprint("position_offset:")
                     # pprint.pprint(position_offset)
@@ -633,16 +629,16 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
                     x_values = self.dilutions[serum_X]
-                    pprint.pprint("x_values =")
-                    pprint.pprint(x_values)
+                    # pprint.pprint("x_values =")
+                    # pprint.pprint(x_values)
                     x_fit = self.dilutions[serum_X].copy()
-                    pprint.pprint("x-fit= ")
-                    pprint.pprint(x_fit)                    
+                    # pprint.pprint("x-fit= ")
+                    # pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
-                    pprint.pprint("x-fit= ")
-                    pprint.pprint(x_fit)    
-                    pprint.pprint("x_values =")
-                    pprint.pprint(x_values)
+                    # pprint.pprint("x-fit= ")
+                    # pprint.pprint(x_fit)    
+                    # pprint.pprint("x_values =")
+                    # pprint.pprint(x_values)
                     exp['data'][serum] = {
                         'x_values': x_values,
                         'x_fit': x_fit,
@@ -662,7 +658,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
                     if X == (data_count):
                         break
-                    pprint.pprint("done...")                
+                    # pprint.pprint("done...")                
 
         return experiments
 
@@ -705,8 +701,8 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):        
-            pprint.pprint("data")
-            pprint.pprint(data)
+            # pprint.pprint("data")
+            # pprint.pprint(data)
 
 
         
@@ -771,31 +767,31 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         }
 
         # viruses per plate = 1       
-        print("self.sera:")
-        pprint.pprint(self.sera)
+        # print("self.sera:")
+        # pprint.pprint(self.sera)
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("self.sera:")
+            # pprint.pprint("self.sera:")
             # pprint.pprint(self.sera)
 
         v_count = len(self.viruses)
         vpp = 1
 
-        print("self.viruses:")
-        pprint.pprint(self.viruses)
+        # print("self.viruses:")
+        # pprint.pprint(self.viruses)
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("self.viruses:")
+            # pprint.pprint("self.viruses:")
             # pprint.pprint(self.viruses)
 
-        print("v_count:")
+        # print("v_count:")
         # pprint.pprint(v_count)
         
         s_count = len(self.sera)
         
-        print("s_count:")
+        # print("s_count:")
         # pprint.pprint(s_count)
 
         data_count = len(data)
@@ -810,26 +806,26 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
                     row = data[X]
                     StandardError = error[X]
 
-                    print('X= ', X)
-                    pprint.pprint("row")
-                    pprint.pprint(row)
-                    pprint.pprint("StandardError")
-                    pprint.pprint(StandardError)
-                    pprint.pprint(virus)
-                    pprint.pprint(serum)
+                    # print('X= ', X)
+                    # pprint.pprint("row")
+                    # pprint.pprint(row)
+                    # pprint.pprint("StandardError")
+                    # pprint.pprint(StandardError)
+                    # pprint.pprint(virus)
+                    # pprint.pprint(serum)
                     
                     serum_X = self.sera.index(serum)
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
                     x_values = self.dilutions[serum_X]
-                    pprint.pprint("x_values =")
-                    pprint.pprint(x_values)
+                    # pprint.pprint("x_values =")
+                    # pprint.pprint(x_values)
                     x_fit = self.dilutions[serum_X].copy()
-                    pprint.pprint("x-fit= ")
-                    pprint.pprint(x_fit)                    
+                    # pprint.pprint("x-fit= ")
+                    # pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
-                    pprint.pprint('Herex_fit-------------->')
-                    pprint.pprint(x_fit)
+                    # pprint.pprint('Herex_fit-------------->')
+                    # pprint.pprint(x_fit)
 
 
                     exp['data'][serum] = {
@@ -851,7 +847,7 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
 
                     if X == (data_count):
                         break
-                    pprint.pprint("done...")                
+                    # pprint.pprint("done...")                
 
         return experiments
 
@@ -866,8 +862,8 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         with pd.option_context('display.max_rows', None, 
                                  'display.max_columns', None, 
                                  'display.precision', 0,):
-            pprint.pprint("df NOT-sorted:")
-            pprint.pprint(df)
+            # pprint.pprint("df NOT-sorted:")
+            # pprint.pprint(df)
 
         df = df.sort_values(by=['Plate ID','Plate Number'])
 
@@ -882,15 +878,15 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
 
         RAWdata = pd.DataFrame(VSS.groups.keys())
 
-        print('VSS - - - ')
-        print(VSS)
+        # print('VSS - - - ')
+        # print(VSS)
 
         RAWdata = pd.DataFrame(VSS.groups.keys())
-        pprint.pprint("Number of plates =")
+        # pprint.pprint("Number of plates =")
         N = len(RAWdata)
-        print("N= ", N)
-        pprint.pprint("plates:")
-        print(RAWdata)
+        # print("N= ", N)
+        # pprint.pprint("plates:")
+        # print(RAWdata)
         SEMs = np.empty([1,11])
         gmeans = np.empty([1,11])
         Ameans = np.empty([1,11])
@@ -905,7 +901,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
 
             # print("Plate", RAWdata.loc[X][0])
             Temp_plate = VSS.get_group(RAWdata.loc[X][0])
-            print("Temp_plate=", Temp_plate)
+            # print("Temp_plate=", Temp_plate)
             Temp_plate = Temp_plate.drop('Well', axis=1)
             Temp_plate = Temp_plate.drop('Well ID', axis=1)
             Temp_plate = Temp_plate.drop('Name', axis=1)
@@ -915,12 +911,12 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
             Temp_plate = Temp_plate.drop('Reading Date/Time', axis=1)
             # print("Temp_plate before numpy=", Temp_plate)
             Temp_plate = Temp_plate.to_numpy()
-            print("Temp_plate after numpy=", Temp_plate)
+            # print("Temp_plate after numpy=", Temp_plate)
             
             Plate_name = RAWdata.loc[X][0]
-            pprint.pprint("Plate_name:")
-            pprint.pprint(Plate_name)
-            print(type(Plate_name))
+            # pprint.pprint("Plate_name:")
+            # pprint.pprint(Plate_name)
+            # print(type(Plate_name))
 
             VirA = Plate_name[0:4]          
             SerA = Plate_name[4:7]
@@ -1041,14 +1037,14 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
 
         Arith_means = np.delete(Arith_means, obj=0, axis=0)
         SE_means = np.delete(SE_means, obj=0, axis=0)
-        pprint.pprint("Here is all the data:")
-        with np.printoptions(threshold=np.inf):
-            pprint.pprint(All_plates)
+        # pprint.pprint("Here is all the data:")
+        # with np.printoptions(threshold=np.inf):
+        #     pprint.pprint(All_plates)
         # pprint.pprint(All_plates)
-        pprint.pprint("Here are the Arith_means:")
-        pprint.pprint(Arith_means)
-        pprint.pprint("Here are the SE_means:")
-        pprint.pprint(SE_means)
+        # pprint.pprint("Here are the Arith_means:")
+        # pprint.pprint(Arith_means)
+        # pprint.pprint("Here are the SE_means:")
+        # pprint.pprint(SE_means)
 
 
         return Arith_means, SE_means
@@ -1155,36 +1151,36 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         }
 
         # viruses per plate = 1       
-        print("self.sera:")
-        pprint.pprint(self.sera)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            pprint.pprint("self.sera:")
-            pprint.pprint(self.sera)
+        # print("self.sera:")
+        # pprint.pprint(self.sera)
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+            # pprint.pprint("self.sera:")
+            # pprint.pprint(self.sera)
 
         v_count = len(self.viruses)
         vpp = 1
 
-        print("self.viruses:")
-        pprint.pprint(self.viruses)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            pprint.pprint("self.viruses:")
+        # print("self.viruses:")
+        # pprint.pprint(self.viruses)
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     pprint.pprint("self.viruses:")
             # pprint.pprint(self.viruses)
 
-        print("v_count:")
+        # print("v_count:")
         # pprint.pprint(v_count)
         
         s_count = len(self.sera)
         
-        print("s_count:")
+        # print("s_count:")
         pprint.pprint(s_count)
 
         data_count = len(data)
-        pprint.pprint("data_count:")
-        pprint.pprint(data_count)
+        # pprint.pprint("data_count:")
+        # pprint.pprint(data_count)
         X=0
 
         # pprint.pprint("data")
@@ -1216,28 +1212,28 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
                 
                     # pprint.pprint("plate_offset:")
                     # pprint.pprint(plate_offset)
-                    print('X= ', X)
-                    pprint.pprint("row")
-                    pprint.pprint(row)
-                    pprint.pprint("StandardError")
-                    pprint.pprint(StandardError)
-                    pprint.pprint(virus)
-                    pprint.pprint(serum)
+                    # print('X= ', X)
+                    # pprint.pprint("row")
+                    # pprint.pprint(row)
+                    # pprint.pprint("StandardError")
+                    # pprint.pprint(StandardError)
+                    # pprint.pprint(virus)
+                    # pprint.pprint(serum)
                     serum_X = self.sera.index(serum)
 
                     exp = experiments.get(virus, copy.deepcopy(new_exp))
                     y_corrected = list(row)
                     x_values = self.dilutions[serum_X]
-                    pprint.pprint("x_values =")
-                    pprint.pprint(x_values)
+                    # pprint.pprint("x_values =")
+                    # pprint.pprint(x_values)
                     x_fit = self.dilutions[serum_X].copy()
-                    pprint.pprint("x-fit= ")
-                    pprint.pprint(x_fit)                    
+                    # pprint.pprint("x-fit= ")
+                    # pprint.pprint(x_fit)                    
                     x_fit[-1] = 0
-                    pprint.pprint("x-fit= ")
-                    pprint.pprint(x_fit)    
-                    pprint.pprint("x_values =")
-                    pprint.pprint(x_values)
+                    # pprint.pprint("x-fit= ")
+                    # pprint.pprint(x_fit)    
+                    # pprint.pprint("x_values =")
+                    # pprint.pprint(x_values)
                     exp['data'][serum] = {
                         'x_values': x_values,
                         'x_fit': x_fit,
@@ -1257,6 +1253,6 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
 
                     if X == (data_count):
                         break
-                    pprint.pprint("done...")                
+                    # pprint.pprint("done...")                
 
         return experiments
