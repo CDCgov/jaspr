@@ -279,10 +279,10 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
-        with pd.option_context('display.max_rows', None, 
-                                'display.max_columns', None, 
-                                'display.precision', 0,):
-            pprint.pprint("df:")
+        # with pd.option_context('display.max_rows', None, 
+        #                         'display.max_columns', None, 
+        #                         'display.precision', 0,):
+        #     pprint.pprint("df:")
             # pprint.pprint(df)
 
         VSS = df.groupby(["Plate"], as_index=False)
@@ -290,13 +290,13 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         RAWdata = pd.DataFrame(VSS.groups.keys())
         N = len(RAWdata)
         # pprint.pprint("N= ")
-        print("Number of plates= ", N)
-        pprint.pprint("plates:")
+        # print("Number of plates= ", N)
+        # pprint.pprint("plates:")
         # print(RAWdata)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            pprint.pprint("RAWdata:")
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     pprint.pprint("RAWdata:")
             # pprint.pprint(RAWdata)
 
         SEMs = np.empty([1,11])
@@ -304,9 +304,9 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         Ameans = np.empty([1,11])
         AllData = pd.DataFrame(columns=['','','','','','','','',''])
         AllData = AllData.to_numpy()
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
             # pprint.pprint("AllData:")
             # pprint.pprint(AllData)
 
@@ -557,17 +557,17 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             },
         }
 
-        # viruses per plate = 1       
+        # # viruses per plate = 1       
 
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            # pprint.pprint("self.sera:")
-            # pprint.pprint(self.sera)
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     # pprint.pprint("self.sera:")
+        #     # pprint.pprint(self.sera)
 
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
             # pprint.pprint("self.viruses:")
             # pprint.pprint(self.viruses)
 
@@ -698,9 +698,9 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         # pprint.pprint("Data type: data")
         # pprint.pprint(data.dtype)
         data = pd.DataFrame(data)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):        
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):        
             # pprint.pprint("data")
             # pprint.pprint(data)
 
@@ -769,9 +769,9 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
         # viruses per plate = 1       
         # print("self.sera:")
         # pprint.pprint(self.sera)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
             # pprint.pprint("self.sera:")
             # pprint.pprint(self.sera)
 
@@ -780,10 +780,10 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
 
         # print("self.viruses:")
         # pprint.pprint(self.viruses)
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            # pprint.pprint("self.viruses:")
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     # pprint.pprint("self.viruses:")
             # pprint.pprint(self.viruses)
 
         # print("v_count:")
@@ -858,11 +858,11 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
 
     def _parse_csv(self, datafile):
         df = pd.concat(pd.read_excel(datafile, skiprows=15, usecols=None, header=0, sheet_name=None), ignore_index=True)
-                    # df = pd.read_excel(datafile, skiprows=15, usecols=['Well', 'Cell Count', 'Plate ID'], \
-        with pd.option_context('display.max_rows', None, 
-                                 'display.max_columns', None, 
-                                 'display.precision', 0,):
-            # pprint.pprint("df NOT-sorted:")
+        #             # df = pd.read_excel(datafile, skiprows=15, usecols=['Well', 'Cell Count', 'Plate ID'], \
+        # with pd.option_context('display.max_rows', None, 
+        #                          'display.max_columns', None, 
+        #                          'display.precision', 0,):
+        #     # pprint.pprint("df NOT-sorted:")
             # pprint.pprint(df)
 
         df = df.sort_values(by=['Plate ID','Plate Number'])
