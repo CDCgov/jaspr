@@ -59,9 +59,38 @@ class HintBase(object):
     
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
-        return [f"{row[0]} {row['Strain']}"
-                for index, row in df.iterrows()], \
-                df.to_dict('index')
+
+        # Support historical and alternate keyfile headers.
+        colmap = {str(col).strip().lower(): col for col in df.columns}
+
+        id_col = None
+        for candidate in ['id', 'virus id', 'virus', 'virus number', 'name']:
+            if candidate in colmap:
+                id_col = colmap[candidate]
+                break
+        if id_col is None:
+            id_col = df.columns[0]
+
+        strain_col = None
+        for candidate in ['strain', 'strain name', 'strain name (optional)', 'variant', 'lineage']:
+            if candidate in colmap:
+                strain_col = colmap[candidate]
+                break
+
+        viruses = []
+        for index, row in df.iterrows():
+            virus_id = str(row[id_col]).strip() if not pd.isna(row[id_col]) else ''
+
+            strain = ''
+            if strain_col is not None and not pd.isna(row[strain_col]):
+                strain = str(row[strain_col]).strip()
+
+            virus_name = f"{virus_id} {strain}".strip()
+            if not virus_name:
+                virus_name = f"Virus {index + 1}"
+            viruses.append(virus_name)
+
+        return viruses, df.to_dict('index')
 
     def _get_dilutions(self, start_titer):
         if start_titer not in self.dilutions:
