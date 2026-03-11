@@ -517,6 +517,14 @@ def reportFRNTresults():
     """Generate Excel Report"""
     jm=JasprModel()
 
+    # Avoid writing large debug payloads to uWSGI stdout, which can block.
+    class _NoOpPPrint:
+        @staticmethod
+        def pprint(*args, **kwargs):
+            return None
+
+    pprint = _NoOpPPrint()
+
     pprint.pprint("The JASPR Model:")
     pprint.pprint(jm.experiments)
     
