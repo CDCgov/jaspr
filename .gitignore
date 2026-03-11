@@ -12,3 +12,5 @@ build/.env
 build/run/*
 .env
 app/dump.rdb
+app/supervisord.log
+app/supervisord.pid
