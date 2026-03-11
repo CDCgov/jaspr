@@ -13,6 +13,9 @@ import pprint
 import itertools 
 import os.path
 import glob
+import os
+import tempfile
+import zipfile
 
 
 def _noop_pprint(*args, **kwargs):
@@ -118,6 +121,42 @@ def upload_file():
     jm = JasprModel()
 
     return render_template('upload.html', **jm.context)
+
+
+@app.route('/loadAnscombeData')
+def load_anscombe_data():
+    """Reset the session to the built-in Anscombe dataset."""
+    jm = JasprModel()
+    jm.set_defaults()
+    return redirect('/', code=302)
+
+
+@app.route('/downloadExampleData')
+def download_example_data():
+    """Download bundled example input files as a zip archive."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    example_dir = os.path.join(repo_root, 'example_data')
+
+    if not os.path.isdir(example_dir):
+        return redirect('/error502', code=302)
+
+    tmp_handle = tempfile.NamedTemporaryFile(prefix='jaspr_example_data_', suffix='.zip', delete=False)
+    tmp_handle.close()
+
+    with zipfile.ZipFile(tmp_handle.name, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(example_dir):
+            for file_name in files:
+                abs_path = os.path.join(root, file_name)
+                arcname = os.path.relpath(abs_path, repo_root)
+                zf.write(abs_path, arcname)
+
+    response = make_response(send_file(
+        tmp_handle.name,
+        as_attachment=True,
+        download_name=f'jaspr_example_data_{datetime.now().strftime("%Y_%m_%d")}.zip'
+    ))
+    response.headers['cache-control'] = 'no-cache'
+    return response
 
 @app.route('/error502')
 def error502():
