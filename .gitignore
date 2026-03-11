@@ -11,3 +11,4 @@ Notes.html
 build/.env
 build/run/*
 .env
+app/dump.rdb
