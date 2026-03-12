@@ -9,6 +9,11 @@
         <li class="nav-item">
           <a class="nav-link" href="\upload">Load Data</a>
         </li>
+        {% if session.get('analysis_ready') %}
+        <li class="nav-item">
+          <a class="nav-link" href="\analysis">Analysis</a>
+        </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="\report">Report</a>
         </li>

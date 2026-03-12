@@ -108,7 +108,10 @@ def upload():
     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
     jm = JasprModel().set_defaults(settings)
 
-    return redirect('/upload?showExperiment=1', code=302)
+    session['analysis_ready'] = True
+    session.modified = True
+
+    return redirect('/analysis', code=302)
    
 @app.route("/ping", methods = ['GET'])
 def ping():
@@ -127,8 +130,7 @@ def reset():
 @app.route('/upload')
 def upload_file():
     jm = JasprModel()
-    show_experiment_section = request.args.get('showExperiment') == '1'
-    return render_template('upload.html', show_experiment_section=show_experiment_section, **jm.context)
+    return render_template('upload.html', **jm.context)
 
 
 @app.route('/loadAnscombeData')
@@ -136,7 +138,19 @@ def load_anscombe_data():
     """Reset the session to the built-in Anscombe dataset."""
     jm = JasprModel()
     jm.set_defaults()
-    return redirect('/upload?showExperiment=1', code=302)
+    session['analysis_ready'] = True
+    session.modified = True
+    return redirect('/analysis', code=302)
+
+
+@app.route('/analysis')
+def analysis():
+    """Render the analysis page once data has been loaded."""
+    if not session.get('analysis_ready', False):
+        return redirect('/upload', code=302)
+
+    jm = JasprModel()
+    return render_template('analysis.html', **jm.context)
 
 
 @app.route('/downloadExampleData')
