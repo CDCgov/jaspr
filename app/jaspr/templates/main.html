@@ -8,11 +8,14 @@
 				<h4 class="card-title mb-3">About JASPR</h4>
 				<p class="card-text">
 					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in influenza surveillance workflows.
-					It supports common 96-well plate workflows and helps teams move from instrument output to interpretable titers and quality flags quickly.
+					A complete run starts by entering assay inputs on the Load Data page (data file + key file + parser), followed by automated parsing,
+					curve fitting, and result generation.
 				</p>
 				<p class="card-text mb-0">
-					This deployment includes parser support for HINT, ICP, and FRNT assays, in addition to the built-in Anscombe demonstration dataset.
-					Use the Load Data page to choose a parser and import matching data and key files.
+					After analysis, use the main review page to inspect experiment-level curves and tables, optionally tune fit behavior on the Settings page,
+					then export final outputs from the Reports page.
+					The Reset Session control clears the active run so you can begin a clean analysis, and the Help page provides parser-specific guidance,
+					references, and operating notes.
 				</p>
 			</div>
 		</div>
@@ -25,28 +28,43 @@
 			<div class="card-body">
 				<h4 class="card-title mb-3">Instructions for Use</h4>
 				<ol class="mb-3">
-					<li>Open <strong>Load Data</strong>, select the parser matching your assay and instrument.</li>
-					<li>Upload the assay data file and matching key file, then click <strong>Submit</strong>.</li>
-					<li>Review curves and tables on this page, then generate exports from the Reports tab.</li>
+					<li>Open <strong>Load Data</strong>, select the parser matching your assay and instrument, upload the assay data and key files, then click <strong>Submit</strong>.</li>
+					<li>Use the main analysis/review page to inspect the loaded run by experiment and sample, including fitted curves and data tables.</li>
+					<li>Open <strong>Reports</strong> to generate and download assay output tables and report files for the current session.</li>
+					<li>Open <strong>Settings</strong> to adjust analysis options (fit visibility, blank correction, axis scale, and fitting function), then return to review/report pages to verify updated outputs.</li>
+					<li>Use <strong>Reset Session</strong> when starting a new run so prior data and selections do not carry into the next analysis.</li>
+					<li>Open <strong>Help</strong> for parser documentation, reference materials, and assay-specific instructions.</li>
 				</ol>
 
 				<h5>Parser Notes</h5>
 				<ul class="mb-0">
 					<li>
 						<strong>HINT:</strong> Supports antigenic HINT workflows including ICP-informed working virus dilution.
-						Reference publication:
-						<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+						Default settings: Show Curve Fit = On, Blank Correction = On, X-axis = Log, Fit Function = robust_logistic4.
+						<div class="ml-4 mt-1">
+							Reference publication:
+							<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+						</div>
 					</li>
 					<li>
 						<strong>ICP:</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
 						which is then used in HINT setup.
+						Default settings: Show Curve Fit = On, Blank Correction = On, X-axis = Log, Fit Function = ICP_robust_logistic3.
 					</li>
 					<li>
 						<strong>FRNT:</strong> Supports FRNT assay data processing and report outputs.
-						Reference protocol:
-						<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>.
+						Default settings: Show Curve Fit = On, X-axis = Log, and FRNT parser defaults typically use logistic4 (V-S-S layouts) or robust_logistic4;
+						blank correction is parser-dependent and defaults to Off for V-S-S Cx5 layouts.
+						<div class="ml-4 mt-1">
+							Reference protocol:
+							<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>.
+						</div>
 					</li>
 				</ul>
+				<p class="mt-3 mb-0">
+					To update settings and re-analyze data: open <strong>Settings</strong>, change the fit controls, then return to the review or report pages.
+					JASPR applies the updated session settings to subsequent chart/table generation and report exports.
+				</p>
 			</div>
 		</div>
 	</div>
