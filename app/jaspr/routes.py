@@ -14,6 +14,14 @@ import itertools
 import os.path
 import glob
 
+
+def _noop_pprint(*args, **kwargs):
+    return None
+
+
+# Disable verbose pprint output in request handlers to avoid blocking stdout under uWSGI.
+pprint.pprint = _noop_pprint
+
 # flask imports
 from flask import Flask, render_template, request, \
         jsonify, redirect, make_response, send_from_directory, send_file, session
