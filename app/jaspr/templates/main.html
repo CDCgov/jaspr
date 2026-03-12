@@ -2,6 +2,69 @@
 
 {% block body %}
 <script src={{ url_for('static', filename='js/jaspr-main.js') }}></script>
+
+<div class="row mb-3">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title mb-3">About JASPR</h4>
+				<p class="card-text">
+					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in influenza surveillance workflows.
+					It supports common 96-well plate workflows and helps teams move from instrument output to interpretable titers and quality flags quickly.
+				</p>
+				<p class="card-text mb-0">
+					This deployment includes parser support for HINT, ICP, and FRNT assays, in addition to the built-in Anscombe demonstration dataset.
+					Use the Load Data page to choose a parser and import matching data and key files.
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row mb-3">
+	<div class="col-lg-8 mb-3 mb-lg-0">
+		<div class="card h-100">
+			<div class="card-body">
+				<h4 class="card-title mb-3">Instructions for Use</h4>
+				<ol class="mb-3">
+					<li>Open <strong>Load Data</strong>, select the parser matching your assay and instrument.</li>
+					<li>Upload the assay data file and matching key file, then click <strong>Submit</strong>.</li>
+					<li>Review curves and tables on this page, then generate exports from the Reports tab.</li>
+				</ol>
+
+				<h5>Parser Notes</h5>
+				<ul class="mb-0">
+					<li>
+						<strong>HINT:</strong> Supports antigenic HINT workflows including ICP-informed working virus dilution.
+						Reference publication:
+						<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+						Procedure summary: prepare MDCK-SIAT1 cells, perform titration or sera+virus incubation, add cells, incubate,
+						fix/stain over days 2-3, and read on Celigo with target ~1000 ICP per 50 uL and acceptable total cell counts in range.
+					</li>
+					<li>
+						<strong>ICP:</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
+						which is then used in HINT setup.
+					</li>
+					<li>
+						<strong>FRNT:</strong> Supports FRNT assay data processing and report outputs.
+						SOP reference:
+						<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>.
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<div class="card h-100">
+			<div class="card-body d-flex flex-column">
+				<h4 class="card-title">Example Data</h4>
+				<p class="card-text">Download bundled example datasets for parser validation and training runs.</p>
+				<a class="btn btn-primary mt-auto" href="/downloadExampleData">Download Example Data</a>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="row">
 	<div class="col-3">
 		<div class="form-group">
@@ -15,6 +78,12 @@
 		</div>
 	</div>
 	<div class="col-9">
+		{% if curr_experiment == 'Anscombe' %}
+		<div class="d-flex justify-content-end mb-2">
+			<a class="btn btn-outline-primary mr-2" href="https://www.sjsu.edu/faculty/gerstman/StatPrimer/anscombe1973.pdf" target="_blank" rel="noopener noreferrer">View Anscombe Publication (PDF)</a>
+			<a class="btn btn-outline-secondary" href="https://en.wikipedia.org/wiki/Anscombe%27s_quartet" target="_blank" rel="noopener noreferrer">View Anscombe on Wikipedia</a>
+		</div>
+		{% endif %}
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
 				<a class="nav-link active" data-toggle="tab" href="#jasprgraph">Graph</a>

@@ -12,5 +12,8 @@ build/.env
 build/run/*
 .env
 app/dump.rdb
+<<<<<<< HEAD
 app/supervisord.log
 app/supervisord.pid
+=======
+>>>>>>> FLULIMS-5583
