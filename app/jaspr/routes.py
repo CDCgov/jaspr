@@ -127,8 +127,9 @@ def reset():
 @app.route('/upload')
 def upload_file():
     jm = JasprModel()
+    show_experiment_section = request.args.get('showExperiment') == '1'
 
-    return render_template('upload.html', **jm.context)
+    return render_template('upload.html', show_experiment_section=show_experiment_section, **jm.context)
 
 
 @app.route('/loadAnscombeData')
@@ -136,7 +137,7 @@ def load_anscombe_data():
     """Reset the session to the built-in Anscombe dataset."""
     jm = JasprModel()
     jm.set_defaults()
-    return redirect('/', code=302)
+    return redirect('/upload?showExperiment=1', code=302)
 
 
 @app.route('/downloadExampleData')
