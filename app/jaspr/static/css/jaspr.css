@@ -15,7 +15,7 @@ body {
 }
 
 .menubar {
-height: 35px;
+  min-height: 35px;
 }
 
 .align-right {

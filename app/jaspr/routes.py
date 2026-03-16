@@ -51,6 +51,88 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
 
+
+def _set_analysis_session_ready():
+    """Mark session state for analysis/report navigation availability."""
+    session['analysis_ready'] = True
+    session['report_ready'] = True
+    session.modified = True
+
+
+def _is_report_ready():
+    """Return whether report routes should be available for current session."""
+    return bool(session.get('analysis_ready', False) and session.get('report_ready', False))
+
+
+def _first_result_record(jm):
+    """Return a representative result dict from the loaded run or {}."""
+    if not jm.experiment_list or not jm.sample_list:
+        return {}
+
+    try:
+        exp = jm.experiment_list[0]
+        sample = jm.sample_list[0]
+        return jm.experiments[exp]['results'][jm.curr_function][sample]
+    except (KeyError, IndexError, TypeError):
+        return {}
+
+
+def _available_report_links(jm):
+    """Build report links that are expected to work for current analysis data."""
+    links = [
+        {
+            'label': 'Graphs (Single Sample)',
+            'href': '/reportPNG',
+            'description': 'Export per-sample graph images for the current run.'
+        },
+    ]
+
+    first_result = _first_result_record(jm)
+    keys = set(first_result.keys()) if isinstance(first_result, dict) else set()
+
+    # General summary reports rely on titer/ec50-like result keys.
+    if {'titer', 'ec50'}.intersection(keys):
+        links.append({
+            'label': 'Download Antigenic Report',
+            'href': '/reportAntigenic',
+            'description': 'Virus-by-sera table of assay titers.'
+        })
+        links.append({
+            'label': 'Download Result Analysis Report',
+            'href': '/reportResultAnalysis',
+            'description': 'Summary table with titer/fold/SB metrics.'
+        })
+
+    # ICP-specific endpoint expects ICP1000 result output.
+    if 'ICP1000' in keys:
+        links.append({
+            'label': 'Download ICP 1000 Report',
+            'href': '/reportICP1000',
+            'description': 'Dilution estimates at ICP=1000 for each virus.'
+        })
+
+    # FRNT exports depend on pooled_sera metadata and FRNT result keys.
+    has_pooled_sera = False
+    if jm.experiment_list:
+        first_exp = jm.experiment_list[0]
+        has_pooled_sera = 'pooled_sera' in jm.experiments.get(first_exp, {})
+
+    if has_pooled_sera and {'IC50', 'h', 'Vmax', 'titer'}.intersection(keys):
+        links.append({
+            'label': 'Download FRNT Results Report',
+            'href': '/reportFRNTResultAnalysis',
+            'description': 'FRNT-formatted output for pooled sera workflows.'
+        })
+
+    return links
+
+
+def _guard_report_route():
+    """Redirect to load flow when report routes are accessed without data."""
+    if not _is_report_ready():
+        return redirect('/upload', code=302)
+    return None
+
 def page_not_found(e):
     return render_template('502.html'), 502
 
@@ -108,8 +190,7 @@ def upload():
     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
     jm = JasprModel().set_defaults(settings)
 
-    session['analysis_ready'] = True
-    session.modified = True
+    _set_analysis_session_ready()
 
     return redirect('/analysis', code=302)
    
@@ -138,8 +219,7 @@ def load_anscombe_data():
     """Reset the session to the built-in Anscombe dataset."""
     jm = JasprModel()
     jm.set_defaults()
-    session['analysis_ready'] = True
-    session.modified = True
+    _set_analysis_session_ready()
     return redirect('/analysis', code=302)
 
 
@@ -241,6 +321,10 @@ def drawWidgetHTML():
 
 @app.route('/reportPNG', methods=["GET"])
 def reportPngs():
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jc = JasprChart()
     pngList = jc.get_pngs()
     return render_template('reportPNG.html', pngList=pngList)
@@ -249,12 +333,19 @@ def reportPngs():
 @app.route('/report', methods=["GET"])
 def report():
     """render the reports"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
+    jm = JasprModel()
+    report_links = _available_report_links(jm)
+
     #The charting report is broken so we bypass it for now
     # to make progress on other reports
     # jc = JasprChart()
     # pngList = jc.get_pngs()
     #return render_template('report.html', pngList=pngList)
-    return render_template ('report.html')
+    return render_template('report.html', report_links=report_links)
 
 
 @app.route('/reportpngs/<path:filename>')
@@ -265,6 +356,10 @@ def reportpngs(filename):
 @app.route('/reportResultAnalysis')
 def reportOther():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
 
     output=BytesIO()
@@ -313,6 +408,10 @@ def reportOther():
 @app.route('/reportAntigenic')
 def reportTiter():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
 
     output=BytesIO()
@@ -349,6 +448,10 @@ def reportTiter():
 @app.route('/reportICP1000')
 def reportICP():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     import pprint
     jm=JasprModel()
     output=BytesIO()
@@ -596,6 +699,10 @@ def reportFRNT_Titers():
 @app.route('/reportFRNTResultAnalysis')
 def reportFRNTresults():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
 
     pprint.pprint("The JASPR Model:")

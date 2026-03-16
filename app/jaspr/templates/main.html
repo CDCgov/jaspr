@@ -30,8 +30,9 @@
 				<ol class="mb-3">
 					<li>Open <strong>Load Data</strong>, select the parser matching your assay and instrument, upload the assay data and key files, then click <strong>Submit</strong>.</li>
 					<li><strong>Analysis</strong> appears in the navigation menu only after data is loaded into the active session.</li>
+					<li><strong>Report</strong> appears in the navigation menu only after data is loaded into the active session.</li>
 					<li>Use the main analysis/review page to inspect the loaded run by experiment and sample, including fitted curves and data tables.</li>
-					<li>Open <strong>Reports</strong> to generate and download assay output tables and report files for the current session.</li>
+					<li>Open <strong>Report</strong> to generate and download only the exports that are valid for the currently loaded analysis.</li>
 					<li>Open <strong>Settings</strong> to adjust analysis options (fit visibility, blank correction, axis scale, and fitting function), then click <strong>Execute</strong> to apply changes and return to Analysis for verification.</li>
 					<li>Use <strong>Reset Session</strong> when starting a new run so prior data and selections do not carry into the next analysis.</li>
 					<li>Open <strong>License</strong> for parser documentation, reference materials, and assay-specific instructions.</li>
@@ -87,24 +88,70 @@
 				</ul>
 				<h5 class="mt-3">Updating Settings</h5>
 				<p class="mb-2">
-					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to re-run analysis with updated values.
-				</p>
-				<ul class="mb-2">
-					<li><strong>Antigenic tests (HINT and FRNT):</strong> Use <strong>robust_logistic4</strong> or <strong>logistic4</strong> (parser-dependent), keep <strong>X-axis = Log</strong>, and set <strong>Blank Correction</strong> according to assay/parser defaults.</li>
-					<li><strong>ICP tests:</strong> Use <strong>ICP_robust_logistic3</strong> with <strong>X-axis = Log</strong> and <strong>Blank Correction = On</strong> unless your run requires a manual override.</li>
-					<li><strong>Where settings appear:</strong> The active setting values and calculated results are shown in the graph/report panel header area (upper-left of the chart view).</li>
-				</ul>
-				<p class="mb-2">
-					Screenshot file location: place your image at
-					<code>app/jaspr/static/images/instructions/Sample_graph.jpg</code>
-					to display it below.
+					The active setting values and calculated results are shown in the graph/report panel header area (upper-left of the chart view).
 				</p>
 				<img
 					src="{{ url_for('static', filename='images/instructions/Sample_graph.jpg') }}"
 					alt="Example graph showing settings and results in the upper-left"
-					class="img-fluid border rounded"
+					class="img-fluid border rounded mb-3"
+					style="max-width: 750px; max-height: 750px; width: 100%; height: auto;"
 					onerror="this.style.display='none'"
 				/>
+				<p class="mb-2">
+					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to apply changes and refresh Analysis/Report outputs.
+				</p>
+				<h6 class="mb-2">Setting Controls</h6>
+				<ul class="mb-2">
+					<li><strong>Show Curve Fit:</strong> Toggles fit-line visibility on analysis charts; disable to inspect only measured data points.</li>
+					<li><strong>Blank Correction:</strong> Uses blank/background correction (y_corrected) instead of raw y_values when computing fits and derived labels.</li>
+					<li><strong>Axis Scale:</strong> Switches concentration axis between <strong>Log</strong> and <strong>Linear</strong>; this affects fit/plot x-series used in charts.</li>
+					<li><strong>Fit Function:</strong> Selects the curve model used to compute result labels (for example titer, IC50, ec50, or ICP1000).</li>
+					<li><strong>Execute:</strong> Applies all setting changes to the active session and returns to Analysis for immediate review.</li>
+				</ul>
+				<h6 class="mb-2">Recommended Use By Analysis Type</h6>
+				<ul class="mb-2">
+					<li><strong>Antigenic tests (HINT/FRNT):</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, and use <strong>robust_logistic4</strong> or <strong>logistic4</strong> (parser-dependent defaults).</li>
+					<li><strong>ICP tests:</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, <strong>Blank Correction = On</strong>, and use <strong>ICP_robust_logistic3</strong>.</li>
+				</ul>
+				<h6 class="mb-2">Model Fits (Code Function -> Supported Parsers)</h6>
+				<p class="mb-2">
+					Default parser-to-fit mappings used on load:
+				</p>
+				<ul class="mb-2">
+					<li><strong>anscombe</strong> -> <strong>linear</strong></li>
+					<li><strong>HINT celigo</strong> -> <strong>robust_logistic4</strong></li>
+					<li><strong>ICP celigo</strong> -> <strong>ICP_robust_logistic3</strong></li>
+					<li><strong>FRNT Virus-Serum-Serum Plate Layout Cx5</strong> -> <strong>logistic4</strong></li>
+					<li><strong>FRNT Serum-Virus-Virus Plate Layout Cx5</strong> -> <strong>logistic4</strong></li>
+					<li><strong>FRNT Virus-Serum-Serum Plate Layout Cytation7</strong> -> <strong>logistic4</strong></li>
+				</ul>
+				<p class="mb-2">
+					Fit implementations and parser support:
+				</p>
+				<ul class="mb-0">
+					<li><strong>linear</strong> -> <code>outlet.functions.linear.LinearRegression</code> -> default for <strong>anscombe</strong>; selectable for all loaded parsers from Settings.</li>
+					<li><strong>robust_linear</strong> -> <code>outlet.functions.linear.RobustLinearRegression</code> -> selectable for all loaded parsers from Settings.</li>
+					<li><strong>logistic3</strong> -> <code>outlet.functions.logistic.Logistic3</code> -> selectable for all loaded parsers from Settings.</li>
+					<li><strong>robust_logistic3</strong> -> <code>outlet.functions.logistic.RobustLogistic3</code> -> selectable for all loaded parsers from Settings.</li>
+					<li><strong>ICP_logistic3</strong> -> <code>outlet.functions.logistic.ICP_Logistic3</code> -> ICP-family option; used with <strong>ICP celigo</strong> when selected manually.</li>
+					<li><strong>ICP_robust_logistic3</strong> -> <code>outlet.functions.logistic.ICPRobustLogistic3</code> -> default for <strong>ICP celigo</strong>; selectable on loaded runs.</li>
+					<li><strong>logistic4</strong> -> <code>outlet.functions.logistic.Logistic4</code> -> default for FRNT parser labels above; selectable for loaded HINT/FRNT runs.</li>
+					<li><strong>robust_logistic4</strong> -> <code>outlet.functions.logistic.RobustLogistic4</code> -> default for <strong>HINT celigo</strong>; selectable for loaded HINT/FRNT runs.</li>
+					<li><strong>logistic4_h=1</strong> -> <code>outlet.functions.logistic.Logistic4_h1</code> -> selectable for loaded HINT/FRNT/ICP runs.</li>
+					<li><strong>robust_log4_h=1</strong> -> <code>outlet.functions.logistic.Robust_Logistic4_h1</code> -> selectable for loaded HINT/FRNT/ICP runs.</li>
+				</ul>
+				<h5 class="mt-3">Reports</h5>
+				<p class="mb-2">
+					The <strong>Report</strong> page is hidden until data is loaded. After loading, it shows only the report exports that are expected to work for that analysis type.
+				</p>
+				<ul class="mb-2">
+					<li><strong>Antigenic/HINT/FRNT-style runs:</strong> Antigenic and Result Analysis exports are shown when required result fields are present.</li>
+					<li><strong>ICP runs:</strong> ICP 1000 export is shown only when ICP1000 values are available from the active fit results.</li>
+					<li><strong>FRNT pooled-sera runs:</strong> FRNT Results export is shown only when pooled-sera metadata and FRNT result fields are available.</li>
+				</ul>
+				<p class="mb-0">
+					If a report link is not shown, that export is not supported for the currently loaded analysis/session.
+				</p>
 				<h5 class="mt-3">Supported Instruments</h5>
 				<ul class="mb-0">
 					<li>
