@@ -185,6 +185,12 @@ def error502():
     jm = JasprModel()
     return render_template('502.html', **jm.context)
 
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon for app servers that are not fronted by nginx."""
+    return send_from_directory(app.static_folder, 'favicon.ico')
+
 @app.route('/settings')
 def settings():
     """render the settings page"""
