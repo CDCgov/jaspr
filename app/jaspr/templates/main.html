@@ -113,33 +113,38 @@
 					<li><strong>Antigenic tests (HINT/FRNT):</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, and use <strong>robust_logistic4</strong> or <strong>logistic4</strong> (parser-dependent defaults).</li>
 					<li><strong>ICP tests:</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, <strong>Blank Correction = On</strong>, and use <strong>ICP_robust_logistic3</strong>.</li>
 				</ul>
-				<h6 class="mb-2">Model Fits (Code Function -> Supported Parsers)</h6>
+				<h6 class="mb-2">How Curve Fitting Works (Math/Statistics Translation)</h6>
 				<p class="mb-2">
-					Default parser-to-fit mappings used on load:
+					JASPR fits models using <code>scipy.optimize.least_squares</code>. For every model, it computes
+					<code>residual = observed y - predicted y</code> at each concentration and then minimizes the residual vector.
+					The optimizer tries multiple starting guesses and keeps the first successful convergence.
 				</p>
+				<p class="mb-2">
+					Loss function translation:
+					<code>loss='linear'</code> means ordinary least squares (L2),
+					and <code>loss='soft_l1'</code> means a robust loss that reduces the influence of outliers.
+				</p>
+				<h6 class="mb-2">Fit Implementations Translated to English</h6>
 				<ul class="mb-2">
-					<li><strong>anscombe</strong> -> <strong>linear</strong></li>
-					<li><strong>HINT celigo</strong> -> <strong>robust_logistic4</strong></li>
-					<li><strong>ICP celigo</strong> -> <strong>ICP_robust_logistic3</strong></li>
-					<li><strong>FRNT Virus-Serum-Serum Plate Layout Cx5</strong> -> <strong>logistic4</strong></li>
-					<li><strong>FRNT Serum-Virus-Virus Plate Layout Cx5</strong> -> <strong>logistic4</strong></li>
-					<li><strong>FRNT Virus-Serum-Serum Plate Layout Cytation7</strong> -> <strong>logistic4</strong></li>
+					<li><strong>linear</strong> (<code>loss='linear'</code>): Straight-line regression <code>y = slope*x + intercept</code>. Default for <strong>anscombe</strong>; selectable for loaded parsers.</li>
+					<li><strong>robust_linear</strong> (<code>loss='soft_l1'</code>): Same straight-line equation, but robust to outliers. Selectable for loaded parsers.</li>
+					<li><strong>logistic3</strong> (<code>loss='linear'</code>): 3-parameter saturating logistic with parameters <code>Vmax</code> and <code>Ki/IC50</code>. Selectable for loaded parsers.</li>
+					<li><strong>robust_logistic3</strong> (<code>loss='soft_l1'</code>): Same 3-parameter logistic form with robust outlier handling. Selectable for loaded parsers.</li>
+					<li><strong>ICP_logistic3</strong> (<code>loss='linear'</code>): ICP-oriented 3-parameter logistic used to derive <code>ICP1000</code>. Selectable for <strong>ICP celigo</strong> workflows.</li>
+					<li><strong>ICP_robust_logistic3</strong> (<code>loss='soft_l1'</code>): Robust ICP-oriented 3-parameter logistic used to derive <code>ICP1000</code>. Default for <strong>ICP celigo</strong>.</li>
+					<li><strong>logistic4</strong> (<code>loss='linear'</code>): 4-parameter logistic (includes Hill slope <code>h</code>), used for titer/ec50 style outputs. Default for FRNT parsers; selectable for HINT/FRNT runs.</li>
+					<li><strong>robust_logistic4</strong> (<code>loss='soft_l1'</code>): Robust 4-parameter logistic with reduced outlier sensitivity. Default for <strong>HINT celigo</strong>; selectable for HINT/FRNT runs.</li>
+					<li><strong>logistic4_h=1</strong> (<code>loss='linear'</code>): 4-parameter logistic with Hill slope fixed at 1. Selectable for loaded runs.</li>
+					<li><strong>robust_log4_h=1</strong> (<code>loss='soft_l1'</code>): Robust version of the fixed-Hill logistic model. Selectable for loaded runs.</li>
 				</ul>
-				<p class="mb-2">
-					Fit implementations and parser support:
+				<p class="mb-0">
+					Default parser-to-fit mappings on load: <strong>anscombe -> linear</strong>,
+					<strong>HINT celigo -> robust_logistic4</strong>,
+					<strong>ICP celigo -> ICP_robust_logistic3</strong>,
+					and FRNT parsers (<strong>FRNT Virus-Serum-Serum Plate Layout Cx5</strong>,
+					<strong>FRNT Serum-Virus-Virus Plate Layout Cx5</strong>,
+					<strong>FRNT Virus-Serum-Serum Plate Layout Cytation7</strong>) -> <strong>logistic4</strong>.
 				</p>
-				<ul class="mb-0">
-					<li><strong>linear</strong> -> <code>outlet.functions.linear.LinearRegression</code> -> default for <strong>anscombe</strong>; selectable for all loaded parsers from Settings.</li>
-					<li><strong>robust_linear</strong> -> <code>outlet.functions.linear.RobustLinearRegression</code> -> selectable for all loaded parsers from Settings.</li>
-					<li><strong>logistic3</strong> -> <code>outlet.functions.logistic.Logistic3</code> -> selectable for all loaded parsers from Settings.</li>
-					<li><strong>robust_logistic3</strong> -> <code>outlet.functions.logistic.RobustLogistic3</code> -> selectable for all loaded parsers from Settings.</li>
-					<li><strong>ICP_logistic3</strong> -> <code>outlet.functions.logistic.ICP_Logistic3</code> -> ICP-family option; used with <strong>ICP celigo</strong> when selected manually.</li>
-					<li><strong>ICP_robust_logistic3</strong> -> <code>outlet.functions.logistic.ICPRobustLogistic3</code> -> default for <strong>ICP celigo</strong>; selectable on loaded runs.</li>
-					<li><strong>logistic4</strong> -> <code>outlet.functions.logistic.Logistic4</code> -> default for FRNT parser labels above; selectable for loaded HINT/FRNT runs.</li>
-					<li><strong>robust_logistic4</strong> -> <code>outlet.functions.logistic.RobustLogistic4</code> -> default for <strong>HINT celigo</strong>; selectable for loaded HINT/FRNT runs.</li>
-					<li><strong>logistic4_h=1</strong> -> <code>outlet.functions.logistic.Logistic4_h1</code> -> selectable for loaded HINT/FRNT/ICP runs.</li>
-					<li><strong>robust_log4_h=1</strong> -> <code>outlet.functions.logistic.Robust_Logistic4_h1</code> -> selectable for loaded HINT/FRNT/ICP runs.</li>
-				</ul>
 				<h5 class="mt-3">Reports</h5>
 				<p class="mb-2">
 					The <strong>Report</strong> page is hidden until data is loaded. After loading, it shows only the report exports that are expected to work for that analysis type.
