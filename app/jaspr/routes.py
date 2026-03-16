@@ -191,6 +191,12 @@ def favicon():
     """Serve favicon for app servers that are not fronted by nginx."""
     return send_from_directory(app.static_folder, 'favicon.ico')
 
+
+@app.route('/favicon_32.png')
+def favicon_32():
+    """Serve 32px favicon fallback for browser icon selection."""
+    return send_from_directory(app.static_folder, 'favicon_32.png')
+
 @app.route('/settings')
 def settings():
     """render the settings page"""
