@@ -108,11 +108,6 @@
 					<li><strong>Fit Function:</strong> Selects the curve model used to compute result labels (for example titer, IC50, ec50, or ICP1000).</li>
 					<li><strong>Execute:</strong> Applies all setting changes to the active session and returns to Analysis for immediate review.</li>
 				</ul>
-				<h6 class="mb-2">Recommended Use By Analysis Type</h6>
-				<ul class="mb-2">
-					<li><strong>Antigenic tests (HINT/FRNT):</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, and use <strong>robust_logistic4</strong> or <strong>logistic4</strong> (parser-dependent defaults).</li>
-					<li><strong>ICP tests:</strong> Start with <strong>X-axis = Log</strong>, <strong>Show Curve Fit = On</strong>, <strong>Blank Correction = On</strong>, and use <strong>ICP_robust_logistic3</strong>.</li>
-				</ul>
 				<h6 class="mb-2">How Curve Fitting Works (Math/Statistics Translation)</h6>
 				<p class="mb-2">
 					JASPR fits models using <code>scipy.optimize.least_squares</code>. For every model, it computes
@@ -126,16 +121,16 @@
 				</p>
 				<h6 class="mb-2">Fit Implementations Translated to English</h6>
 				<ul class="mb-2">
-					<li><strong>linear</strong> (<code>loss='linear'</code>): Straight-line regression <code>y = slope*x + intercept</code>. Default for <strong>anscombe</strong>; selectable for loaded parsers.</li>
-					<li><strong>robust_linear</strong> (<code>loss='soft_l1'</code>): Same straight-line equation, but robust to outliers. Selectable for loaded parsers.</li>
-					<li><strong>logistic3</strong> (<code>loss='linear'</code>): 3-parameter saturating logistic with parameters <code>Vmax</code> and <code>Ki/IC50</code>. Selectable for loaded parsers.</li>
-					<li><strong>robust_logistic3</strong> (<code>loss='soft_l1'</code>): Same 3-parameter logistic form with robust outlier handling. Selectable for loaded parsers.</li>
-					<li><strong>ICP_logistic3</strong> (<code>loss='linear'</code>): ICP-oriented 3-parameter logistic used to derive <code>ICP1000</code>. Selectable for <strong>ICP celigo</strong> workflows.</li>
+					<li><strong>linear</strong> (<code>loss='linear'</code>): Fits a straight line, <code>y = slope*x + intercept</code>, by ordinary least squares. Default for <strong>anscombe</strong>; available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_linear</strong> (<code>loss='soft_l1'</code>): Fits the same straight line, but down-weights outliers using a robust loss. Available for <strong>all parsers</strong>.</li>
+					<li><strong>logistic3</strong> (<code>loss='linear'</code>): Fits a 3-parameter logistic/saturation curve with <code>Vmax</code> and <code>Ki (IC50)</code>. Available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_logistic3</strong> (<code>loss='soft_l1'</code>): Fits the same 3-parameter logistic shape with robust outlier handling. Available for <strong>all parsers</strong>.</li>
+					<li><strong>ICP_logistic3</strong> (<code>loss='linear'</code>): Fits the ICP-oriented 3-parameter logistic form used for <code>ICP1000</code> calculation. Available for <strong>all parsers</strong>; commonly used with <strong>ICP celigo</strong>.</li>
 					<li><strong>ICP_robust_logistic3</strong> (<code>loss='soft_l1'</code>): Robust ICP-oriented 3-parameter logistic used to derive <code>ICP1000</code>. Default for <strong>ICP celigo</strong>.</li>
-					<li><strong>logistic4</strong> (<code>loss='linear'</code>): 4-parameter logistic (includes Hill slope <code>h</code>), used for titer/ec50 style outputs. Default for FRNT parsers; selectable for HINT/FRNT runs.</li>
-					<li><strong>robust_logistic4</strong> (<code>loss='soft_l1'</code>): Robust 4-parameter logistic with reduced outlier sensitivity. Default for <strong>HINT celigo</strong>; selectable for HINT/FRNT runs.</li>
-					<li><strong>logistic4_h=1</strong> (<code>loss='linear'</code>): 4-parameter logistic with Hill slope fixed at 1. Selectable for loaded runs.</li>
-					<li><strong>robust_log4_h=1</strong> (<code>loss='soft_l1'</code>): Robust version of the fixed-Hill logistic model. Selectable for loaded runs.</li>
+					<li><strong>logistic4</strong> (<code>loss='linear'</code>): Fits a 4-parameter logistic curve with a free Hill slope <code>h</code>, often used for titer/ec50 reporting. Default for FRNT parsers; available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_logistic4</strong> (<code>loss='soft_l1'</code>): Fits the same 4-parameter logistic curve with robust outlier resistance. Default for <strong>HINT celigo</strong>; available for <strong>all parsers</strong>.</li>
+					<li><strong>logistic4_h=1</strong> (<code>loss='linear'</code>): Fits a 4-parameter logistic curve with Hill slope fixed at 1. Available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_log4_h=1</strong> (<code>loss='soft_l1'</code>): Robust version of the fixed-Hill logistic model. Available for <strong>all parsers</strong>.</li>
 				</ul>
 				<p class="mb-0">
 					Default parser-to-fit mappings on load: <strong>anscombe -> linear</strong>,
