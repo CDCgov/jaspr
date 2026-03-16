@@ -85,6 +85,26 @@
 						</div>
 					</li>
 				</ul>
+				<h5 class="mt-3">Updating Settings</h5>
+				<p class="mb-2">
+					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to re-run analysis with updated values.
+				</p>
+				<ul class="mb-2">
+					<li><strong>Antigenic tests (HINT and FRNT):</strong> Use <strong>robust_logistic4</strong> or <strong>logistic4</strong> (parser-dependent), keep <strong>X-axis = Log</strong>, and set <strong>Blank Correction</strong> according to assay/parser defaults.</li>
+					<li><strong>ICP tests:</strong> Use <strong>ICP_robust_logistic3</strong> with <strong>X-axis = Log</strong> and <strong>Blank Correction = On</strong> unless your run requires a manual override.</li>
+					<li><strong>Where settings appear:</strong> The active setting values and calculated results are shown in the graph/report panel header area (upper-left of the chart view).</li>
+				</ul>
+				<p class="mb-2">
+					Screenshot file location: place your image at
+					<code>app/jaspr/static/images/instructions/Sample_graph.jpg</code>
+					to display it below.
+				</p>
+				<img
+					src="{{ url_for('static', filename='images/instructions/Sample_graph.jpg') }}"
+					alt="Example graph showing settings and results in the upper-left"
+					class="img-fluid border rounded"
+					onerror="this.style.display='none'"
+				/>
 				<h5 class="mt-3">Supported Instruments</h5>
 				<ul class="mb-0">
 					<li>
