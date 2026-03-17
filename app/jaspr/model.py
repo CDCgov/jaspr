@@ -69,7 +69,10 @@ class JasprModel(object):
     def parser_list(self):
         """List file parsing plugins"""
         # Hide unsupported parser options from the Load Data UI.
-        return [name for name in ParserRegistry.plugins if name != 'hint_cx5']
+        return [
+            name for name in ParserRegistry.plugins
+            if name not in {'hint_cx5', 'anscombe'}
+        ]
 
     @property
     def experiment_list(self):
