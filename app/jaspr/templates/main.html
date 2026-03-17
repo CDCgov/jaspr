@@ -7,15 +7,20 @@
 			<div class="card-body">
 				<h4 class="card-title mb-3">About JASPR</h4>
 				<p class="card-text">
-					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in influenza surveillance workflows.
-					A complete run starts by entering assay inputs on the Load Data page (data file + key file + parser), followed by automated parsing,
-					curve fitting, and result generation.
+					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in viral surveillance workflows.
+					Supported workflows include Hemagglutination Inhibition Next-Generation Titer (HINT)
+					(<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>),
+					Infectivity Cell Percentage (ICP)
+					(<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>),
+					and Focus Reduction Neutralization Test (FRNT)
+					(<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>).
 				</p>
 				<p class="card-text mb-0">
-					After analysis, use the main review page to inspect experiment-level curves and tables, optionally tune fit behavior on the Settings page,
-					then export final outputs from the Reports page.
-					The Reset Session control clears the active run so you can begin a clean analysis, and the License page provides parser-specific guidance,
-					references, and operating notes.
+					The analysis begins with loading assay inputs on the <strong>Load Data</strong> page (data file + key file + parser),
+					then reviewing curves and tables on <strong>Analysis</strong>, and generating outputs on <strong>Report</strong>.
+					Before uploading the next dataset, use <strong>Reset Session</strong> to clear current data and selections.
+					Optional setting adjustments can be made on <strong>Settings</strong> when fit behavior needs to be tuned.
+					New users can download bundled sample files from the <a href="#example-data">Example Data</a> section to get started.
 				</p>
 			</div>
 		</div>
@@ -44,7 +49,7 @@
 				<h5>Parser Notes</h5>
 				<ul class="mb-0">
 					<li>
-						<strong>HINT:</strong> Supports antigenic HINT workflows including ICP-informed working virus dilution.
+						<strong>HINT (Hemagglutination Inhibition Next-Generation Titer):</strong> Supports antigenic workflows including ICP-informed working virus dilution.
 						<div class="ml-4 mt-1">
 							Default settings:
 							<ul class="mb-1">
@@ -60,7 +65,7 @@
 						</div>
 					</li>
 					<li>
-						<strong>ICP:</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
+						<strong>ICP (Infectivity Cell Percentage):</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
 						which is then used in HINT setup.
 						<div class="ml-4 mt-1">
 							Default settings:
@@ -71,9 +76,13 @@
 								<li>Fit Function: ICP_robust_logistic3</li>
 							</ul>
 						</div>
+						<div class="ml-4 mt-1">
+							Reference publication:
+							<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+						</div>
 					</li>
 					<li>
-						<strong>FRNT:</strong> Supports FRNT assay data processing and report outputs.
+						<strong>FRNT (Focus Reduction Neutralization Test):</strong> Supports FRNT assay data processing and report outputs.
 						<div class="ml-4 mt-1">
 							Default settings:
 							<ul class="mb-1">
@@ -91,7 +100,7 @@
 				</ul>
 				<h5 class="mt-3">Updating Settings</h5>
 				<p class="mb-2">
-					The active setting values and calculated results are shown in the graph/report panel header area (upper-left of the chart view).
+					Current setting values and calculated results are shown in the upper-left of the chart view.
 				</p>
 				<img
 					src="{{ url_for('static', filename='images/instructions/Sample_graph.jpg') }}"
@@ -101,7 +110,7 @@
 					onerror="this.style.display='none'"
 				/>
 				<p class="mb-2">
-					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to apply changes and refresh Analysis/Report outputs.
+					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to apply changes and refresh Analysis and Report outputs.
 				</p>
 				<h6 class="mb-2">Setting Controls</h6>
 				<ul class="mb-2">
@@ -195,10 +204,10 @@
 
 <div class="row mb-3">
 	<div class="col-lg-4">
-		<div class="card h-100">
+		<div class="card h-100" id="example-data">
 			<div class="card-body d-flex flex-column">
 				<h4 class="card-title">Example Data</h4>
-				<p class="card-text">Download bundled example datasets for parser validation and training runs.</p>
+				<p class="card-text">Download bundled example datasets for parser validation and training runs. When uploading your experimental data for analysis, match the data structure and file names used in the example files.</p>
 				<a class="btn btn-primary mt-auto" href="/downloadExampleData">Download Example Data</a>
 			</div>
 		</div>
