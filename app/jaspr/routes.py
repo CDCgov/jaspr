@@ -82,6 +82,20 @@ def _available_report_links(jm):
     if _is_anscombe_dataset(jm):
         return []
 
+    if _is_frnt_parser(jm):
+        return [
+            {
+                'label': 'Download Antigenic Report',
+                'href': '/reportAntigenic',
+                'description': 'Virus-by-sera table of assay titers.'
+            },
+            {
+                'label': 'Download FRNT Results Report',
+                'href': '/reportFRNTResultAnalysis',
+                'description': 'FRNT-formatted output for pooled sera workflows.'
+            },
+        ]
+
     links = [
         {
             'label': 'Graphs (Single Sample)',
@@ -137,9 +151,33 @@ def _guard_report_route():
     return None
 
 
+def _guard_specific_report_href(jm, href):
+    """Return a friendly response when a direct report route is not available."""
+    available_links = _available_report_links(jm)
+    available_hrefs = {item.get('href') for item in available_links}
+
+    if href in available_hrefs:
+        return None
+
+    return render_template(
+        'report.html',
+        report_links=available_links,
+        no_reports_message='This report is not available for the current parser and data. Please choose from the available reports.'
+    )
+
+
 def _is_anscombe_dataset(jm):
     """Return True when the active session is the built-in Anscombe dataset."""
     return bool(jm.experiment_list and jm.experiment_list[0] == 'Anscombe')
+
+
+def _is_frnt_parser(jm):
+    """Return True when the current parser is one of the FRNT parser variants."""
+    return jm.curr_parser in {
+        'FRNT Virus-Serum-Serum Plate Layout Cx5',
+        'FRNT Serum-Virus-Virus Plate Layout Cx5',
+        'FRNT Virus-Serum-Serum Plate Layout Cytation7',
+    }
 
 def page_not_found(e):
     return render_template('502.html'), 502
@@ -292,6 +330,13 @@ def settings():
     return render_template('settings.html', **jm.context)
 
 
+@app.route('/license')
+def license_page():
+    """Render the license page with the app navigation menu."""
+    jm = JasprModel()
+    return render_template('license.html', **jm.context)
+
+
 @app.route('/')
 def main():
     """render the main page"""
@@ -341,6 +386,10 @@ def reportPngs():
             no_reports_message='Results are not provided for the Anscombe data set.'
         )
 
+    specific_guard = _guard_specific_report_href(jm, '/reportPNG')
+    if specific_guard is not None:
+        return specific_guard
+
     jc = JasprChart()
     pngList = jc.get_pngs()
     return render_template('reportPNG.html', pngList=pngList)
@@ -378,6 +427,9 @@ def reportOther():
         return guard
 
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportResultAnalysis')
+    if specific_guard is not None:
+        return specific_guard
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -430,6 +482,9 @@ def reportTiter():
         return guard
 
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportAntigenic')
+    if specific_guard is not None:
+        return specific_guard
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -471,6 +526,10 @@ def reportICP():
 
     import pprint
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportICP1000')
+    if specific_guard is not None:
+        return specific_guard
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -721,6 +780,9 @@ def reportFRNTresults():
         return guard
 
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportFRNTResultAnalysis')
+    if specific_guard is not None:
+        return specific_guard
 
     pprint.pprint("The JASPR Model:")
     pprint.pprint(jm.experiments)
