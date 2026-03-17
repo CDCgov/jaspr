@@ -97,13 +97,7 @@ def _available_report_links(jm):
             },
         ]
 
-    links = [
-        {
-            'label': 'Graphs (Single Sample)',
-            'href': '/reportPNG',
-            'description': 'Export per-sample graph images for the current run.'
-        },
-    ]
+    links = []
 
     first_result = _first_result_record(jm)
     keys = set(first_result.keys()) if isinstance(first_result, dict) else set()
@@ -413,29 +407,6 @@ def drawWidgetHTML():
     return jsonify(chart())
 
 
-@app.route('/reportPNG', methods=["GET"])
-def reportPngs():
-    guard = _guard_report_route()
-    if guard is not None:
-        return guard
-
-    jm = JasprModel()
-    if _is_anscombe_dataset(jm):
-        return render_template(
-            'report.html',
-            report_links=[],
-            no_reports_message='Results are not provided for the Anscombe data set.'
-        )
-
-    specific_guard = _guard_specific_report_href(jm, '/reportPNG')
-    if specific_guard is not None:
-        return specific_guard
-
-    jc = JasprChart()
-    pngList = jc.get_pngs()
-    return render_template('reportPNG.html', pngList=pngList)
-
-
 @app.route('/report', methods=["GET"])
 def report():
     """render the reports"""
@@ -447,17 +418,7 @@ def report():
     report_links = _available_report_links(jm)
     no_reports_message = 'Results are not provided for the Anscombe data set.' if _is_anscombe_dataset(jm) else None
 
-    #The charting report is broken so we bypass it for now
-    # to make progress on other reports
-    # jc = JasprChart()
-    # pngList = jc.get_pngs()
-    #return render_template('report.html', pngList=pngList)
     return render_template('report.html', report_links=report_links, no_reports_message=no_reports_message)
-
-
-@app.route('/reportpngs/<path:filename>')
-def reportpngs(filename):
-    return send_from_directory(f"/app/tmp", filename)
 
 
 @app.route('/reportResultAnalysis')

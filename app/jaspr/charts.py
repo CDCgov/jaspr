@@ -7,10 +7,8 @@ from math import log2
 from pickle import TRUE
 import numpy as np
 import pandas as pd
-from uuid import uuid4
 
 from bokeh.embed import components
-from bokeh.io import export_png
 from bokeh.layouts import column as widgetbox
 from bokeh.models import ColumnDataSource, Whisker
 from bokeh.models.glyphs import Line
@@ -232,19 +230,6 @@ class JasprChart(object):
         data_table = DataTable(source=source, columns=bcols, height=580)
         title = Div(text=f'<strong>{self.m.curr_experiment}: {self.m.curr_sample}</strong>')
         return components(widgetbox(title, data_table))
-
-    def get_pngs(self):
-        png_list = []
-        #for experiment in self.m.experiment_list:
-        #    self.m.curr_experiment = experiment
-        for sample in self.m.sample_list:
-            self.m.curr_sample = sample
-            p = self._create_chart()
-            p.toolbar_location=None
-            pngFile_temp = f"{uuid4()}.png"
-            export_png(p, filename=f"tmp/{pngFile_temp}")
-            png_list.append(pngFile_temp)
-        return png_list
 
     def __call__(self):
         values = {}
