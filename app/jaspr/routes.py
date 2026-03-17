@@ -300,6 +300,34 @@ def download_example_data():
     response.headers['cache-control'] = 'no-cache'
     return response
 
+
+@app.route('/downloadSlides')
+def download_slides():
+    """Download bundled supplementary slide decks as a zip archive."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    slides_dir = os.path.join(repo_root, 'example_data', 'Slides')
+
+    if not os.path.isdir(slides_dir):
+        return redirect('/error502', code=302)
+
+    tmp_handle = tempfile.NamedTemporaryFile(prefix='jaspr_slides_', suffix='.zip', delete=False)
+    tmp_handle.close()
+
+    with zipfile.ZipFile(tmp_handle.name, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(slides_dir):
+            for file_name in files:
+                abs_path = os.path.join(root, file_name)
+                arcname = os.path.relpath(abs_path, repo_root)
+                zf.write(abs_path, arcname)
+
+    response = make_response(send_file(
+        tmp_handle.name,
+        as_attachment=True,
+        download_name=f'jaspr_slides_{datetime.now().strftime("%Y_%m_%d")}.zip'
+    ))
+    response.headers['cache-control'] = 'no-cache'
+    return response
+
 @app.route('/error502')
 def error502():
     jm = JasprModel()
