@@ -79,6 +79,9 @@ def _first_result_record(jm):
 
 def _available_report_links(jm):
     """Build report links that are expected to work for current analysis data."""
+    if _is_anscombe_dataset(jm):
+        return []
+
     links = [
         {
             'label': 'Graphs (Single Sample)',
@@ -132,6 +135,11 @@ def _guard_report_route():
     if not _is_report_ready():
         return redirect('/upload', code=302)
     return None
+
+
+def _is_anscombe_dataset(jm):
+    """Return True when the active session is the built-in Anscombe dataset."""
+    return bool(jm.experiment_list and jm.experiment_list[0] == 'Anscombe')
 
 def page_not_found(e):
     return render_template('502.html'), 502
@@ -325,6 +333,14 @@ def reportPngs():
     if guard is not None:
         return guard
 
+    jm = JasprModel()
+    if _is_anscombe_dataset(jm):
+        return render_template(
+            'report.html',
+            report_links=[],
+            no_reports_message='Results are not provided for the Anscombe data set.'
+        )
+
     jc = JasprChart()
     pngList = jc.get_pngs()
     return render_template('reportPNG.html', pngList=pngList)
@@ -339,13 +355,14 @@ def report():
 
     jm = JasprModel()
     report_links = _available_report_links(jm)
+    no_reports_message = 'Results are not provided for the Anscombe data set.' if _is_anscombe_dataset(jm) else None
 
     #The charting report is broken so we bypass it for now
     # to make progress on other reports
     # jc = JasprChart()
     # pngList = jc.get_pngs()
     #return render_template('report.html', pngList=pngList)
-    return render_template('report.html', report_links=report_links)
+    return render_template('report.html', report_links=report_links, no_reports_message=no_reports_message)
 
 
 @app.route('/reportpngs/<path:filename>')

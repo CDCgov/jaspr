@@ -16,7 +16,7 @@
 					{% endfor %}
 				</div>
 			{% else %}
-				<p class="mb-0">No report exports are available for the current session.</p>
+				<p class="mb-0">{{ no_reports_message or 'No report exports are available for the current session.' }}</p>
 			{% endif %}
 		</div>
 	</div>
