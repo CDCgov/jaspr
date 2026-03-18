@@ -7,13 +7,13 @@
 			<div class="card-body">
 				<h4 class="card-title mb-3">About JASPR</h4>
 				<p class="card-text">
-					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in viral surveillance workflows.
-					Supported workflows include Hemagglutination Inhibition Next-Generation Titer (HINT)
-					(<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>),
+					JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows.
+					Supported workflows include high content imaging-based neutralization test (HINT)
+					(<a href="#references">Gubareva et al., 2019</a>),
 					Infectivity Cell Percentage (ICP)
-					(<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>),
+					(<a href="#references">Gubareva et al., 2019</a>),
 					and Focus Reduction Neutralization Test (FRNT)
-					(<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>).
+					(<a href="#references">Suthar et al., 2020</a>).
 				</p>
 				<p class="card-text mb-0">
 					The analysis begins with loading assay inputs on the <strong>Load Data</strong> page (data file + key file + parser),
@@ -52,7 +52,7 @@
 				<div class="collapse" id="parserNotes">
 				<ul class="mb-0">
 					<li>
-						<strong>HINT (Hemagglutination Inhibition Next-Generation Titer):</strong> Supports antigenic workflows including ICP-informed working virus dilution.
+						<strong>HINT (high content imaging-based neutralization test):</strong> Supports antigenic workflows including ICP-informed working virus dilution.
 						<div class="ml-4 mt-1">
 							Default settings:
 							<ul class="mb-1">
@@ -64,7 +64,7 @@
 						</div>
 						<div class="ml-4 mt-1">
 							Reference publication:
-							<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+							<a href="#references">Gubareva et al., 2019</a>.
 						</div>
 					</li>
 					<li>
@@ -81,7 +81,7 @@
 						</div>
 						<div class="ml-4 mt-1">
 							Reference publication:
-							<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
+							<a href="#references">Gubareva et al., 2019</a>.
 						</div>
 					</li>
 					<li>
@@ -96,8 +96,8 @@
 							</ul>
 						</div>
 						<div class="ml-4 mt-1">
-							Reference protocol:
-							<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>.
+							Reference publication:
+							<a href="#references">Suthar et al., 2020</a>.
 						</div>
 					</li>
 				</ul>
@@ -170,27 +170,29 @@
 				<ul class="mb-2">
 					<li><strong>Antigenic/HINT/FRNT-style runs:</strong> Antigenic and Result Analysis exports are shown when required result fields are present.</li>
 					<li><strong>ICP runs:</strong> ICP 1000 export is shown only when ICP1000 values are available from the active fit results.</li>
-					<li><strong>FRNT pooled-sera runs:</strong> FRNT Results export is shown only when pooled-sera metadata and FRNT result fields are available.</li>
 				</ul>
 				<p class="mb-0">
 					If a report link is not shown, that export is not supported for the currently loaded analysis/session.
 				</p>
 				</div>
 				<h5 class="mt-3">
-					<button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#supportedInstruments" aria-expanded="false" aria-controls="supportedInstruments">Supported Instruments</button>
+					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#supportedInstruments" aria-expanded="false" aria-controls="supportedInstruments">Supported Instruments</button>
 				</h5>
 				<div class="collapse" id="supportedInstruments">
+				<ul class="mb-0">
+					<li>
+						<strong>HINT:</strong>
 						<div class="ml-4 mt-1">
 							<ul class="mb-1">
-								<li><a href="https://www.revvity.com/product/celigo-5c-config-200-bffl-5c?utm_source=google&utm_medium=cpc&utm_campaign=PLT-NXM-2026-USCAN-CPC-SCH-DG-REV-ZZ-GGL&sfdc_id=701Qr00000fOluEIAS&ls=ppc&adgroup=156058344457&ad=689043669809&keyword=celigo%27&placement=&gad_source=1&gad_campaignid=20967708207&gclid=EAIaIQobChMIo9fjtPyakwMVfCvUAR08JDKeEAAYAiAAEgJYiPD_BwE" target="_blank" rel="noopener noreferrer">Celigo</a></li>
+								<li><a href="https://www.revvity.com/product/celigo-image-cytometer" target="_blank" rel="noopener noreferrer">Celigo - Celigo Image Cytometer</a></li>
 							</ul>
 						</div>
-					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#supportedInstruments" aria-expanded="false" aria-controls="supportedInstruments">Supported Instruments</button>
+					</li>
 					<li>
 						<strong>ICP:</strong>
 						<div class="ml-4 mt-1">
 							<ul class="mb-1">
-								<li><a href="https://www.revvity.com/product/celigo-5c-config-200-bffl-5c?utm_source=google&utm_medium=cpc&utm_campaign=PLT-NXM-2026-USCAN-CPC-SCH-DG-REV-ZZ-GGL&sfdc_id=701Qr00000fOluEIAS&ls=ppc&adgroup=156058344457&ad=689043669809&keyword=celigo%27&placement=&gad_source=1&gad_campaignid=20967708207&gclid=EAIaIQobChMIo9fjtPyakwMVfCvUAR08JDKeEAAYAiAAEgJYiPD_BwE" target="_blank" rel="noopener noreferrer">Celigo</a></li>
+								<li><a href="https://www.revvity.com/product/celigo-image-cytometer" target="_blank" rel="noopener noreferrer">Celigo - Celigo Image Cytometer</a></li>
 							</ul>
 						</div>
 					</li>
@@ -198,8 +200,8 @@
 						<strong>FRNT:</strong>
 						<div class="ml-4 mt-1">
 							<ul class="mb-1">
-								<li><a href="https://www.thermofisher.com/us/en/home/life-science/cell-analysis/cellular-imaging/hcs-hca/platforms/cx5.html" target="_blank" rel="noopener noreferrer">Cx5</a></li>
-								<li><a href="https://www.agilent.com/en/product/cell-analysis/cell-imaging-microscopy/cell-imaging-multimode-readers/biotek-cytation-7-cell-imaging-multimode-reader-1623204?Product_Interest_Source=Marketing%20Campaign&source=Marketing%20Campaign&Lead_Campaign_Source=7015Y000002ubofQAA&Campaign_Source=7015Y000002ubofQAA&gclsrc=aw.ds&gad_source=1&gad_campaignid=22570275783&gclid=EAIaIQobChMIuOOp-fyakwMVjibUAR0-9DxfEAAYASAAEgKm5PD_BwE" target="_blank" rel="noopener noreferrer">Cytation7</a></li>
+								<li><a href="https://www.thermofisher.com/us/en/home/life-science/cell-analysis/cellular-imaging/hcs-hca/platforms/cx5.html" target="_blank" rel="noopener noreferrer">Cx5 - CellInsight CX5 HCS Platform</a></li>
+								<li><a href="https://www.agilent.com/en/product/cell-analysis/cell-imaging-microscopy/cell-imaging-multimode-readers/biotek-cytation-7-cell-imaging-multimode-reader-1623204" target="_blank" rel="noopener noreferrer">Cytation 7 - BioTek Cytation 7 Cell Imaging Multimode Reader</a></li>
 							</ul>
 						</div>
 					</li>
@@ -230,6 +232,33 @@
 				<h4 class="card-title">Supplementary Information</h4>
 				<p class="card-text">Powerpoint presentations include illustrations of sample plate layouts and logistic fit modifications that differentiate the ICP vs. antigenic testing analysis.</p>
 				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadSlides">Download Powerpoint Presentations</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row mb-3" id="references">
+	<div class="col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<h4 class="card-title mb-3">References</h4>
+				<ol class="mb-0">
+					<li>
+						Jorquera PA, Mishin VP, Chesnokov A, et al.; Gubareva LV. (2019). Insights into the antigenic advancement of influenza A(H3N2) viruses, 2011-2018. <em>Scientific Reports</em>, 9(1). DOI: <a href="https://doi.org/10.1038/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">10.1038/s41598-019-39276-1</a>.
+					</li>
+					<li>
+						Vanderheiden A, Edara VV, Floyd K, et al.; Suthar MS. (2020). Development of a Rapid Focus Reduction Neutralization Test Assay for Measuring SARS-CoV-2 Neutralizing Antibodies. <em>Current Protocols in Immunology</em>, 131(1), e116. DOI: <a href="https://doi.org/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">10.1002/cpim.116</a>.
+					</li>
+					<li>
+						Revvity. Celigo Image Cytometer. <a href="https://www.revvity.com/product/celigo-image-cytometer" target="_blank" rel="noopener noreferrer">https://www.revvity.com/product/celigo-image-cytometer</a>.
+					</li>
+					<li>
+						Thermo Fisher Scientific. CellInsight CX5 HCS Platform. <a href="https://www.thermofisher.com/us/en/home/life-science/cell-analysis/cellular-imaging/hcs-hca/platforms/cx5.html" target="_blank" rel="noopener noreferrer">https://www.thermofisher.com/us/en/home/life-science/cell-analysis/cellular-imaging/hcs-hca/platforms/cx5.html</a>.
+					</li>
+					<li>
+						Agilent. BioTek Cytation 7 Cell Imaging Multimode Reader. <a href="https://www.agilent.com/en/product/cell-analysis/cell-imaging-microscopy/cell-imaging-multimode-readers/biotek-cytation-7-cell-imaging-multimode-reader-1623204" target="_blank" rel="noopener noreferrer">https://www.agilent.com/en/product/cell-analysis/cell-imaging-microscopy/cell-imaging-multimode-readers/biotek-cytation-7-cell-imaging-multimode-reader-1623204</a>.
+					</li>
+				</ol>
 			</div>
 		</div>
 	</div>
