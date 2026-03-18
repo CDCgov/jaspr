@@ -19,6 +19,10 @@ ADD ./build /build
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
     conda install -c conda-forge --file requirements.txt
 
+# Bundle supplementary slide assets for in-container download routes.
+RUN mkdir -p /var/JASPR/example_data/Slides
+COPY example_data/Slides/ /var/JASPR/example_data/Slides/
+
 # App runtime location (matches existing image)
 VOLUME /app
 WORKDIR /app

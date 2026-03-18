@@ -195,6 +195,15 @@ def _resolve_slides_dir():
     """Locate the Slides directory under example_data for current runtime layout."""
     route_dir = os.path.dirname(__file__)
 
+    # Preferred in-container path for bundled supplementary slides.
+    bundled_candidates = [
+        '/var/JASPR/example_data/Slides',
+        '/var/JASPR/example_data/slides',
+    ]
+    for candidate_dir in bundled_candidates:
+        if os.path.isdir(candidate_dir):
+            return '/var/JASPR', candidate_dir
+
     # Preferred location for supplementary slides in app static assets.
     static_candidates = [
         os.path.join(route_dir, 'static', 'example_data', 'Slides'),
