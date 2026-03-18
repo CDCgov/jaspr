@@ -34,8 +34,9 @@ def _noop_pprint(*args, **kwargs):
 pprint.pprint = _noop_pprint
 
 # flask imports
-from flask import Flask, render_template, request, \
+from flask import Flask, render_template, render_template_string, request, \
     jsonify, redirect, make_response, send_from_directory, send_file, session
+from jinja2 import TemplateNotFound
 
 # local imports
 from jaspr import app
@@ -387,7 +388,36 @@ def download_slides():
     ]
 
     jm = JasprModel()
-    return render_template('slides.html', slide_files=slide_files, **jm.context)
+        try:
+                return render_template('slides.html', slide_files=slide_files, **jm.context)
+        except TemplateNotFound:
+                # Fallback for deployments where slides.html has not been synced yet.
+                return render_template_string(
+                        """
+                        {% extends "jaspr_layout.html" %}
+                        {% block body %}
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-3">PowerPoint Slides</h4>
+                                        <ul class="mb-0">
+                                            {% for slide in slide_files %}
+                                            <li>
+                                                <a href="{{ url_for('download_slide_file', slide_relpath=slide.rel_path) }}">{{ slide.filename }}</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endblock %}
+                        {% block pagescript %}{% endblock %}
+                        """,
+                        slide_files=slide_files,
+                        **jm.context,
+                )
 
 
 @app.route('/downloadSlides/file/<path:slide_relpath>')
