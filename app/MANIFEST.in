@@ -1,0 +1,2 @@
+recursive-include jaspr/templates *.html
+recursive-include jaspr/static *
