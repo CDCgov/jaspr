@@ -36,7 +36,7 @@ pprint.pprint = _noop_pprint
 # flask imports
 from flask import Flask, render_template, render_template_string, request, \
     jsonify, redirect, make_response, send_from_directory, send_file, session
-from jinja2 import TemplateNotFound
+from jinja2.exceptions import TemplateNotFound
 
 # local imports
 from jaspr import app
