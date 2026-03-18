@@ -387,7 +387,7 @@ def download_slides():
         for rel_path in rel_paths
     ]
 
-    jm = JasprModel()
+        jm = JasprModel()
         try:
                 return render_template('slides.html', slide_files=slide_files, **jm.context)
         except TemplateNotFound:
