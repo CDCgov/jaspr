@@ -173,6 +173,50 @@ def _is_frnt_parser(jm):
         'FRNT Virus-Serum-Serum Plate Layout Cytation7',
     }
 
+
+def _slides_search_roots():
+    """Return candidate repository roots where example slide files may exist."""
+    route_dir = os.path.dirname(__file__)
+    repo_candidates = [
+        os.path.abspath(os.path.join(route_dir, '..', '..')),
+        os.path.abspath(os.path.join(route_dir, '..', '..', '..')),
+        os.getcwd(),
+        '/app',
+    ]
+
+    deduped_repo_candidates = []
+    for candidate in repo_candidates:
+        if candidate not in deduped_repo_candidates:
+            deduped_repo_candidates.append(candidate)
+    return deduped_repo_candidates
+
+
+def _resolve_slides_dir():
+    """Locate the Slides directory under example_data for current runtime layout."""
+    for candidate_root in _slides_search_roots():
+        candidate_dirs = [
+            os.path.join(candidate_root, 'example_data', 'Slides'),
+            os.path.join(candidate_root, 'example_data', 'slides'),
+        ]
+        for candidate_dir in candidate_dirs:
+            if os.path.isdir(candidate_dir):
+                return candidate_root, candidate_dir
+    return None, None
+
+
+def _collect_slide_files(slides_dir):
+    """Return sorted slide file paths relative to slides_dir."""
+    slide_files = []
+    for root, _, files in os.walk(slides_dir):
+        for file_name in files:
+            if not file_name.lower().endswith(('.ppt', '.pptx')):
+                continue
+            abs_path = os.path.join(root, file_name)
+            rel_path = os.path.relpath(abs_path, slides_dir).replace('\\', '/')
+            slide_files.append(rel_path)
+
+    return sorted(slide_files, key=lambda x: x.lower())
+
 def page_not_found(e):
     return render_template('502.html'), 502
 
@@ -303,27 +347,52 @@ def download_example_data():
 
 @app.route('/downloadSlides')
 def download_slides():
-    """Download bundled supplementary slide decks as a zip archive."""
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    slides_dir = os.path.join(repo_root, 'example_data', 'Slides')
-
-    if not os.path.isdir(slides_dir):
+    """Render a page listing downloadable supplementary PowerPoint files."""
+    _, slides_dir = _resolve_slides_dir()
+    if not slides_dir:
         return redirect('/error502', code=302)
 
-    tmp_handle = tempfile.NamedTemporaryFile(prefix='jaspr_slides_', suffix='.zip', delete=False)
-    tmp_handle.close()
+    rel_paths = _collect_slide_files(slides_dir)
+    if not rel_paths:
+        return redirect('/error502', code=302)
 
-    with zipfile.ZipFile(tmp_handle.name, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(slides_dir):
-            for file_name in files:
-                abs_path = os.path.join(root, file_name)
-                arcname = os.path.relpath(abs_path, repo_root)
-                zf.write(abs_path, arcname)
+    slide_files = [
+        {
+            'rel_path': rel_path,
+            'filename': os.path.basename(rel_path),
+        }
+        for rel_path in rel_paths
+    ]
+
+    jm = JasprModel()
+    return render_template('slides.html', slide_files=slide_files, **jm.context)
+
+
+@app.route('/downloadSlides/file/<path:slide_relpath>')
+def download_slide_file(slide_relpath):
+    """Download a single slide file from the supplementary Slides directory."""
+    _, slides_dir = _resolve_slides_dir()
+    if not slides_dir:
+        return redirect('/error502', code=302)
+
+    normalized_relpath = slide_relpath.replace('\\', '/')
+    candidate_path = os.path.abspath(os.path.join(slides_dir, normalized_relpath))
+    slides_root = os.path.abspath(slides_dir)
+
+    # Prevent path traversal outside the Slides directory.
+    if not candidate_path.startswith(slides_root + os.sep):
+        return redirect('/error502', code=302)
+
+    if not os.path.isfile(candidate_path):
+        return redirect('/error502', code=302)
+
+    if not candidate_path.lower().endswith(('.ppt', '.pptx')):
+        return redirect('/error502', code=302)
 
     response = make_response(send_file(
-        tmp_handle.name,
+        candidate_path,
         as_attachment=True,
-        download_name=f'jaspr_slides_{datetime.now().strftime("%Y_%m_%d")}.zip'
+        download_name=os.path.basename(candidate_path)
     ))
     response.headers['cache-control'] = 'no-cache'
     return response
