@@ -240,6 +240,45 @@ def _collect_slide_files(slides_dir):
 
     return sorted(slide_files, key=lambda x: x.lower())
 
+
+def _resolve_example_data_dir():
+    """Locate the example_data directory for current runtime layout."""
+    route_dir = os.path.dirname(__file__)
+
+    preferred_candidates = [
+        '/var/JASPR/example_data',
+        os.path.join(route_dir, 'static', 'example_data'),
+    ]
+    for candidate_dir in preferred_candidates:
+        if os.path.isdir(candidate_dir):
+            return os.path.abspath(candidate_dir)
+
+    for candidate_root in _slides_search_roots():
+        candidate_dirs = [
+            os.path.join(candidate_root, 'example_data'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data'),
+        ]
+        for candidate_dir in candidate_dirs:
+            if os.path.isdir(candidate_dir):
+                return os.path.abspath(candidate_dir)
+
+    return None
+
+
+def _resolve_example_test_dir(example_data_dir, test_type):
+    """Resolve test-type directory (FRNT/HINT/ICP) in a case-insensitive way."""
+    expected = test_type.upper()
+    direct = os.path.join(example_data_dir, expected)
+    if os.path.isdir(direct):
+        return direct
+
+    for child_name in os.listdir(example_data_dir):
+        child_path = os.path.join(example_data_dir, child_name)
+        if os.path.isdir(child_path) and child_name.upper() == expected:
+            return child_path
+
+    return None
+
 def page_not_found(e):
     return render_template('502.html'), 502
 
@@ -342,27 +381,100 @@ def analysis():
 
 @app.route('/downloadExampleData')
 def download_example_data():
-    """Download bundled example input files as a zip archive."""
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    example_dir = os.path.join(repo_root, 'example_data')
-
-    if not os.path.isdir(example_dir):
+    """Render a page listing downloadable example-data bundles by assay type."""
+    example_data_dir = _resolve_example_data_dir()
+    if not example_data_dir:
         return redirect('/error502', code=302)
 
-    tmp_handle = tempfile.NamedTemporaryFile(prefix='jaspr_example_data_', suffix='.zip', delete=False)
+    bundle_defs = [
+        {'key': 'FRNT', 'label': 'FRNT'},
+        {'key': 'HINT', 'label': 'HINT'},
+        {'key': 'ICP', 'label': 'ICP'},
+    ]
+
+    bundles = []
+    for bundle in bundle_defs:
+        test_dir = _resolve_example_test_dir(example_data_dir, bundle['key'])
+        if not test_dir:
+            continue
+        bundles.append(bundle)
+
+    if not bundles:
+        return redirect('/error502', code=302)
+
+    jm = JasprModel()
+    try:
+        return render_template('example_data_downloads.html', bundles=bundles, **jm.context)
+    except TemplateNotFound:
+        return render_template_string(
+            """
+            {% extends "jaspr_layout.html" %}
+            {% block body %}
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h4 class="card-title mb-3">Example Data Downloads</h4>
+                    <p class="mb-2">Download bundled example datasets by test type.</p>
+                    <ul class="mb-0">
+                      {% for bundle in bundles %}
+                      <li>
+                        <a href="{{ url_for('download_example_data_bundle', test_type=bundle.key) }}">Download {{ bundle.label }} Bundle</a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endblock %}
+            {% block pagescript %}{% endblock %}
+            """,
+            bundles=bundles,
+            **jm.context,
+        )
+
+
+@app.route('/downloadExampleData/bundle/<string:test_type>')
+def download_example_data_bundle(test_type):
+    """Download one example-data bundle for FRNT, HINT, or ICP."""
+    normalized_type = test_type.upper()
+    allowed_types = {'FRNT', 'HINT', 'ICP'}
+    if normalized_type not in allowed_types:
+        return redirect('/error502', code=302)
+
+    example_data_dir = _resolve_example_data_dir()
+    if not example_data_dir:
+        return redirect('/error502', code=302)
+
+    test_dir = _resolve_example_test_dir(example_data_dir, normalized_type)
+    if not test_dir:
+        return redirect('/error502', code=302)
+
+    tmp_handle = tempfile.NamedTemporaryFile(
+        prefix=f'jaspr_example_{normalized_type.lower()}_',
+        suffix='.zip',
+        delete=False,
+    )
     tmp_handle.close()
 
+    found_files = False
     with zipfile.ZipFile(tmp_handle.name, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(example_dir):
+        for root, _, files in os.walk(test_dir):
             for file_name in files:
                 abs_path = os.path.join(root, file_name)
-                arcname = os.path.relpath(abs_path, repo_root)
+                arcname = os.path.relpath(abs_path, example_data_dir)
                 zf.write(abs_path, arcname)
+                found_files = True
+
+    if not found_files:
+        os.unlink(tmp_handle.name)
+        return redirect('/error502', code=302)
 
     response = make_response(send_file(
         tmp_handle.name,
         as_attachment=True,
-        download_name=f'jaspr_example_data_{datetime.now().strftime("%Y_%m_%d")}.zip'
+        download_name=f'jaspr_example_{normalized_type}_{datetime.now().strftime("%Y_%m_%d")}.zip'
     ))
     response.headers['cache-control'] = 'no-cache'
     return response
