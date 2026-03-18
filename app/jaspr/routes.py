@@ -193,10 +193,23 @@ def _slides_search_roots():
 
 def _resolve_slides_dir():
     """Locate the Slides directory under example_data for current runtime layout."""
+    route_dir = os.path.dirname(__file__)
+
+    # Preferred location for supplementary slides in app static assets.
+    static_candidates = [
+        os.path.join(route_dir, 'static', 'example_data', 'Slides'),
+        os.path.join(route_dir, 'static', 'example_data', 'slides'),
+    ]
+    for candidate_dir in static_candidates:
+        if os.path.isdir(candidate_dir):
+            return os.path.abspath(route_dir), candidate_dir
+
     for candidate_root in _slides_search_roots():
         candidate_dirs = [
             os.path.join(candidate_root, 'example_data', 'Slides'),
             os.path.join(candidate_root, 'example_data', 'slides'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data', 'Slides'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data', 'slides'),
         ]
         for candidate_dir in candidate_dirs:
             if os.path.isdir(candidate_dir):
