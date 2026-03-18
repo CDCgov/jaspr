@@ -10,16 +10,17 @@
 					JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows.
 					Supported workflows include high content imaging-based neutralization test (HINT)
 					(<a href="#references">Gubareva et al., 2019</a>),
-					Infectivity Cell Percentage (ICP)
+					Infected Cell Population (ICP)
 					(<a href="#references">Gubareva et al., 2019</a>),
 					and Focus Reduction Neutralization Test (FRNT)
 					(<a href="#references">Suthar et al., 2020</a>).
 				</p>
+				<p class="card-text">
+					The analysis begins with loading assay inputs on the <strong>Load Data</strong> page (parser + data file + key file), then reviewing curves and tables on the <strong>Analysis</strong> page, and generating outputs on the <strong>Report</strong> page.
+					Before uploading the next dataset, select <strong>Reset Session</strong> to clear current data and selections.
+					Optional setting adjustments can be made on the <strong>Settings</strong> page when fit tuning is desired.
+				</p>
 				<p class="card-text mb-0">
-					The analysis begins with loading assay inputs on the <strong>Load Data</strong> page (data file + key file + parser),
-					then reviewing curves and tables on <strong>Analysis</strong>, and generating outputs on <strong>Report</strong>.
-					Before uploading the next dataset, use <strong>Reset Session</strong> to clear current data and selections.
-					Optional setting adjustments can be made on <strong>Settings</strong> when fit behavior needs to be tuned.
 					New users can download bundled sample files from the <a href="#example-data">Example Data</a> section to get started.
 				</p>
 			</div>
@@ -68,7 +69,7 @@
 						</div>
 					</li>
 					<li>
-						<strong>ICP (Infectivity Cell Percentage):</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
+						<strong>ICP (Infected Cell Population):</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
 						which is then used in HINT setup.
 						<div class="ml-4 mt-1">
 							Default settings:
@@ -87,17 +88,21 @@
 					<li>
 						<strong>FRNT (Focus Reduction Neutralization Test):</strong> Supports FRNT assay data processing and report outputs.
 						<div class="ml-4 mt-1">
-							Default settings:
+							Default settings by parser:
 							<ul class="mb-1">
-								<li>Show Curve Fit: On</li>
-								<li>X-axis: Log</li>
-								<li>Fit Function: logistic4 (V-S-S layouts) or robust_logistic4 (parser-dependent)</li>
-								<li>Blank Correction: parser-dependent; Off for V-S-S Cx5 layouts</li>
+								<li>
+									<strong>FRNT Virus-Serum-Serum Plate Layout Cx5:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
+								<li>
+									<strong>FRNT Serum-Virus-Virus Plate Layout Cx5:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
+								<li>
+									<strong>FRNT Virus-Serum-Serum Plate Layout Cytation7:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
 							</ul>
-						</div>
-						<div class="ml-4 mt-1">
-							Reference publication:
-							<a href="#references">Suthar et al., 2020</a>.
 						</div>
 					</li>
 				</ul>
@@ -151,14 +156,6 @@
 					<li><strong>logistic4_h=1</strong> (<code>loss='linear'</code>): Fits a 4-parameter logistic curve with Hill slope fixed at 1. Available for <strong>all parsers</strong>.</li>
 					<li><strong>robust_log4_h=1</strong> (<code>loss='soft_l1'</code>): Robust version of the fixed-Hill logistic model. Available for <strong>all parsers</strong>.</li>
 				</ul>
-				<p class="mb-0">
-					Default parser-to-fit mappings on load: <strong>anscombe -> linear</strong>,
-					<strong>HINT celigo -> robust_logistic4</strong>,
-					<strong>ICP celigo -> ICP_robust_logistic3</strong>,
-					and FRNT parsers (<strong>FRNT Virus-Serum-Serum Plate Layout Cx5</strong>,
-					<strong>FRNT Serum-Virus-Virus Plate Layout Cx5</strong>,
-					<strong>FRNT Virus-Serum-Serum Plate Layout Cytation7</strong>) -> <strong>logistic4</strong>.
-				</p>
 				</div>
 				<h5 class="mt-3">
 					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#reportsSection" aria-expanded="false" aria-controls="reportsSection">Reports</button>
@@ -168,8 +165,8 @@
 					The <strong>Report</strong> page is hidden until data is loaded. After loading, it shows only the report exports that are expected to work for that analysis type.
 				</p>
 				<ul class="mb-2">
-					<li><strong>Antigenic/HINT/FRNT-style runs:</strong> Antigenic and Result Analysis exports are shown when required result fields are present.</li>
-					<li><strong>ICP runs:</strong> ICP 1000 export is shown only when ICP1000 values are available from the active fit results.</li>
+					<li><strong>Antigenic assays:</strong> Antigenic and Result Analysis exports are shown when required result fields are present.</li>
+					<li><strong>ICP assays:</strong> ICP 1000 export is shown only when ICP1000 values are available from the active fit results.</li>
 				</ul>
 				<p class="mb-0">
 					If a report link is not shown, that export is not supported for the currently loaded analysis/session.
