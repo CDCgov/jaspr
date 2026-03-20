@@ -1,0 +1,60 @@
+{% extends "jaspr_layout.html" %}
+
+{% block body %}
+<script src={{ url_for('static', filename='js/jaspr-main.js') }}></script>
+
+<div class="row">
+	<div class="col-3">
+		<div class="form-group">
+			<label for="selExp">Selected Experiment</label>
+			<select class="form-control" id="selExp" onchange='ChangeExperiment(this);'>
+				{% for experiment in experiment_list %}
+                    <option value="{{experiment}}">{{experiment}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+	<div class="col-9">
+		{% if curr_experiment == 'Anscombe' %}
+		<div class="d-flex justify-content-end mb-2">
+			<a class="btn btn-outline-primary mr-2" href="https://www.sjsu.edu/faculty/gerstman/StatPrimer/anscombe1973.pdf" target="_blank" rel="noopener noreferrer">View Anscombe Publication (PDF)</a>
+			<a class="btn btn-outline-secondary" href="https://en.wikipedia.org/wiki/Anscombe%27s_quartet" target="_blank" rel="noopener noreferrer">View Anscombe on Wikipedia</a>
+		</div>
+		{% endif %}
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+				<a class="nav-link active" data-toggle="tab" href="#jasprgraph">Graph</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#jasprtable">Table</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="row content-row">
+	<div class="col-3 selector ">
+		<ul class="samplelist nav flex-column nav-pills">
+			{% for sample in sample_list %}
+			<li class="nav-item">
+				<a class="nav-link {% if sample == curr_sample %}active{% endif %}" data-toggle="pill" onclick="ChangeSample('{{sample}}');" href="#">{{ sample }}</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="col-9">
+		<div class="tab-content">
+			<div class="tab-pane fade show active" active id="jasprgraph">
+				<span class="dataGraph">loading Graph</span>
+			</div>
+			<div class="tab-pane show" id="jasprtable">
+				<span class="dataTable">loading table</span>
+			</div>
+		</div>
+	</div>
+</div>
+{%endblock%}
+
+{%block pagescript%}
+<!--No page level javascript required -->
+{%endblock%}

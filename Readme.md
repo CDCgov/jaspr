@@ -63,6 +63,8 @@ Then, update the jaspr-prod server with master branch.
 cd ../../../var/JASPR
 podman-compose build && podman-compose down && podman-compose up
 
+Note: when changing Flask templates or static assets under app/jaspr, always run a full image rebuild (the build command above) before starting containers so packaged resources are refreshed in the runtime image.
+
 =======
 
 

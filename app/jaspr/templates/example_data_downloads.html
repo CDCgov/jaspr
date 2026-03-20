@@ -1,0 +1,25 @@
+{% extends "jaspr_layout.html" %}
+
+{% block body %}
+<div class="row mb-3">
+	<div class="col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<h4 class="card-title mb-3">Example Data Downloads</h4>
+				<p class="mb-2">Download bundled example datasets by test type.</p>
+				<ul class="mb-0">
+					{% for bundle in bundles %}
+					<li>
+						<a href="{{ url_for('download_example_data_bundle', test_type=bundle.key) }}">Download {{ bundle.label }} Bundle</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block pagescript %}
+<!-- No page level javascript required -->
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "jaspr_layout.html" %}
+
+{% block body %}
+<div class="row mb-3">
+	<div class="col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<h4 class="card-title mb-3">PowerPoint Slides</h4>
+				{% if slide_files %}
+				<ul class="mb-0">
+					{% for slide in slide_files %}
+					<li>
+						<a href="{{ url_for('download_slide_file', slide_relpath=slide.rel_path) }}">{{ slide.filename }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+				{% else %}
+				<p class="mb-0">No PowerPoint slide files are currently available.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block pagescript %}
+<!-- No page level javascript required -->
+{% endblock %}

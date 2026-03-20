@@ -11,9 +11,18 @@ import glob
 app = Flask(__name__)
 app.secret_key = b'HoleyMoleyRocky'
 app.config['TESTING'] = True
-app.config['SESSION_TYPE'] = 'redis'
-redis_host = os.getenv("REDIS_HOST", "redis")  # "redis" in multi-container; "127.0.0.1" in single-container
-app.config['SESSION_REDIS'] = redis.from_url(f"redis://{redis_host}:6379")
+redis_host = os.getenv("REDIS_HOST", "127.0.0.1")  # Override to "redis" in multi-container compose.
+redis_client = redis.from_url(f"redis://{redis_host}:6379", socket_connect_timeout=1, socket_timeout=1)
+
+try:
+    redis_client.ping()
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = redis_client
+except redis.RedisError:
+    # Keep the app available even when Redis is unreachable in local/single-container runs.
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'
+    app.config['SESSION_PERMANENT'] = False
 
 #allow intercepts without stopping while debugging
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False

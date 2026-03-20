@@ -1,25 +1,35 @@
 <div class="row w-100">
   <nav class="menubar navbar navbar-expand-lg navbar-dark bg-dark w-100">
-    <a class="navbar-brand" href="#">JASPR Curve Fitting Tool </a>
+    <a class="navbar-brand" href="/">JASPR Curve Fitting Tool</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="\">Home</a>
+          <a class="nav-link" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="\upload">Load Data</a>
+          <a class="nav-link" href="/upload">Load Data</a>
+        </li>
+        {% if session.get('analysis_ready') %}
+        <li class="nav-item">
+          <a class="nav-link" href="/analysis">Analysis</a>
+        </li>
+        {% endif %}
+        {% if session.get('report_ready') %}
+        <li class="nav-item">
+          <a class="nav-link" href="/report">Report</a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link" href="/settings">Settings</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="\report">Report</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="\settings">Settings</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="\reset">Reset Session</a>
+          <a class="nav-link" href="/reset">Reset Session</a>
           </li>
         <li class="nav-item">
-          <a class="nav-link" href="\static\help\index.html" target="_blank">Help</a>
+          <a class="nav-link" href="/license">License</a>
         </li>
 
       </ul>

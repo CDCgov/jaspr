@@ -1,20 +1,27 @@
 {% extends "jaspr_layout.html" %}
 
 {% block body %}
-<script src={{ url_for('static', filename='js/jaspr-main.js') }}></script>
-
 <div class="row mb-3">
 	<div class="col-12">
-		<div class="card">
+		<div class="card h-100">
 			<div class="card-body">
 				<h4 class="card-title mb-3">About JASPR</h4>
 				<p class="card-text">
-					JASPR is a curve-fitting and report-generation application for antiviral assay analysis used in influenza surveillance workflows.
-					It supports common 96-well plate workflows and helps teams move from instrument output to interpretable titers and quality flags quickly.
+					JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows.
+					Supported workflows include high content imaging-based neutralization test (HINT)
+					(<a href="#references">Gubareva et al., 2019</a>),
+					Infected Cell Population (ICP)
+					(<a href="#references">Gubareva et al., 2019</a>),
+					and Focus Reduction Neutralization Test (FRNT)
+					(<a href="#references">Suthar et al., 2020</a>).
+				</p>
+				<p class="card-text">
+					The analysis begins with loading assay inputs on the <strong>Load Data</strong> page (parser + data file + key file), then reviewing curves and tables on the <strong>Analysis</strong> page, and generating outputs on the <strong>Report</strong> page.
+					Before uploading the next dataset, select <strong>Reset Session</strong> to clear current data and selections.
+					Optional setting adjustments can be made on the <strong>Settings</strong> page when fit tuning is desired.
 				</p>
 				<p class="card-text mb-0">
-					This deployment includes parser support for HINT, ICP, and FRNT assays, in addition to the built-in Anscombe demonstration dataset.
-					Use the Load Data page to choose a parser and import matching data and key files.
+					New users can download bundled sample files from the <a href="#example-data">Example Data</a> section to get started.
 				</p>
 			</div>
 		</div>
@@ -22,102 +29,243 @@
 </div>
 
 <div class="row mb-3">
-	<div class="col-lg-8 mb-3 mb-lg-0">
+	<div class="col-12">
 		<div class="card h-100">
 			<div class="card-body">
 				<h4 class="card-title mb-3">Instructions for Use</h4>
 				<ol class="mb-3">
-					<li>Open <strong>Load Data</strong>, select the parser matching your assay and instrument.</li>
-					<li>Upload the assay data file and matching key file, then click <strong>Submit</strong>.</li>
-					<li>Review curves and tables on this page, then generate exports from the Reports tab.</li>
+					<li>Open <strong>Load Data</strong>, select the parser for your assay/instrument, upload the data file and key file, then click <strong>Submit</strong>.</li>
+					<li>Open <strong>Analysis</strong> to review curves and tables for the loaded data.
+						<ul class="mb-0 mt-1">
+							<li><strong>Analysis</strong> and <strong>Report</strong> pages appear in the navigation menu only after data is loaded into the active session.</li>
+							<li>
+								The Virus and Serum samples displayed in the graph are indicated in the upper left.
+								<img
+									src="{{ url_for('static', filename='images/instructions/Sample_selection.jpg') }}"
+									alt="Example graph highlighting Virus and Serum sample selection in the upper-left"
+									class="img-fluid border rounded mt-2"
+									style="max-width: 750px; max-height: 750px; width: 100%; height: auto;"
+									onerror="this.style.display='none'"
+								/>
+							</li>
+						</ul>
+					</li>
+					<li>Open <strong>Report</strong> to generate and download valid outputs for the loaded run.</li>
+					<li>Click <strong>Reset Session</strong> before uploading the next dataset to clear current data and selections.</li>
 				</ol>
+				<p class="mb-3">
+					Optional: Use <strong>Settings</strong> to adjust fit visibility, blank correction, axis scale, and fitting function, then click <strong>Execute</strong> to apply updates and re-check Analysis/Report outputs.
+				</p>
 
-				<h5>Parser Notes</h5>
+				<h5>
+					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#parserNotes" aria-expanded="false" aria-controls="parserNotes">Parser Notes</button>
+				</h5>
+				<div class="collapse" id="parserNotes">
 				<ul class="mb-0">
 					<li>
-						<strong>HINT:</strong> Supports antigenic HINT workflows including ICP-informed working virus dilution.
-						Reference publication:
-						<a href="https://www.nature.com/articles/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">Nature Scientific Reports (2019)</a>.
-						Procedure summary: prepare MDCK-SIAT1 cells, perform titration or sera+virus incubation, add cells, incubate,
-						fix/stain over days 2-3, and read on Celigo with target ~1000 ICP per 50 uL and acceptable total cell counts in range.
+						<strong>HINT (high content imaging-based neutralization test):</strong> Supports antigenic workflows including ICP-informed working virus dilution.
+						<div class="ml-4 mt-1">
+							Default settings:
+							<ul class="mb-1">
+								<li>Show Curve Fit: On</li>
+								<li>Blank Correction: On</li>
+								<li>X-axis: Log</li>
+								<li>Fit Function: robust_logistic4</li>
+							</ul>
+						</div>
+						<div class="ml-4 mt-1">
+							Reference publication:
+							<a href="#references">Gubareva et al., 2019</a>.
+						</div>
 					</li>
 					<li>
-						<strong>ICP:</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
+						<strong>ICP (Infected Cell Population):</strong> Supports serial virus dilution workflows to estimate the dilution where ICP reaches 1000,
 						which is then used in HINT setup.
+						<div class="ml-4 mt-1">
+							Default settings:
+							<ul class="mb-1">
+								<li>Show Curve Fit: On</li>
+								<li>Blank Correction: On</li>
+								<li>X-axis: Log</li>
+								<li>Fit Function: ICP_robust_logistic3</li>
+							</ul>
+						</div>
+						<div class="ml-4 mt-1">
+							Reference publication:
+							<a href="#references">Gubareva et al., 2019</a>.
+						</div>
 					</li>
 					<li>
-						<strong>FRNT:</strong> Supports FRNT assay data processing and report outputs.
-						SOP reference:
-						<a href="https://currentprotocols.onlinelibrary.wiley.com/doi/abs/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">Current Protocols FRNT method</a>.
+						<strong>FRNT (Focus Reduction Neutralization Test):</strong> Supports FRNT assay data processing and report outputs.
+						<div class="ml-4 mt-1">
+							Default settings by parser:
+							<ul class="mb-1">
+								<li>
+									<strong>FRNT Virus-Serum-Serum Plate Layout Cx5:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
+								<li>
+									<strong>FRNT Serum-Virus-Virus Plate Layout Cx5:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
+								<li>
+									<strong>FRNT Virus-Serum-Serum Plate Layout Cytation7:</strong>
+									Show Curve Fit = On, Blank Correction = Off, X-axis = Log, Fit Function = logistic4
+								</li>
+							</ul>
+						</div>
 					</li>
 				</ul>
+				</div>
+				<h5 class="mt-3">
+					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#updatingSettings" aria-expanded="false" aria-controls="updatingSettings">Updating Settings</button>
+				</h5>
+				<div class="collapse" id="updatingSettings">
+				<p class="mb-2">
+					Current setting values and calculated results are shown in the upper-left of the chart view.
+				</p>
+				<img
+					src="{{ url_for('static', filename='images/instructions/Sample_graph.jpg') }}"
+					alt="Example graph showing settings and results in the upper-left"
+					class="img-fluid border rounded mb-3"
+					style="max-width: 750px; max-height: 750px; width: 100%; height: auto;"
+					onerror="this.style.display='none'"
+				/>
+				<p class="mb-2">
+					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to apply changes and refresh Analysis and Report outputs.
+				</p>
+				<h6 class="mb-2">Setting Controls</h6>
+				<ul class="mb-2">
+					<li><strong>Show Curve Fit:</strong> Toggles fit-line visibility on analysis charts; disable to inspect only measured data points.</li>
+					<li><strong>Blank Correction:</strong> Uses blank/background correction (y_corrected) instead of raw y_values when computing fits and derived labels.</li>
+					<li><strong>Axis Scale:</strong> Switches concentration axis between <strong>Log</strong> and <strong>Linear</strong>; this affects fit/plot x-series used in charts.</li>
+					<li><strong>Fit Function:</strong> Selects the curve model used to compute result labels (for example titer, IC50, ec50, or ICP1000).</li>
+					<li><strong>Execute:</strong> Applies all setting changes to the active session and returns to Analysis for immediate review.</li>
+				</ul>
+				<h6 class="mb-2">How Curve Fitting Works (Math/Statistics Translation)</h6>
+				<p class="mb-2">
+					JASPR fits models using <code>scipy.optimize.least_squares</code>. For every model, it computes
+					<code>residual = observed y - predicted y</code> at each concentration and then minimizes the residual vector.
+					The optimizer tries multiple starting guesses and keeps the first successful convergence.
+				</p>
+				<p class="mb-2">
+					Loss function translation:
+					<code>loss='linear'</code> means ordinary least squares (L2),
+					and <code>loss='soft_l1'</code> means a robust loss that reduces the influence of outliers.
+				</p>
+				<h6 class="mb-2">Fit Implementations Translated to English</h6>
+				<ul class="mb-2">
+					<li><strong>linear</strong> (<code>loss='linear'</code>): Fits a straight line, <code>y = slope*x + intercept</code>, by ordinary least squares. Default for <strong>anscombe</strong>; available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_linear</strong> (<code>loss='soft_l1'</code>): Fits the same straight line, but down-weights outliers using a robust loss. Available for <strong>all parsers</strong>.</li>
+					<li><strong>logistic3</strong> (<code>loss='linear'</code>): Fits a 3-parameter logistic/saturation curve with <code>Vmax</code> and <code>Ki (IC50)</code>. Available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_logistic3</strong> (<code>loss='soft_l1'</code>): Fits the same 3-parameter logistic shape with robust outlier handling. Available for <strong>all parsers</strong>.</li>
+					<li><strong>ICP_logistic3</strong> (<code>loss='linear'</code>): Fits the ICP-oriented 3-parameter logistic form used for <code>ICP1000</code> calculation. Recommended for <strong>ICP</strong> analyses only (available in Settings but generally not appropriate for non-ICP parser data).</li>
+					<li><strong>ICP_robust_logistic3</strong> (<code>loss='soft_l1'</code>): Robust ICP-oriented 3-parameter logistic used to derive <code>ICP1000</code>. Default for <strong>ICP celigo</strong>.</li>
+					<li><strong>logistic4</strong> (<code>loss='linear'</code>): Fits a 4-parameter logistic curve with a free Hill slope <code>h</code>, often used for titer/ec50 reporting. Default for FRNT parsers; available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_logistic4</strong> (<code>loss='soft_l1'</code>): Fits the same 4-parameter logistic curve with robust outlier resistance. Default for <strong>HINT celigo</strong>; available for <strong>all parsers</strong>.</li>
+					<li><strong>logistic4_h=1</strong> (<code>loss='linear'</code>): Fits a 4-parameter logistic curve with Hill slope fixed at 1. Available for <strong>all parsers</strong>.</li>
+					<li><strong>robust_log4_h=1</strong> (<code>loss='soft_l1'</code>): Robust version of the fixed-Hill logistic model. Available for <strong>all parsers</strong>.</li>
+				</ul>
+				</div>
+				<h5 class="mt-3">
+					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#reportsSection" aria-expanded="false" aria-controls="reportsSection">Reports</button>
+				</h5>
+				<div class="collapse" id="reportsSection">
+				<p class="mb-2">
+					The <strong>Report</strong> page is hidden until data is loaded. After loading, it shows only the report exports that are expected to work for that analysis type.
+				</p>
+				<ul class="mb-2">
+					<li><strong>Antigenic assays:</strong> Antigenic and Result Analysis exports are shown when required result fields are present.</li>
+					<li><strong>ICP assays:</strong> ICP 1000 export is shown only when ICP1000 values are available from the active fit results.</li>
+				</ul>
+				<p class="mb-0">
+					If a report link is not shown, that export is not supported for the currently loaded analysis/session.
+				</p>
+				</div>
+				<h5 class="mt-3">
+					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#supportedInstruments" aria-expanded="false" aria-controls="supportedInstruments">Supported Instruments</button>
+				</h5>
+				<div class="collapse" id="supportedInstruments">
+				<ul class="mb-0">
+					<li>
+						<strong>HINT:</strong>
+						<div class="ml-4 mt-1">
+							<ul class="mb-1">
+								<li><a href="https://www.google.com/search?q=Celigo+Image+Cytometer" target="_blank" rel="noopener noreferrer">Celigo - Celigo Image Cytometer</a></li>
+							</ul>
+						</div>
+					</li>
+					<li>
+						<strong>ICP:</strong>
+						<div class="ml-4 mt-1">
+							<ul class="mb-1">
+								<li><a href="https://www.google.com/search?q=Celigo+Image+Cytometer" target="_blank" rel="noopener noreferrer">Celigo - Celigo Image Cytometer</a></li>
+							</ul>
+						</div>
+					</li>
+					<li>
+						<strong>FRNT:</strong>
+						<div class="ml-4 mt-1">
+							<ul class="mb-1">
+								<li><a href="https://www.google.com/search?q=CellInsight+CX5+HCS+Platform" target="_blank" rel="noopener noreferrer">Cx5 - CellInsight CX5 HCS Platform</a></li>
+								<li><a href="https://www.google.com/search?q=BioTek+Cytation+7+Cell+Imaging+Multimode+Reader" target="_blank" rel="noopener noreferrer">Cytation 7 - BioTek Cytation 7 Cell Imaging Multimode Reader</a></li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+				</div>
 			</div>
 		</div>
 	</div>
+	
+</div>
+
+<div class="row mb-3">
 	<div class="col-lg-4">
-		<div class="card h-100">
+		<div class="card h-100" id="example-data">
 			<div class="card-body d-flex flex-column">
 				<h4 class="card-title">Example Data</h4>
-				<p class="card-text">Download bundled example datasets for parser validation and training runs.</p>
-				<a class="btn btn-primary mt-auto" href="/downloadExampleData">Download Example Data</a>
+				<p class="card-text">Download bundled example datasets for parser validation and training runs. When uploading your experimental data for analysis, match the data structure and file names used in the example files.</p>
+				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadExampleData">Download Example Data</a>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="row">
-	<div class="col-3">
-		<div class="form-group">
-			<label for="selExp">Selected Experiment</label>
-			<select class="form-control" id="selExp"
-							onchange='ChangeExperiment(this);'>
-				{% for experiment in experiment_list %}
-                    <option value="{{experiment}}">{{experiment}}</option>
-				{% endfor %}
-			</select>
+<div class="row mb-3">
+	<div class="col-lg-6">
+		<div class="card h-100">
+			<div class="card-body d-flex flex-column">
+				<h4 class="card-title">Supplementary Information</h4>
+				<p class="card-text">Powerpoint presentations include illustrations of sample plate layouts and logistic fit modifications that differentiate the ICP vs. antigenic testing analysis.</p>
+				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadSlides">Download Powerpoint Presentations</a>
+			</div>
 		</div>
-	</div>
-	<div class="col-9">
-		{% if curr_experiment == 'Anscombe' %}
-		<div class="d-flex justify-content-end mb-2">
-			<a class="btn btn-outline-primary mr-2" href="https://www.sjsu.edu/faculty/gerstman/StatPrimer/anscombe1973.pdf" target="_blank" rel="noopener noreferrer">View Anscombe Publication (PDF)</a>
-			<a class="btn btn-outline-secondary" href="https://en.wikipedia.org/wiki/Anscombe%27s_quartet" target="_blank" rel="noopener noreferrer">View Anscombe on Wikipedia</a>
-		</div>
-		{% endif %}
-		<ul class="nav nav-tabs">
-			<li class="nav-item">
-				<a class="nav-link active" data-toggle="tab" href="#jasprgraph">Graph</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#jasprtable">Table</a>
-			</li>
-			<!-- <li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#jasprFRNTgraph">FRNT Graph</a>
-			</li> -->
-		</ul>
 	</div>
 </div>
-<div class="row content-row">
-	<div class="col-3 selector ">
-		<ul class="samplelist nav flex-column nav-pills">
-			{% for sample in sample_list %}
-			<li class="nav-item">
-				<a class="nav-link {% if sample == curr_sample %}active{% endif %}"
-				   data-toggle="pill" onclick="ChangeSample('{{sample}}');" href="#">{{ sample }}</a>
-			</li>
-			{% endfor %}
-		</ul>
-	</div>
-	<div class="col-9">
-		<div class="tab-content"> 
-			<div class="tab-pane fade show active" active id="jasprgraph">
-				<span class="dataGraph">loading Graph</span>
-			</div>
-			<div class="tab-pane show" id="jasprtable">
-				<span class="dataTable">loading table</span>
-			</div>
-			<div class="tab-pane fade show" active id="jasprFRNTgraph">
-				<span class="FRNTdataGraph">loading FRNT Graph</span>
+
+<div class="row mb-3" id="references">
+	<div class="col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<h4 class="card-title mb-3">References</h4>
+				<ol class="mb-0">
+					<li>
+						Jorquera PA, Mishin VP, Chesnokov A, et al.; Gubareva LV. (2019). Insights into the antigenic advancement of influenza A(H3N2) viruses, 2011-2018. <em>Scientific Reports</em>, 9(1). DOI: <a href="https://doi.org/10.1038/s41598-019-39276-1" target="_blank" rel="noopener noreferrer">10.1038/s41598-019-39276-1</a>.
+					</li>
+					<li>
+						Vanderheiden A, Edara VV, Floyd K, et al.; Suthar MS. (2020). Development of a Rapid Focus Reduction Neutralization Test Assay for Measuring SARS-CoV-2 Neutralizing Antibodies. <em>Current Protocols in Immunology</em>, 131(1), e116. DOI: <a href="https://doi.org/10.1002/cpim.116" target="_blank" rel="noopener noreferrer">10.1002/cpim.116</a>.
+					</li>
+					<li>
+						Celigo Image Cytometer. <a href="https://www.google.com/search?q=Celigo+Image+Cytometer" target="_blank" rel="noopener noreferrer">https://www.google.com/search?q=Celigo+Image+Cytometer</a>.
+					</li>
+					<li>
+						CellInsight CX5 HCS Platform. <a href="https://www.google.com/search?q=CellInsight+CX5+HCS+Platform" target="_blank" rel="noopener noreferrer">https://www.google.com/search?q=CellInsight+CX5+HCS+Platform</a>.
+					</li>
+					<li>
+						BioTek Cytation 7 Cell Imaging Multimode Reader. <a href="https://www.google.com/search?q=BioTek+Cytation+7+Cell+Imaging+Multimode+Reader" target="_blank" rel="noopener noreferrer">https://www.google.com/search?q=BioTek+Cytation+7+Cell+Imaging+Multimode+Reader</a>.
+					</li>
+				</ol>
 			</div>
 		</div>
 	</div>
