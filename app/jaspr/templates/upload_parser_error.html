@@ -1,0 +1,18 @@
+{% extends "jaspr_layout.html" %}
+
+{% block body %}
+<div class="row mt-4">
+  <div class="col-12 col-lg-8 offset-lg-2">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h4 class="card-title text-danger mb-3">Error, data not compatible with the selected parser.</h4>
+        <p class="mb-3">
+          <strong>Selected parser:</strong>
+          {{ selected_parser or "Unknown" }}
+        </p>
+        <a class="btn btn-primary" href="/upload">return to Load Data</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
