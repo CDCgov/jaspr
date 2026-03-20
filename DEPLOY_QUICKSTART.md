@@ -1,46 +1,84 @@
-JASPR Docker Hub Quickstart
+JASPR Container Image Quickstart
 
 Goal
-Run JASPR from a published container image with no local source checkout.
+Build or pull a published JASPR image and run it with either Docker or Podman.
+
+Why both work
+- Docker Hub stores OCI-compatible container images.
+- Podman and Docker can both build, push, pull, and run the same JASPR image.
 
 Prerequisites
-- Docker Desktop or Docker Engine with Docker Compose v2
+- Podman on RHEL 8.10 for build and push
 - Network access to Docker Hub
 
-Fast Start
-1. In a clean folder, copy docker-compose.deploy.yml from this repo.
-2. Pull and start:
-   docker compose -f docker-compose.deploy.yml pull
-   docker compose -f docker-compose.deploy.yml up -d
-3. Open the app in a browser:
-   https://localhost
+Image variables
+```bash
+export IMAGE_REGISTRY=docker.io
+export IMAGE_USER=yourdockerhubuser
+export IMAGE_NAME=jaspr
+export IMAGE_TAG=single
+export FULL_IMAGE=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG
+```
 
-Stop
-- docker compose -f docker-compose.deploy.yml down
+Build and push from your RHEL 8.10 Podman environment
+```bash
+cd /path/to/jaspr
+podman login docker.io
+podman build -f build/docker/dockerfile-single -t $FULL_IMAGE .
+podman push $FULL_IMAGE
+```
 
-Browser Access Model
-- The container publishes host ports 80 and 443 by default.
-- HTTP requests are redirected to HTTPS.
-- Default URL is https://localhost.
+Optional rolling tag
+```bash
+podman tag $FULL_IMAGE $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
+podman push $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
+```
 
-Friendly Hostname Options
-- Same machine alias:
-  Add 127.0.0.1 localhost-jaspr to your hosts file, then browse to https://localhost-jaspr.
-- Loopback domain option:
-  Try https://localhost-jaspr.localhost.
+Run with Docker
+```bash
+docker pull $FULL_IMAGE
+docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+```
 
-Custom host on another machine
-1. On the client machine, map a name to the server IP in DNS or hosts file.
-2. Browse to https://your-custom-name.
+Run with Podman
+```bash
+podman pull $FULL_IMAGE
+podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+```
 
-Optional environment overrides
-- JASPR_IMAGE (example: yourdockerhub/jaspr:single)
-- JASPR_HTTP_PORT
-- JASPR_HTTPS_PORT
-- DEPLOYMENT_DNS
+Browser access
+- Open https://localhost:8443
+- JASPR redirects HTTP to HTTPS internally.
+- Using 8080 and 8443 avoids privileged-port issues.
 
-Windows hosts file location
-- C:/Windows/System32/drivers/etc/hosts
+Optional 80 and 443 bindings
+```bash
+docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+```
 
-Linux and macOS hosts file location
-- /etc/hosts
+Then open https://localhost
+
+Friendly hostname on the same machine
+1. Add this hosts-file entry:
+  127.0.0.1 localhost-jaspr
+2. Open https://localhost-jaspr:8443
+
+Access from another machine
+1. Map a DNS name or hosts-file entry to the server IP.
+2. Browse to that name over HTTPS.
+
+Example client hosts entry
+```text
+192.168.1.50 localhost-jaspr
+```
+
+Stop and remove
+```bash
+docker stop jaspr && docker rm jaspr
+podman stop jaspr && podman rm jaspr
+```
+
+Hosts file locations
+- Windows: C:/Windows/System32/drivers/etc/hosts
+- Linux and macOS: /etc/hosts

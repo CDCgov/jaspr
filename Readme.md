@@ -36,39 +36,97 @@ For deployment to the production environment, follow the established strategy de
 
 ## JASPR
 
-### Docker Hub Quick Access
+### Container Image Quick Access
 
-Run JASPR from a published container image without checking out source code.
+Use the published JASPR container image from Docker Hub without checking out source code.
 
-Prerequisites:
-- Docker Desktop or Docker Engine with Docker Compose v2
+Set the published image reference:
 
-Start:
-1. Pull and launch:
-   docker compose -f docker-compose.deploy.yml pull
-   docker compose -f docker-compose.deploy.yml up -d
-2. Open in browser:
-   https://localhost
+```bash
+export FULL_IMAGE=docker.io/yourdockerhubuser/jaspr:single
+```
 
-Stop:
-- docker compose -f docker-compose.deploy.yml down
+#### Pull and Run on Another Machine
 
-Optional hostname alias (same machine):
-- Add this line to your hosts file:
-  127.0.0.1 localhost-jaspr
-- Then browse to:
-  https://localhost-jaspr
+Run with Docker:
 
-Access from another machine:
-- Map a DNS name (or hosts entry) to the server IP, then browse to that name over HTTPS.
-- Example hosts entry on client machine:
-  192.168.1.50 localhost-jaspr
+```bash
+docker pull $FULL_IMAGE
+docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+```
 
-Optional overrides:
-- JASPR_IMAGE (example: yourdockerhub/jaspr:single)
-- JASPR_HTTP_PORT
-- JASPR_HTTPS_PORT
-- DEPLOYMENT_DNS
+Run with Podman:
+
+```bash
+podman pull $FULL_IMAGE
+podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+```
+
+Then open:
+
+```text
+https://localhost:8443
+```
+
+Using `8080` and `8443` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
+
+#### Optional 80/443 Bindings
+
+If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` and `443` instead:
+
+```bash
+docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+```
+
+Then open:
+
+```text
+https://localhost
+```
+
+#### Friendly Hostname on the Same Machine
+
+Add this line to your hosts file:
+
+```text
+127.0.0.1 localhost-jaspr
+```
+
+Then browse to:
+
+```text
+https://localhost-jaspr:8443
+```
+
+If you are using ports `80` and `443`, browse instead to:
+
+```text
+https://localhost-jaspr
+```
+
+#### Access from Another Machine
+
+Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTPS.
+
+Example client hosts entry:
+
+```text
+192.168.1.50 localhost-jaspr
+```
+
+Then browse to:
+
+```text
+https://localhost-jaspr:8443
+```
+
+#### Stop the Container
+
+```bash
+docker stop jaspr && docker rm jaspr
+podman stop jaspr && podman rm jaspr
+```
 
 ### Branch Strategy Notice
 
@@ -98,8 +156,6 @@ cd ../../../var/JASPR
 podman-compose build && podman-compose down && podman-compose up
 
 Note: when changing Flask templates or static assets under app/jaspr, always run a full image rebuild (the build command above) before starting containers so packaged resources are refreshed in the runtime image.
-
-=======
 
 
 
