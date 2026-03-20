@@ -34,8 +34,9 @@ def _noop_pprint(*args, **kwargs):
 pprint.pprint = _noop_pprint
 
 # flask imports
-from flask import Flask, render_template, request, \
-        jsonify, redirect, make_response, send_from_directory, send_file, session
+from flask import Flask, render_template, render_template_string, request, \
+    jsonify, redirect, make_response, send_from_directory, send_file, session
+from jinja2.exceptions import TemplateNotFound
 
 # local imports
 from jaspr import app
@@ -50,6 +51,246 @@ from outlet import ParserRegistry
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
+
+
+def _is_parser_data_compatibility_error(exc):
+    """Return True for expected parser/data mismatch failures during upload."""
+    parser_data_errors = (
+        KeyError,
+        ValueError,
+        IndexError,
+        TypeError,
+        pd.errors.ParserError,
+        pd.errors.EmptyDataError,
+    )
+    return isinstance(exc, parser_data_errors)
+
+
+def _set_analysis_session_ready():
+    """Mark session state for analysis/report navigation availability."""
+    session['analysis_ready'] = True
+    session['report_ready'] = True
+    session.modified = True
+
+
+def _is_report_ready():
+    """Return whether report routes should be available for current session."""
+    return bool(session.get('analysis_ready', False) and session.get('report_ready', False))
+
+
+def _first_result_record(jm):
+    """Return a representative result dict from the loaded run or {}."""
+    if not jm.experiment_list or not jm.sample_list:
+        return {}
+
+    try:
+        exp = jm.experiment_list[0]
+        sample = jm.sample_list[0]
+        return jm.experiments[exp]['results'][jm.curr_function][sample]
+    except (KeyError, IndexError, TypeError):
+        return {}
+
+
+def _available_report_links(jm):
+    """Build report links that are expected to work for current analysis data."""
+    if _is_anscombe_dataset(jm):
+        return []
+
+    if _is_frnt_parser(jm):
+        return [
+            {
+                'label': 'Download Antigenic Report',
+                'href': '/reportAntigenic',
+                'description': 'Virus-by-sera table of assay titers.'
+            },
+            {
+                'label': 'Download FRNT Results Report',
+                'href': '/reportFRNTResultAnalysis',
+                'description': 'FRNT-formatted output for pooled sera workflows.'
+            },
+        ]
+
+    links = []
+
+    first_result = _first_result_record(jm)
+    keys = set(first_result.keys()) if isinstance(first_result, dict) else set()
+
+    # General summary reports rely on titer/ec50-like result keys.
+    if {'titer', 'ec50'}.intersection(keys):
+        links.append({
+            'label': 'Download Antigenic Report',
+            'href': '/reportAntigenic',
+            'description': 'Virus-by-sera table of assay titers.'
+        })
+        links.append({
+            'label': 'Download Result Analysis Report',
+            'href': '/reportResultAnalysis',
+            'description': 'Summary table with titer/fold/SB metrics.'
+        })
+
+    # ICP-specific endpoint expects ICP1000 result output.
+    if 'ICP1000' in keys:
+        links.append({
+            'label': 'Download ICP 1000 Report',
+            'href': '/reportICP1000',
+            'description': 'Dilution estimates at ICP=1000 for each virus.'
+        })
+
+    # FRNT exports depend on pooled_sera metadata and FRNT result keys.
+    has_pooled_sera = False
+    if jm.experiment_list:
+        first_exp = jm.experiment_list[0]
+        has_pooled_sera = 'pooled_sera' in jm.experiments.get(first_exp, {})
+
+    if has_pooled_sera and {'IC50', 'h', 'Vmax', 'titer'}.intersection(keys):
+        links.append({
+            'label': 'Download FRNT Results Report',
+            'href': '/reportFRNTResultAnalysis',
+            'description': 'FRNT-formatted output for pooled sera workflows.'
+        })
+
+    return links
+
+
+def _guard_report_route():
+    """Redirect to load flow when report routes are accessed without data."""
+    if not _is_report_ready():
+        return redirect('/upload', code=302)
+    return None
+
+
+def _guard_specific_report_href(jm, href):
+    """Return a friendly response when a direct report route is not available."""
+    available_links = _available_report_links(jm)
+    available_hrefs = {item.get('href') for item in available_links}
+
+    if href in available_hrefs:
+        return None
+
+    return render_template(
+        'report.html',
+        report_links=available_links,
+        no_reports_message='This report is not available for the current parser and data. Please choose from the available reports.'
+    )
+
+
+def _is_anscombe_dataset(jm):
+    """Return True when the active session is the built-in Anscombe dataset."""
+    return bool(jm.experiment_list and jm.experiment_list[0] == 'Anscombe')
+
+
+def _is_frnt_parser(jm):
+    """Return True when the current parser is one of the FRNT parser variants."""
+    return jm.curr_parser in {
+        'FRNT Virus-Serum-Serum Plate Layout Cx5',
+        'FRNT Serum-Virus-Virus Plate Layout Cx5',
+        'FRNT Virus-Serum-Serum Plate Layout Cytation7',
+    }
+
+
+def _slides_search_roots():
+    """Return candidate repository roots where example slide files may exist."""
+    route_dir = os.path.dirname(__file__)
+    repo_candidates = [
+        os.path.abspath(os.path.join(route_dir, '..', '..')),
+        os.path.abspath(os.path.join(route_dir, '..', '..', '..')),
+        os.getcwd(),
+        '/app',
+    ]
+
+    deduped_repo_candidates = []
+    for candidate in repo_candidates:
+        if candidate not in deduped_repo_candidates:
+            deduped_repo_candidates.append(candidate)
+    return deduped_repo_candidates
+
+
+def _resolve_slides_dir():
+    """Locate the Slides directory under example_data for current runtime layout."""
+    route_dir = os.path.dirname(__file__)
+
+    # Preferred in-container path for bundled supplementary slides.
+    bundled_candidates = [
+        '/var/JASPR/example_data/Slides',
+        '/var/JASPR/example_data/slides',
+    ]
+    for candidate_dir in bundled_candidates:
+        if os.path.isdir(candidate_dir):
+            return '/var/JASPR', candidate_dir
+
+    # Preferred location for supplementary slides in app static assets.
+    static_candidates = [
+        os.path.join(route_dir, 'static', 'example_data', 'Slides'),
+        os.path.join(route_dir, 'static', 'example_data', 'slides'),
+    ]
+    for candidate_dir in static_candidates:
+        if os.path.isdir(candidate_dir):
+            return os.path.abspath(route_dir), candidate_dir
+
+    for candidate_root in _slides_search_roots():
+        candidate_dirs = [
+            os.path.join(candidate_root, 'example_data', 'Slides'),
+            os.path.join(candidate_root, 'example_data', 'slides'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data', 'Slides'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data', 'slides'),
+        ]
+        for candidate_dir in candidate_dirs:
+            if os.path.isdir(candidate_dir):
+                return candidate_root, candidate_dir
+    return None, None
+
+
+def _collect_slide_files(slides_dir):
+    """Return sorted slide file paths relative to slides_dir."""
+    slide_files = []
+    for root, _, files in os.walk(slides_dir):
+        for file_name in files:
+            if not file_name.lower().endswith(('.ppt', '.pptx')):
+                continue
+            abs_path = os.path.join(root, file_name)
+            rel_path = os.path.relpath(abs_path, slides_dir).replace('\\', '/')
+            slide_files.append(rel_path)
+
+    return sorted(slide_files, key=lambda x: x.lower())
+
+
+def _resolve_example_data_dir():
+    """Locate the example_data directory for current runtime layout."""
+    route_dir = os.path.dirname(__file__)
+
+    preferred_candidates = [
+        '/var/JASPR/example_data',
+        os.path.join(route_dir, 'static', 'example_data'),
+    ]
+    for candidate_dir in preferred_candidates:
+        if os.path.isdir(candidate_dir):
+            return os.path.abspath(candidate_dir)
+
+    for candidate_root in _slides_search_roots():
+        candidate_dirs = [
+            os.path.join(candidate_root, 'example_data'),
+            os.path.join(candidate_root, 'app', 'jaspr', 'static', 'example_data'),
+        ]
+        for candidate_dir in candidate_dirs:
+            if os.path.isdir(candidate_dir):
+                return os.path.abspath(candidate_dir)
+
+    return None
+
+
+def _resolve_example_test_dir(example_data_dir, test_type):
+    """Resolve test-type directory (FRNT/HINT/ICP) in a case-insensitive way."""
+    expected = test_type.upper()
+    direct = os.path.join(example_data_dir, expected)
+    if os.path.isdir(direct):
+        return direct
+
+    for child_name in os.listdir(example_data_dir):
+        child_path = os.path.join(example_data_dir, child_name)
+        if os.path.isdir(child_path) and child_name.upper() == expected:
+            return child_path
+
+    return None
 
 def page_not_found(e):
     return render_template('502.html'), 502
@@ -105,10 +346,28 @@ def upload():
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
-    settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+    selected_parser = jm.curr_parser
+
+    try:
+        settings = ParserRegistry.plugins[selected_parser](keyfile, datafile)()
+    except Exception as exc:
+        if _is_parser_data_compatibility_error(exc):
+            app.logger.warning(
+                'Parser/data incompatibility during upload for parser %s: %s',
+                selected_parser,
+                exc
+            )
+            return render_template(
+                'upload_parser_error.html',
+                selected_parser=selected_parser,
+            ), 400
+        raise
+
     jm = JasprModel().set_defaults(settings)
-        
-    return redirect("/", code=302)
+
+    _set_analysis_session_ready()
+
+    return redirect('/analysis', code=302)
    
 @app.route("/ping", methods = ['GET'])
 def ping():
@@ -127,7 +386,6 @@ def reset():
 @app.route('/upload')
 def upload_file():
     jm = JasprModel()
-
     return render_template('upload.html', **jm.context)
 
 
@@ -136,32 +394,198 @@ def load_anscombe_data():
     """Reset the session to the built-in Anscombe dataset."""
     jm = JasprModel()
     jm.set_defaults()
-    return redirect('/', code=302)
+    _set_analysis_session_ready()
+    return redirect('/analysis', code=302)
+
+
+@app.route('/analysis')
+def analysis():
+    """Render the analysis page once data has been loaded."""
+    if not session.get('analysis_ready', False):
+        return redirect('/upload', code=302)
+
+    jm = JasprModel()
+    return render_template('analysis.html', **jm.context)
 
 
 @app.route('/downloadExampleData')
 def download_example_data():
-    """Download bundled example input files as a zip archive."""
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    example_dir = os.path.join(repo_root, 'example_data')
-
-    if not os.path.isdir(example_dir):
+    """Render a page listing downloadable example-data bundles by assay type."""
+    example_data_dir = _resolve_example_data_dir()
+    if not example_data_dir:
         return redirect('/error502', code=302)
 
-    tmp_handle = tempfile.NamedTemporaryFile(prefix='jaspr_example_data_', suffix='.zip', delete=False)
+    bundle_defs = [
+        {'key': 'FRNT', 'label': 'FRNT'},
+        {'key': 'HINT', 'label': 'HINT'},
+        {'key': 'ICP', 'label': 'ICP'},
+    ]
+
+    bundles = []
+    for bundle in bundle_defs:
+        test_dir = _resolve_example_test_dir(example_data_dir, bundle['key'])
+        if not test_dir:
+            continue
+        bundles.append(bundle)
+
+    if not bundles:
+        return redirect('/error502', code=302)
+
+    jm = JasprModel()
+    try:
+        return render_template('example_data_downloads.html', bundles=bundles, **jm.context)
+    except TemplateNotFound:
+        return render_template_string(
+            """
+            {% extends "jaspr_layout.html" %}
+            {% block body %}
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h4 class="card-title mb-3">Example Data Downloads</h4>
+                    <p class="mb-2">Download bundled example datasets by test type.</p>
+                    <ul class="mb-0">
+                      {% for bundle in bundles %}
+                      <li>
+                        <a href="{{ url_for('download_example_data_bundle', test_type=bundle.key) }}">Download {{ bundle.label }} Bundle</a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endblock %}
+            {% block pagescript %}{% endblock %}
+            """,
+            bundles=bundles,
+            **jm.context,
+        )
+
+
+@app.route('/downloadExampleData/bundle/<string:test_type>')
+def download_example_data_bundle(test_type):
+    """Download one example-data bundle for FRNT, HINT, or ICP."""
+    normalized_type = test_type.upper()
+    allowed_types = {'FRNT', 'HINT', 'ICP'}
+    if normalized_type not in allowed_types:
+        return redirect('/error502', code=302)
+
+    example_data_dir = _resolve_example_data_dir()
+    if not example_data_dir:
+        return redirect('/error502', code=302)
+
+    test_dir = _resolve_example_test_dir(example_data_dir, normalized_type)
+    if not test_dir:
+        return redirect('/error502', code=302)
+
+    tmp_handle = tempfile.NamedTemporaryFile(
+        prefix=f'jaspr_example_{normalized_type.lower()}_',
+        suffix='.zip',
+        delete=False,
+    )
     tmp_handle.close()
 
+    found_files = False
     with zipfile.ZipFile(tmp_handle.name, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(example_dir):
+        for root, _, files in os.walk(test_dir):
             for file_name in files:
                 abs_path = os.path.join(root, file_name)
-                arcname = os.path.relpath(abs_path, repo_root)
+                arcname = os.path.relpath(abs_path, example_data_dir)
                 zf.write(abs_path, arcname)
+                found_files = True
+
+    if not found_files:
+        os.unlink(tmp_handle.name)
+        return redirect('/error502', code=302)
 
     response = make_response(send_file(
         tmp_handle.name,
         as_attachment=True,
-        download_name=f'jaspr_example_data_{datetime.now().strftime("%Y_%m_%d")}.zip'
+        download_name=f'jaspr_example_{normalized_type}_{datetime.now().strftime("%Y_%m_%d")}.zip'
+    ))
+    response.headers['cache-control'] = 'no-cache'
+    return response
+
+
+@app.route('/downloadSlides')
+def download_slides():
+    """Render a page listing downloadable supplementary PowerPoint files."""
+    _, slides_dir = _resolve_slides_dir()
+    if not slides_dir:
+        return redirect('/error502', code=302)
+
+    rel_paths = _collect_slide_files(slides_dir)
+    if not rel_paths:
+        return redirect('/error502', code=302)
+
+    slide_files = [
+        {
+            'rel_path': rel_path,
+            'filename': os.path.basename(rel_path),
+        }
+        for rel_path in rel_paths
+    ]
+
+    jm = JasprModel()
+    try:
+        return render_template('slides.html', slide_files=slide_files, **jm.context)
+    except TemplateNotFound:
+        # Fallback for deployments where slides.html has not been synced yet.
+        return render_template_string(
+            """
+            {% extends "jaspr_layout.html" %}
+            {% block body %}
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h4 class="card-title mb-3">PowerPoint Slides</h4>
+                    <ul class="mb-0">
+                      {% for slide in slide_files %}
+                      <li>
+                        <a href="{{ url_for('download_slide_file', slide_relpath=slide.rel_path) }}">{{ slide.filename }}</a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endblock %}
+            {% block pagescript %}{% endblock %}
+            """,
+            slide_files=slide_files,
+            **jm.context,
+        )
+
+
+@app.route('/downloadSlides/file/<path:slide_relpath>')
+def download_slide_file(slide_relpath):
+    """Download a single slide file from the supplementary Slides directory."""
+    _, slides_dir = _resolve_slides_dir()
+    if not slides_dir:
+        return redirect('/error502', code=302)
+
+    normalized_relpath = slide_relpath.replace('\\', '/')
+    candidate_path = os.path.abspath(os.path.join(slides_dir, normalized_relpath))
+    slides_root = os.path.abspath(slides_dir)
+
+    # Prevent path traversal outside the Slides directory.
+    if not candidate_path.startswith(slides_root + os.sep):
+        return redirect('/error502', code=302)
+
+    if not os.path.isfile(candidate_path):
+        return redirect('/error502', code=302)
+
+    if not candidate_path.lower().endswith(('.ppt', '.pptx')):
+        return redirect('/error502', code=302)
+
+    response = make_response(send_file(
+        candidate_path,
+        as_attachment=True,
+        download_name=os.path.basename(candidate_path)
     ))
     response.headers['cache-control'] = 'no-cache'
     return response
@@ -171,11 +595,30 @@ def error502():
     jm = JasprModel()
     return render_template('502.html', **jm.context)
 
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon for app servers that are not fronted by nginx."""
+    return send_from_directory(app.static_folder, 'favicon.ico')
+
+
+@app.route('/favicon_32.png')
+def favicon_32():
+    """Serve 32px favicon fallback for browser icon selection."""
+    return send_from_directory(app.static_folder, 'favicon_32.png')
+
 @app.route('/settings')
 def settings():
     """render the settings page"""
     jm = JasprModel()
     return render_template('settings.html', **jm.context)
+
+
+@app.route('/license')
+def license_page():
+    """Render the license page with the app navigation menu."""
+    jm = JasprModel()
+    return render_template('license.html', **jm.context)
 
 
 @app.route('/')
@@ -213,33 +656,31 @@ def drawWidgetHTML():
     return jsonify(chart())
 
 
-@app.route('/reportPNG', methods=["GET"])
-def reportPngs():
-    jc = JasprChart()
-    pngList = jc.get_pngs()
-    return render_template('reportPNG.html', pngList=pngList)
-
-
 @app.route('/report', methods=["GET"])
 def report():
     """render the reports"""
-    #The charting report is broken so we bypass it for now
-    # to make progress on other reports
-    # jc = JasprChart()
-    # pngList = jc.get_pngs()
-    #return render_template('report.html', pngList=pngList)
-    return render_template ('report.html')
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
 
+    jm = JasprModel()
+    report_links = _available_report_links(jm)
+    no_reports_message = 'Results are not provided for the Anscombe data set.' if _is_anscombe_dataset(jm) else None
 
-@app.route('/reportpngs/<path:filename>')
-def reportpngs(filename):
-    return send_from_directory(f"/app/tmp", filename)
+    return render_template('report.html', report_links=report_links, no_reports_message=no_reports_message)
 
 
 @app.route('/reportResultAnalysis')
 def reportOther():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportResultAnalysis')
+    if specific_guard is not None:
+        return specific_guard
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -287,7 +728,14 @@ def reportOther():
 @app.route('/reportAntigenic')
 def reportTiter():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportAntigenic')
+    if specific_guard is not None:
+        return specific_guard
 
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -323,8 +771,16 @@ def reportTiter():
 @app.route('/reportICP1000')
 def reportICP():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     import pprint
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportICP1000')
+    if specific_guard is not None:
+        return specific_guard
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -570,7 +1026,14 @@ def reportFRNT_Titers():
 @app.route('/reportFRNTResultAnalysis')
 def reportFRNTresults():
     """Generate Excel Report"""
+    guard = _guard_report_route()
+    if guard is not None:
+        return guard
+
     jm=JasprModel()
+    specific_guard = _guard_specific_report_href(jm, '/reportFRNTResultAnalysis')
+    if specific_guard is not None:
+        return specific_guard
 
     pprint.pprint("The JASPR Model:")
     pprint.pprint(jm.experiments)

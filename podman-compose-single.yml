@@ -6,6 +6,9 @@ services:
     build:
       context: .
       dockerfile: build/docker/dockerfile-single
+    # .env is optional for single-container deploys.
+    # If variables are not provided, localhost-friendly defaults are used.
+    # Cloud environments can still override these via .env or shell env vars.
     environment:
       - FLASK_APP=jaspr
       - FLASK_DEBUG=True
@@ -14,14 +17,14 @@ services:
       # single-container redis lives inside the same container
       - REDIS_HOST=127.0.0.1
       # nginx setup.sh uses these
-      - SSL_CERTIFICATE=${SSL_CERTIFICATE}
+      - SSL_CERTIFICATE=${SSL_CERTIFICATE:-localhost}
       - DEPLOYMENT_DNS="${DEPLOYMENT_DNS:-localhost}"
     image: cdcflu/jaspr:single
     tty: true
     volumes:
-      # same mount as your existing jaspr service :contentReference[oaicite:3]{index=3}
-      - ${CODESHARE}:/app
-      # same credential mounts as your existing nginx service :contentReference[oaicite:4]{index=4}
+      # Defaults to mounting the current repo when CODESHARE is unset.
+      - "${CODESHARE:-.}:/app"
+      # Credential/cert mounts default to local run/ paths for localhost use.
       - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
       - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
       - "${LETSENCRYPT_DATA_PATH:-./run/nginx/letsencrypt/data}:/data/letsencrypt"

@@ -1,6 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
+  <link rel="icon" href="/favicon.ico?v=20260316" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png?v=20260316">
+  <link rel="shortcut icon" href="/favicon.ico?v=20260316">
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -22,7 +25,7 @@
 <p>Average background is calculated from a blank column on each plate - it is no longer assumed to follow the last column on the plate that contains data from an experiment. It is assumed that even if not all available positions are used to run experiments, a full blank column will still be run.</p>
 <p>The average background is subtracted from every measurement on the plate prior to curve fitting. It can then be assumed that the enzyme turnover rate will drop to 0 in the presence of excess quantities of the inhibitor, eliminating the need to include an unknown constant offset term in the fitting equation. This will reduce error in the fit if the error in the experimental setup is greater than the error introduced by variability in the plate reader instrument.</p>
 <h2 id="signal-to-background-ratio-sbr">Signal-to-Background Ratio (SBR)</h2>
-<p>The max signal is always taken from the 0 drug concentration well of an experiment after background correction – this may not be the highest signal of an experiment. This value is then divided by the average background.</p>
+<p>The max signal is always taken from the 0 drug concentration well of an experiment after background correction â€“ this may not be the highest signal of an experiment. This value is then divided by the average background.</p>
 <p>SBR = (raw_signal<sub>0 conc</sub> - background<sub>average</sub>) / background<sub>average</sub></p>
 <p>Thus, an SBR of 0 means that the signal was equal to the average background.</p>
 <p><em>Note</em>: Using the SBR as a quality metric for an experiment can be somewhat misleading. In the case of a high average background with a low standard deviation, it is possible to observe a low SBR value but still get a high quality curve fit and accurate IC<sub>50</sub> value. Alternatively, in the case of a low average background with a high standard deviation, it is possible to observe a high SBR value but get an inaccurate IC<sub>50</sub> value.</p>
@@ -36,3 +39,7 @@
 <p>In some rare cases, these initial guesses will fail to converge to a solution. Typically, this means that the K<sub>i</sub> value is several orders of magnitude too large. jaspr will attempt to use decreasing values from the dilution series for the initial K<sub>i</sub> guess to improve the fit. jaspr should never fail to find a fit for any reasonable data.</p>
 </body>
 </html>
+
+
+
+

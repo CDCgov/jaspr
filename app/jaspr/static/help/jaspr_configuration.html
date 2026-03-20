@@ -1,6 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
+  <link rel="icon" href="/favicon.ico?v=20260316" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png?v=20260316">
+  <link rel="shortcut icon" href="/favicon.ico?v=20260316">
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -18,7 +21,7 @@
 <body>
 <h1 id="jaspr-configuration-files"><code>jaspr</code> Configuration Files</h1>
 <p>The <code>jaspr</code> config files are designed to allow power users to create a new experiment description for use in <code>jaspr</code> with a minimum of effort. <code>jaspr</code> is designed to work with data from 96-well plate readers to fit inhibition binding data. As such, it has a number of quirks that are due to the experiment design needed to fit an 8x12 plate layout.</p>
-<p>This file describes <code>jaspr</code> experiment config files in detail. While it serves as a useful reference, the config files are relatively simple to work with. For a config file with heavy comments, find the jaspr install folder and look at ‘~\jaspr\config\aus_3drug_fluoro_11samples’. For a more minimal config file, see ‘~\jaspr\config\met_3drug_chemi_8samples’.</p>
+<p>This file describes <code>jaspr</code> experiment config files in detail. While it serves as a useful reference, the config files are relatively simple to work with. For a config file with heavy comments, find the jaspr install folder and look at â€˜~\jaspr\config\aus_3drug_fluoro_11samplesâ€™. For a more minimal config file, see â€˜~\jaspr\config\met_3drug_chemi_8samplesâ€™.</p>
 <h2 id="assumptions">Assumptions</h2>
 <ol type="1">
 <li><p>All experiments are run in 96-well plates with 8 rows (A-H) and 12 columns (1-12)</p></li>
@@ -488,7 +491,7 @@ blank
 </tr>
 </table>
 <h3 id="col-orientation">Col Orientation</h3>
-<p>The 11-sample fluorescence experiment uses a column-based layout, log10 dilutions from no drug in row A, lowest (0.01 nM) in column B to highest (10000 nM) in column H, and a ‘blank’ experiment in the last column on each plate. By setting <code>reverse_dilution = True</code>, <code>jaspr</code> will know to reverse the order of the dilution series to match the high -&gt; low ordering of the drug concentrations. Also, because the the blank wells are not in a fixed position, an ID of ‘blank’ needs to be added to the key file for every blank position.</p>
+<p>The 11-sample fluorescence experiment uses a column-based layout, log10 dilutions from no drug in row A, lowest (0.01 nM) in column B to highest (10000 nM) in column H, and a â€˜blankâ€™ experiment in the last column on each plate. By setting <code>reverse_dilution = True</code>, <code>jaspr</code> will know to reverse the order of the dilution series to match the high -&gt; low ordering of the drug concentrations. Also, because the the blank wells are not in a fixed position, an ID of â€˜blankâ€™ needs to be added to the key file for every blank position.</p>
 <p>A (partial) config file for this plate layout would look like:</p>
 <pre><code>[plate]
 orientation = col
@@ -913,3 +916,7 @@ blank
 </table>
 </body>
 </html>
+
+
+
+
