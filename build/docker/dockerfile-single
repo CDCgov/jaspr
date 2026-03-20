@@ -24,7 +24,7 @@ RUN mkdir -p /var/JASPR/example_data
 COPY example_data/ /var/JASPR/example_data/
 
 # App runtime location (matches existing image)
-VOLUME /app
+COPY app/ /app/
 WORKDIR /app
 
 # --- Nginx config + setup script (copied from your nginx image layout) ---

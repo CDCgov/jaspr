@@ -36,6 +36,40 @@ For deployment to the production environment, follow the established strategy de
 
 ## JASPR
 
+### Docker Hub Quick Access
+
+Run JASPR from a published container image without checking out source code.
+
+Prerequisites:
+- Docker Desktop or Docker Engine with Docker Compose v2
+
+Start:
+1. Pull and launch:
+   docker compose -f docker-compose.deploy.yml pull
+   docker compose -f docker-compose.deploy.yml up -d
+2. Open in browser:
+   https://localhost
+
+Stop:
+- docker compose -f docker-compose.deploy.yml down
+
+Optional hostname alias (same machine):
+- Add this line to your hosts file:
+  127.0.0.1 localhost-jaspr
+- Then browse to:
+  https://localhost-jaspr
+
+Access from another machine:
+- Map a DNS name (or hosts entry) to the server IP, then browse to that name over HTTPS.
+- Example hosts entry on client machine:
+  192.168.1.50 localhost-jaspr
+
+Optional overrides:
+- JASPR_IMAGE (example: yourdockerhub/jaspr:single)
+- JASPR_HTTP_PORT
+- JASPR_HTTPS_PORT
+- DEPLOYMENT_DNS
+
 ### Branch Strategy Notice
 
 Core branches
