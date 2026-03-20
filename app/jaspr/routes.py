@@ -53,6 +53,19 @@ from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
 
 
+def _is_parser_data_compatibility_error(exc):
+    """Return True for expected parser/data mismatch failures during upload."""
+    parser_data_errors = (
+        KeyError,
+        ValueError,
+        IndexError,
+        TypeError,
+        pd.errors.ParserError,
+        pd.errors.EmptyDataError,
+    )
+    return isinstance(exc, parser_data_errors)
+
+
 def _set_analysis_session_ready():
     """Mark session state for analysis/report navigation availability."""
     session['analysis_ready'] = True
@@ -333,7 +346,23 @@ def upload():
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
-    settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
+    selected_parser = jm.curr_parser
+
+    try:
+        settings = ParserRegistry.plugins[selected_parser](keyfile, datafile)()
+    except Exception as exc:
+        if _is_parser_data_compatibility_error(exc):
+            app.logger.warning(
+                'Parser/data incompatibility during upload for parser %s: %s',
+                selected_parser,
+                exc
+            )
+            return render_template(
+                'upload_parser_error.html',
+                selected_parser=selected_parser,
+            ), 400
+        raise
+
     jm = JasprModel().set_defaults(settings)
 
     _set_analysis_session_ready()
