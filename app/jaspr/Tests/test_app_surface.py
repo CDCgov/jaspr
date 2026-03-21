@@ -1,4 +1,5 @@
 import unittest
+from io import BytesIO
 
 from jaspr import app
 from jaspr.model import JasprModel
@@ -40,6 +41,19 @@ class TestLiveAppSurface(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.headers['Location'].endswith('/upload'))
+
+    def test_empty_upload_redirects_to_error_page(self):
+        response = self.client.post(
+            '/upload',
+            data={
+                'datafile': (BytesIO(b''), ''),
+                'keyfile': (BytesIO(b''), ''),
+            },
+            content_type='multipart/form-data',
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.headers['Location'].endswith('/error502'))
 
     def test_example_data_downloads_page_is_available(self):
         response = self.client.get('/downloadExampleData')

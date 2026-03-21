@@ -293,6 +293,11 @@ def save_tmpfile(upload_handle):
 
     return tmp_handle.name
 
+
+def _has_selected_upload(upload_handle):
+    """Return True when a file input contains a selected file."""
+    return bool(upload_handle and secure_filename(upload_handle.filename))
+
 @app.route('/updateConfigSetting', methods=['POST'])
 def updateConfigSetting():
     jm = JasprModel()
@@ -302,20 +307,19 @@ def updateConfigSetting():
 
 @app.route('/upload', methods = ['POST'])
 def upload():
-    datafile = save_tmpfile(request.files['datafile'])
-    keyfile = save_tmpfile(request.files['keyfile'])
+    data_upload = request.files.get('datafile')
+    key_upload = request.files.get('keyfile')
+
+    if not _has_selected_upload(data_upload) or not _has_selected_upload(key_upload):
+        app.logger.warning('Upload submitted without both required files.')
+        return redirect('/error502', code=302)
+
+    datafile = save_tmpfile(data_upload)
+    keyfile = save_tmpfile(key_upload)
 
     # \/ \/ Capture Key File Name \/ \/ #
-    file = request.files['keyfile']
-    filename = secure_filename(file.filename)
-    tmp_folder = '/tmp'
-    # pprint.pprint(os.getcwd())
-    os.chdir('../tmp')
-    # pprint.pprint(os.getcwd())
-    file.save(filename)    
-    # pprint.pprint(os.getcwd())
-    os.chdir('../app')
-    # pprint.pprint(os.getcwd())
+    filename = secure_filename(key_upload.filename)
+    key_upload.save(os.path.join('/tmp', filename))
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
