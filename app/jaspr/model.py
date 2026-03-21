@@ -68,10 +68,10 @@ class JasprModel(object):
     @property
     def parser_list(self):
         """List file parsing plugins"""
-        # Hide unsupported parser options from the Load Data UI.
+        # Keep the built-in demo dataset out of the upload parser dropdown.
         return [
             name for name in ParserRegistry.plugins
-            if name not in {'hint_cx5', 'anscombe'}
+            if name != 'anscombe'
         ]
 
     @property
@@ -174,45 +174,4 @@ class JasprModel(object):
                     setattr(self, k, json.loads(v))
                 else:
                     setattr(self, k, v)
-
-    
-    def model_convergence():
-     
-        jm=JasprModel()
-    
-        output=BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-
-        headerList = ["Virus"]
-        for sample in jm.sample_list:
-            headerList.append(sample)
-        
-        rowList = []
-
-        for experiment in jm.experiment_list:
-            rowAdd = []
-            rowAdd.append(experiment)
-            pprint.pprint("experiment:")
-            pprint.pprint(experiment)
-
-            for sample in jm.sample_list:
-                #print("sample:")
-                #pprint.pprint(sample)
-                pprint.pprint("jm.experiments-")
-                pprint.pprint (jm.experiments[experiment]['results'])
-                rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample])
-
-            rowList.append(rowAdd)
-
-        df = pd.DataFrame(rowList, columns=headerList)
-        print(df)
-        df.to_excel(writer, sheet_name="Full_Report", index=False)
-
-        writer.close()
-
-        output.seek(0)
-
-        convergence = make_response(send_file(output, download_name='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-        response.headers['cache-control'] = 'no-cache'
-        return convergence
 
