@@ -22,8 +22,6 @@ services:
     image: cdcflu/jaspr:single
     tty: true
     volumes:
-      # Defaults to mounting the current repo when CODESHARE is unset.
-      - "${CODESHARE:-.}:/app"
       # Credential/cert mounts default to local run/ paths for localhost use.
       - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
       - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
