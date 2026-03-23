@@ -6,7 +6,16 @@
     <div class="col-12">
       <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">Application Error</h4>
-        <p class="mb-0">The requested action could not be completed. Please return to Load Data or reset the session and try again.</p>
+        <p class="mb-3">
+          Data was not loaded properly. Analysis requires both a data file and a key file, and those files must match the format expected by the selected parser.
+        </p>
+        <p class="mb-3">
+          Use the example data bundles on the home page as the reference for the required file structure and naming conventions for each parser before trying the upload again.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-primary mr-2 mb-2" href="/upload">Return to Load Data</a>
+          <a class="btn btn-outline-primary mb-2" href="/#example-data">Go to Example Data Bundles</a>
+        </div>
       </div>
     </div>
   </div>

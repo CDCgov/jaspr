@@ -109,9 +109,8 @@ class HintBase(object):
         return self.data
 
 
-class HintCx5Parser(HintBase, ParserRegistry):
-    name = 'hint_cx5'
-    description = 'CX5 HINT parser'
+class HintCx5Base(HintBase):
+    """Shared HINT/ICP parsing logic for supported instrument-specific parsers."""
 
     def _parse_csv(self, datafile):
         df = pd.read_csv(datafile)
@@ -179,7 +178,7 @@ class HintCx5Parser(HintBase, ParserRegistry):
         return experiments
 
 
-class HintCeligoParser(HintCx5Parser):
+class HintCeligoParser(HintCx5Base, ParserRegistry):
     name = 'HINT celigo'
     description = 'Celigo HINT parser'
     skiprows = 97
@@ -198,7 +197,7 @@ class HintCeligoParser(HintCx5Parser):
                 ignore_index=True).to_numpy(), (-1, 12)), [11], axis=1)
 
 
-class ICPCeligoParser(HintCx5Parser):
+class ICPCeligoParser(HintCx5Base, ParserRegistry):
     name = 'ICP celigo'
     description = 'Celigo ICP parser'
     skiprows = 97

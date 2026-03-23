@@ -25,14 +25,6 @@ def _noop_pprint(*args, **kwargs):
 # Disable verbose pprint output in request handlers to avoid blocking stdout under uWSGI.
 pprint.pprint = _noop_pprint
 
-
-def _noop_pprint(*args, **kwargs):
-    return None
-
-
-# Disable verbose pprint output in request handlers to avoid blocking stdout under uWSGI.
-pprint.pprint = _noop_pprint
-
 # flask imports
 from flask import Flask, render_template, render_template_string, request, \
     jsonify, redirect, make_response, send_from_directory, send_file, session
@@ -49,8 +41,6 @@ from tempfile import NamedTemporaryFile
 
 from outlet import ParserRegistry
 from werkzeug.utils import secure_filename
-
-ALLOWED_EXTENSIONS = set(['txt', 'csv', 'xls', 'xlsx'])
 
 
 def _is_parser_data_compatibility_error(exc):
@@ -303,6 +293,11 @@ def save_tmpfile(upload_handle):
 
     return tmp_handle.name
 
+
+def _has_selected_upload(upload_handle):
+    """Return True when a file input contains a selected file."""
+    return bool(upload_handle and secure_filename(upload_handle.filename))
+
 @app.route('/updateConfigSetting', methods=['POST'])
 def updateConfigSetting():
     jm = JasprModel()
@@ -310,39 +305,21 @@ def updateConfigSetting():
         jm.update_attribute(k, v)
     return 'true'
 
-#  # Original code \/ \/ \/ ###
-# @app.route('/upload', methods = ['POST'])
-# def upload():
-#     datafile = save_tmpfile(request.files['datafile'])
-#     keyfile = save_tmpfile(request.files['keyfile'])
-
-#     jm = JasprModel()
-#     settings = ParserRegistry.plugins[jm.curr_parser](keyfile, datafile)()
-#     jm = JasprModel().set_defaults(settings)
-        
-#     return redirect("/", code=302)
-#  # Original code /\ /\ /\ ###
-
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @app.route('/upload', methods = ['POST'])
 def upload():
-    datafile = save_tmpfile(request.files['datafile'])
-    keyfile = save_tmpfile(request.files['keyfile'])
+    data_upload = request.files.get('datafile')
+    key_upload = request.files.get('keyfile')
+
+    if not _has_selected_upload(data_upload) or not _has_selected_upload(key_upload):
+        app.logger.warning('Upload submitted without both required files.')
+        return redirect('/error502', code=302)
+
+    datafile = save_tmpfile(data_upload)
+    keyfile = save_tmpfile(key_upload)
 
     # \/ \/ Capture Key File Name \/ \/ #
-    file = request.files['keyfile']
-    filename = secure_filename(file.filename)
-    tmp_folder = '/tmp'
-    # pprint.pprint(os.getcwd())
-    os.chdir('../tmp')
-    # pprint.pprint(os.getcwd())
-    file.save(filename)    
-    # pprint.pprint(os.getcwd())
-    os.chdir('../app')
-    # pprint.pprint(os.getcwd())
+    filename = secure_filename(key_upload.filename)
+    key_upload.save(os.path.join('/tmp', filename))
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
@@ -814,215 +791,6 @@ def reportICP():
     response.headers['cache-control'] = 'no-cache'
     return response
 
-@app.route('/reportExcel')
-def reportexcel():
-    """Generate Excel Report"""
-    jm = JasprModel()
-    # df = pd.DataFrame({'Data': [10,20,40,20,15,30,45]})
-
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-
-    sampleList = ["Virus"]
-    for sample in jm.sample_list:
-        sampleList.append(sample)
-
-    sampleList.append("VC")
-    sampleList.append("CC")
-
-    #df = pd.DataFrame(columns=sampleList)
-
-    rowList = []
-
-    # loop sample sets
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        for sample in jm.sample_list:
-            rowAdd.append(jm.experiments[experiment]['data'][sample]['y_values'][0])
-
-        rowAdd.append(jm.experiments[experiment]['cc'])
-        rowAdd.append(jm.experiments[experiment]['vc'])
-
-        rowList.append(rowAdd)
-
-        #df = pd.DataFrame(jm.experiments[jm.curr_experiment]['data'][sample_set])
-
-    df = pd.DataFrame(rowList, columns=sampleList)
-    df.to_excel(writer, sheet_name="FRA", index=False)
-
-    writer.close()
-
-    output.seek(0)
-    response = make_response(send_file(output, download_name='report' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-    response.headers['cache-control'] = 'no-cache'
-    return response
-
-# Print Full Report for the Experiment
-@app.route('/Experiment_report')
-def reportExperiment_Full():
-    """Generate Excel Report"""
-    jm=JasprModel()
-   
-    output=BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    
-    headerList = ["Virus"]
-    for sample in jm.sample_list:
-        headerList.append(sample)
-
-        pprint.pprint("Sample:")
-        pprint.pprint(sample)
-        
-    rowList = []
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-
-        for sample in jm.sample_list:
-            #print("sample:")
-            #pprint.pprint(sample)
-            #pprint.pprint (jm.experiments[experiment]['results'])
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample])
-
-        rowList.append(rowAdd)
-
-    df = pd.DataFrame(rowList, columns=headerList)
-    print(df)
-    df.to_excel(writer, sheet_name="Full_Report", index=False)
-
-    writer.close()
-
-    output.seek(0)
-
-    response = make_response(send_file(output, download_name='Full_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-    response.headers['cache-control'] = 'no-cache'
-    return response
-
-# Print Full Report for the Experiment
-@app.route('/FRNT_Full_report')
-def reportFRNT_Full():
-    """Generate Excel Report"""
-    jm=JasprModel()
-   
-    output=BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    
-    headerList = ["Virus"]
-    for sample in jm.sample_list:
-        headerList.append(sample)
-
-        pprint.pprint("Sample:")
-        pprint.pprint(sample)
-        
-    rowList = []
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-
-        for sample in jm.sample_list:
-            #print("sample:")
-            #pprint.pprint(sample)
-            #pprint.pprint (jm.experiments[experiment]['results'])
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample])
-
-        rowList.append(rowAdd)
-
-    df = pd.DataFrame(rowList, columns=headerList)
-    print(df)
-    df.to_excel(writer, sheet_name="Full_Report", index=False)
-
-    writer.close()
-
-    output.seek(0)
-
-    response = make_response(send_file(output, download_name='FRNT_Report_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-    response.headers['cache-control'] = 'no-cache'
-    return response
-
-@app.route('/FRNT_Titers')
-def reportFRNT_Titers():
-    """Generate Excel Report"""
-    jm=JasprModel()
-   
-    output=BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    
-    headerList = ["Virus"]
-    for sample in jm.sample_list:
-        headerList.append(sample)
-
-        pprint.pprint("Sample:")
-        pprint.pprint(sample)
-        
-    rowList = []
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-    
-        for sample in jm.sample_list:
-
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['IC50'])
-        rowList.append(rowAdd)
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-
-        for sample in jm.sample_list:
-
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['h'])
-        rowList.append(rowAdd)
-    df = pd.DataFrame(rowList, columns=headerList)
-    print(df)
-    df.to_excel(writer, sheet_name="Titers_Report", index=False)
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-
-        for sample in jm.sample_list:
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])
-        rowList.append(rowAdd)
-    df = pd.DataFrame(rowList, columns=headerList)
-    print(df)
-    df.to_excel(writer, sheet_name="Titers_Report", index=False)
-
-    for experiment in jm.experiment_list:
-        rowAdd = []
-        rowAdd.append(experiment)
-        pprint.pprint("Experiment")
-        pprint.pprint(experiment)
-
-        for sample in jm.sample_list:
-
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
-        rowList.append(rowAdd)
-    df = pd.DataFrame(rowList, columns=headerList)
-    print(df)
-    df.to_excel(writer, sheet_name="Titers_Report", index=False)
-
-    writer.close()
-
-    output.seek(0)
-
-    response = make_response(send_file(output, download_name='FRNT_Titers_' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-    response.headers['cache-control'] = 'no-cache'
-    return response
-
 @app.route('/reportFRNTResultAnalysis')
 def reportFRNTresults():
     """Generate Excel Report"""
@@ -1378,45 +1146,3 @@ def reportFRNTresults():
     response = make_response(send_file(output, download_name='FRNT-'+ FluLIMS_run +'-Results-' + FRNT_date +'.xlsx', as_attachment=True))
     response.headers['cache-control'] = 'no-cache'
     return response
-
-# # This produces the report as 'Viruses X Sera' \/ \/ \/  ##
-# @app.route('/reportFRNTResultAnalysis')
-# def reportFRNTresults():
-#     """Generate Excel Report"""
-#     jm=JasprModel()
-
-#     output=BytesIO()
-#     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-
-#     headerList = ['Virus']
-#     for sample in jm.sample_list:
-#         headerList.append(sample + ', ec50')
-#         headerList.append(sample + ', h')
-#         headerList.append(sample + ', Vmax')
-#         headerList.append(sample + ', titer')
-#     rowList = []
-
-#     for experiment in jm.experiment_list:
-#         pprint.pprint(jm.experiments[experiment]['data'])
-#         rowAdd = []
-#         rowAdd.append(experiment)
-#         for sample in jm.sample_list:
-#             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['ec50'])
-#             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['h'])
-#             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])
-#             rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
-            
-#         rowList.append(rowAdd)
-
-#     df = pd.DataFrame(rowList, columns = headerList)
-#     a = df.columns.str.split(', ', expand=True).values
-#     df.columns = pd.MultiIndex.from_tuples([('', x[0]) if pd.isnull(x[1]) else x for x in a])
-#     df.to_excel(writer, sheet_name="Result Analysis")
-
-#     writer.close()
-
-#     output.seek(0)
-#     response = make_response(send_file(output, download_name='reportFRNTresults' + str(datetime.now().strftime('%Y_%m_%d')) +'.xlsx', as_attachment=True))
-#     response.headers['cache-control'] = 'no-cache'
-#     return response
-# # This produces the report Viruses X Sera /\ /\ /\ /\  ##    
