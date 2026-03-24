@@ -11,36 +11,35 @@ export FULL_IMAGE=docker.io/cdcgov/jaspr:single
 Pull and run with Docker
 ```bash
 docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+docker run -d --name jaspr -p 8080:80 $FULL_IMAGE
 ```
 
 Pull and run with Podman
 ```bash
 podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 8080:80 $FULL_IMAGE
 ```
 
 Browser access
-- Open https://localhost:8443
-- JASPR redirects HTTP to HTTPS internally.
-- Using 8080 and 8443 avoids privileged-port issues.
+- Open http://localhost:8080
+- Using 8080 avoids privileged-port issues.
 
-Optional 80 and 443 bindings
+Optional 80 binding
 ```bash
-docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+docker run -d --name jaspr -p 80:80 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 $FULL_IMAGE
 ```
 
-Then open https://localhost
+Then open http://localhost
 
 Friendly hostname on the same machine
 1. Add this hosts-file entry:
    127.0.0.1 localhost-jaspr
-2. Open https://localhost-jaspr:8443
+2. Open http://localhost-jaspr:8080
 
 Access from another machine
 1. Map a DNS name or hosts-file entry to the server IP.
-2. Browse to that name over HTTPS.
+2. Browse to that name over HTTP.
 
 Example client hosts entry
 ```text

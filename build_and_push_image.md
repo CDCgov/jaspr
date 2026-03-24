@@ -65,13 +65,13 @@ podman pull $IMAGE_SECONDARY
 ## 8. Optional local run check
 
 ```bash
-podman run -d --name jaspr_test -p 8080:80 -p 8443:443 $IMAGE_PRIMARY
+podman run -d --name jaspr_test -p 8080:80 $IMAGE_PRIMARY
 ```
 
 Open:
 
 ```text
-https://localhost:8443
+http://localhost:8080
 ```
 
 Cleanup:

@@ -52,37 +52,37 @@ Run with Docker:
 
 ```bash
 docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+docker run -d --name jaspr -p 8080:80 $FULL_IMAGE
 ```
 
 Run with Podman:
 
 ```bash
 podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 8080:80 $FULL_IMAGE
 ```
 
 Then open:
 
 ```text
-https://localhost:8443
+http://localhost:8080
 ```
 
-Using `8080` and `8443` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
+Using `8080` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
 
-#### Optional 80/443 Bindings
+#### Optional Port 80 Binding
 
-If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` and `443` instead:
+If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` instead:
 
 ```bash
-docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+docker run -d --name jaspr -p 80:80 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 $FULL_IMAGE
 ```
 
 Then open:
 
 ```text
-https://localhost
+http://localhost
 ```
 
 #### Friendly Hostname on the Same Machine
@@ -96,18 +96,19 @@ Add this line to your hosts file:
 Then browse to:
 
 ```text
-https://localhost-jaspr:8443
+http://localhost-jaspr:8080
 ```
 
-If you are using ports `80` and `443`, browse instead to:
+If you are using port `80`, browse instead to:
 
 ```text
-https://localhost-jaspr
+http://localhost-jaspr
 ```
 
 #### Access from Another Machine
 
 Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTPS.
+Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTP.
 
 Example client hosts entry:
 
@@ -118,7 +119,7 @@ Example client hosts entry:
 Then browse to:
 
 ```text
-https://localhost-jaspr:8443
+http://localhost-jaspr:8080
 ```
 
 #### Stop the Container
