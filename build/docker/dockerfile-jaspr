@@ -1,7 +1,7 @@
 # gather miniconda
 FROM continuumio/miniconda3:latest
 
-MAINTAINER Garrett Peterson "garrettp@yaharasoftware.com"
+MAINTAINER CDCgov JASPR "ddidncirdflulimsdevelopers@cdc.gov"
 
 #RUN apt-get --allow-releaseinfo-change update
 RUN apt-get -y update
