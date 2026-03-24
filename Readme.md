@@ -43,7 +43,7 @@ Use the published JASPR container image from Docker Hub without checking out sou
 Set the published image reference:
 
 ```bash
-export FULL_IMAGE=docker.io/cdcgov/jaspr:single
+export FULL_IMAGE=docker.io/cdcgov/jaspr:latest
 ```
 
 #### Pull and Run on Another Machine
