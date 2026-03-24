@@ -52,30 +52,13 @@ Run with Docker:
 
 ```bash
 docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 8080:80 $FULL_IMAGE
+docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
 ```
 
 Run with Podman:
 
 ```bash
 podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 $FULL_IMAGE
-```
-
-Then open:
-
-```text
-http://localhost:8080
-```
-
-Using `8080` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
-
-#### Optional Localhost Mode (HTTP and HTTPS)
-
-If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` and `443` so either protocol works with `localhost`:
-
-```bash
-docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
 podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
 ```
 
@@ -88,6 +71,26 @@ https://localhost
 
 If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
 
+#### Optional High-Port Mode
+
+If your runtime/user is not allowed to bind to standard web ports, use high ports instead:
+
+```bash
+docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
+```
+
+Then open either:
+
+```text
+http://localhost:8080
+https://localhost:8443
+```
+
+Using `8080` and `8443` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
+
+If the browser shows "Your connection isn't private" for `https://localhost:8443`, open `Advanced` and choose `Proceed to localhost`.
+
 #### Friendly Hostname on the Same Machine
 
 Add this line to your hosts file:
@@ -97,12 +100,6 @@ Add this line to your hosts file:
 ```
 
 Then browse to:
-
-```text
-http://localhost-jaspr:8080
-```
-
-If you are using ports `80` and `443`, browse instead to:
 
 ```text
 http://localhost-jaspr
@@ -124,7 +121,8 @@ Example client hosts entry:
 Then browse to:
 
 ```text
-http://localhost-jaspr:8080
+http://localhost-jaspr
+https://localhost-jaspr
 ```
 
 #### Stop the Container
