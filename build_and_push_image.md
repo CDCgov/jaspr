@@ -67,7 +67,7 @@ podman pull $IMAGE_SECONDARY
 For easiest local use with either protocol on plain `localhost`, publish both standard web ports:
 
 ```bash
-podman run -d --name jaspr_test -p 80:80 -p 443:443 $IMAGE_PRIMARY
+podman run -d --name jaspr -p 80:80 -p 443:443 $IMAGE_PRIMARY
 ```
 
 Open:
