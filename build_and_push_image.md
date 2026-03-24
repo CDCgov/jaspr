@@ -21,11 +21,10 @@ cd /path/to/jaspr
 export IMAGE_REGISTRY=docker.io
 export IMAGE_USER=cdcgov
 export IMAGE_NAME=jaspr
-export IMAGE_TAG_PRIMARY=1.0
-export IMAGE_TAG_SECONDARY=latest
+export VERSION=1.0
+export IMAGE_PRIMARY=docker.io/cdcgov/jaspr:$VERSION
+export IMAGE_SECONDARY=docker.io/cdcgov/jaspr:latest
 
-export IMAGE_PRIMARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG_PRIMARY
-export IMAGE_SECONDARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG_SECONDARY
 ```
 
 ## 3. Log in to Docker Hub
@@ -39,7 +38,7 @@ podman login docker.io
 ## 4. Build the image
 
 ```bash
-podman build -f build/docker/dockerfile-single -t $IMAGE_PRIMARY .
+podman build -f build/docker/dockerfile-single --label org.opencontainers.image.source="https://github.com/cdcent/jaspr" --label org.opencontainers.image.url="https://hub.docker.com/r/cdcgov/jaspr" --label org.opencontainers.image.documentation="https://github.com/cdcent/jaspr" -t $IMAGE_PRIMARY .
 ```
 
 ## 5. Create the second tag
@@ -82,7 +81,7 @@ If the browser shows "Your connection isn't private" for `https://localhost`, op
 If your environment cannot bind privileged ports, use high ports instead:
 
 ```bash
-podman run -d --name jaspr_test -p 8080:80 -p 8443:443 $IMAGE_PRIMARY
+podman run -d --name jaspr -p 8080:80 -p 8443:443 $IMAGE_PRIMARY
 ```
 
 Then open:
