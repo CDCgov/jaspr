@@ -1,6 +1,13 @@
 # Build and Push JASPR Image
 
-These steps are for building the JASPR single-container image from a RHEL 8.10 Podman environment and pushing it to Docker Hub.
+These steps publish the single-container image to Docker Hub repository:
+
+- `cdcgov/jaspr`
+
+with two tags:
+
+- `single`
+- `latest`
 
 ## 1. Go to the repository root
 
@@ -8,98 +15,68 @@ These steps are for building the JASPR single-container image from a RHEL 8.10 P
 cd /path/to/jaspr
 ```
 
-## 2. Set your image values
-
-Replace `yourdockerhubuser` if needed.
+## 2. Set image values
 
 ```bash
 export IMAGE_REGISTRY=docker.io
-export IMAGE_USER=yourdockerhubuser
+export IMAGE_USER=cdcgov
 export IMAGE_NAME=jaspr
-export IMAGE_TAG=single
-export FULL_IMAGE=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG
+export IMAGE_TAG_PRIMARY=single
+export IMAGE_TAG_SECONDARY=latest
+
+export IMAGE_PRIMARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG_PRIMARY
+export IMAGE_SECONDARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG_SECONDARY
 ```
 
-## 3. Log in to Docker Hub from Podman
+## 3. Log in to Docker Hub
+
+Use your Docker Hub username. You will be prompted for password input.
 
 ```bash
-podman login docker.io
+docker login -u <username>
 ```
 
-## 4. Build the single-container image
+## 4. Build the image
 
 ```bash
-podman build -f build/docker/dockerfile-single -t $FULL_IMAGE .
+docker build -f build/docker/dockerfile-single -t $IMAGE_PRIMARY .
 ```
 
-## 5. Push the image to Docker Hub
+## 5. Create the second tag
 
 ```bash
-podman push $FULL_IMAGE
+docker tag $IMAGE_PRIMARY $IMAGE_SECONDARY
 ```
 
-## 6. Optional: push a rolling tag
+## 6. Push both tags to cdcgov/jaspr
 
 ```bash
-podman tag $FULL_IMAGE $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
-podman push $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
+docker push $IMAGE_PRIMARY
+docker push $IMAGE_SECONDARY
 ```
 
-## 7. Optional local validation before moving to another machine
-
-Run the image locally on non-privileged ports:
+## 7. Optional: verify tags are pullable
 
 ```bash
-podman run -d --name jaspr_test -p 8080:80 -p 8443:443 $FULL_IMAGE
+docker pull $IMAGE_PRIMARY
+docker pull $IMAGE_SECONDARY
 ```
 
-Open in a browser:
+## 8. Optional local run check
+
+```bash
+docker run -d --name jaspr_test -p 8080:80 -p 8443:443 $IMAGE_PRIMARY
+```
+
+Open:
 
 ```text
 https://localhost:8443
 ```
 
-Stop and remove the test container:
+Cleanup:
 
 ```bash
-podman stop jaspr_test
-podman rm jaspr_test
-```
-
-## 8. On another computer, pull and run the image
-
-With Podman:
-
-```bash
-export FULL_IMAGE=docker.io/yourdockerhubuser/jaspr:single
-podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
-```
-
-With Docker:
-
-```bash
-export FULL_IMAGE=docker.io/yourdockerhubuser/jaspr:single
-docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
-```
-
-Then open:
-
-```text
-https://localhost:8443
-```
-
-## 9. Optional localhost alias
-
-Add this line to the hosts file on the machine where the browser is running:
-
-```text
-127.0.0.1 localhost-jaspr
-```
-
-Then browse to:
-
-```text
-https://localhost-jaspr:8443
+docker stop jaspr_test
+docker rm jaspr_test
 ```

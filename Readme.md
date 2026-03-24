@@ -43,7 +43,7 @@ Use the published JASPR container image from Docker Hub without checking out sou
 Set the published image reference:
 
 ```bash
-export FULL_IMAGE=docker.io/yourdockerhubuser/jaspr:single
+export FULL_IMAGE=docker.io/cdcgov/jaspr:single
 ```
 
 #### Pull and Run on Another Machine
@@ -151,11 +151,6 @@ Once your branch is ready for testing, merge it into the QA branch and deploy it
 Once testing on the QA branch is approved, merge the QA branch to master but make sure to not close/delete the QA branch.
 
 Then, update the jaspr-prod server with master branch.
-
-cd ../../../var/JASPR
-podman-compose build && podman-compose down && podman-compose up
-
-Note: when changing Flask templates or static assets under app/jaspr, always run a full image rebuild (the build command above) before starting containers so packaged resources are refreshed in the runtime image.
 
 
 

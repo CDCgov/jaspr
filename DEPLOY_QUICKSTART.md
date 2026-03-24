@@ -1,46 +1,20 @@
 JASPR Container Image Quickstart
 
 Goal
-Build or pull a published JASPR image and run it with either Docker or Podman.
+Pull a published JASPR image and run it locally with either Docker or Podman.
 
-Why both work
-- Docker Hub stores OCI-compatible container images.
-- Podman and Docker can both build, push, pull, and run the same JASPR image.
-
-Prerequisites
-- Podman on RHEL 8.10 for build and push
-- Network access to Docker Hub
-
-Image variables
+Published image
 ```bash
-export IMAGE_REGISTRY=docker.io
-export IMAGE_USER=yourdockerhubuser
-export IMAGE_NAME=jaspr
-export IMAGE_TAG=single
-export FULL_IMAGE=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$IMAGE_TAG
+export FULL_IMAGE=docker.io/cdcgov/jaspr:single
 ```
 
-Build and push from your RHEL 8.10 Podman environment
-```bash
-cd /path/to/jaspr
-podman login docker.io
-podman build -f build/docker/dockerfile-single -t $FULL_IMAGE .
-podman push $FULL_IMAGE
-```
-
-Optional rolling tag
-```bash
-podman tag $FULL_IMAGE $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
-podman push $IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
-```
-
-Run with Docker
+Pull and run with Docker
 ```bash
 docker pull $FULL_IMAGE
 docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
 ```
 
-Run with Podman
+Pull and run with Podman
 ```bash
 podman pull $FULL_IMAGE
 podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
@@ -61,7 +35,7 @@ Then open https://localhost
 
 Friendly hostname on the same machine
 1. Add this hosts-file entry:
-  127.0.0.1 localhost-jaspr
+   127.0.0.1 localhost-jaspr
 2. Open https://localhost-jaspr:8443
 
 Access from another machine
