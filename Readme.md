@@ -70,19 +70,20 @@ http://localhost:8080
 
 Using `8080` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
 
-#### Optional Port 80 Binding
+#### Optional Localhost Mode (HTTP and HTTPS)
 
-If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` instead:
+If your runtime/user is allowed to bind to standard web ports, you can publish directly on `80` and `443` so either protocol works with `localhost`:
 
 ```bash
-docker run -d --name jaspr -p 80:80 $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 $FULL_IMAGE
+docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
 ```
 
-Then open:
+Then open either:
 
 ```text
 http://localhost
+https://localhost
 ```
 
 #### Friendly Hostname on the Same Machine
@@ -99,15 +100,15 @@ Then browse to:
 http://localhost-jaspr:8080
 ```
 
-If you are using port `80`, browse instead to:
+If you are using ports `80` and `443`, browse instead to:
 
 ```text
 http://localhost-jaspr
+https://localhost-jaspr
 ```
 
 #### Access from Another Machine
 
-Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTPS.
 Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTP.
 
 Example client hosts entry:

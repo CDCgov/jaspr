@@ -24,18 +24,22 @@ Browser access
 - Open http://localhost:8080
 - Using 8080 avoids privileged-port issues.
 
-Optional 80 binding
+Optional easiest localhost mode (both HTTP and HTTPS)
 ```bash
-docker run -d --name jaspr -p 80:80 $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 $FULL_IMAGE
+docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
 ```
 
-Then open http://localhost
+Then open either:
+- http://localhost
+- https://localhost
 
 Friendly hostname on the same machine
 1. Add this hosts-file entry:
    127.0.0.1 localhost-jaspr
-2. Open http://localhost-jaspr:8080
+2. Open one of:
+   http://localhost-jaspr:8080
+   https://localhost-jaspr
 
 Access from another machine
 1. Map a DNS name or hosts-file entry to the server IP.
