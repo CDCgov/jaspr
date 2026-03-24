@@ -96,6 +96,6 @@ If the browser shows "Your connection isn't private" for `https://localhost:8443
 Cleanup:
 
 ```bash
-podman stop jaspr_test
-podman rm jaspr_test
+podman stop jaspr
+podman rm jaspr
 ```
