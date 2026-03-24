@@ -34,12 +34,16 @@ Then open either:
 - http://localhost
 - https://localhost
 
+If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
+
 Friendly hostname on the same machine
 1. Add this hosts-file entry:
    127.0.0.1 localhost-jaspr
 2. Open one of:
    http://localhost-jaspr:8080
    https://localhost-jaspr
+
+If the browser shows "Your connection isn't private" for the HTTPS option, open `Advanced` and choose `Proceed to localhost`.
 
 Access from another machine
 1. Map a DNS name or hosts-file entry to the server IP.

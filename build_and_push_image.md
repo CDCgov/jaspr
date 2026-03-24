@@ -77,6 +77,8 @@ http://localhost
 https://localhost
 ```
 
+If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
+
 If your environment cannot bind privileged ports, use high ports instead:
 
 ```bash
@@ -89,6 +91,8 @@ Then open:
 http://localhost:8080
 https://localhost:8443
 ```
+
+If the browser shows "Your connection isn't private" for `https://localhost:8443`, open `Advanced` and choose `Proceed to localhost`.
 
 Cleanup:
 

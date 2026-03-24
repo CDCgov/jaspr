@@ -86,6 +86,8 @@ http://localhost
 https://localhost
 ```
 
+If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
+
 #### Friendly Hostname on the Same Machine
 
 Add this line to your hosts file:
@@ -106,6 +108,8 @@ If you are using ports `80` and `443`, browse instead to:
 http://localhost-jaspr
 https://localhost-jaspr
 ```
+
+If the browser shows "Your connection isn't private" for the HTTPS option, open `Advanced` and choose `Proceed to localhost`.
 
 #### Access from Another Machine
 
