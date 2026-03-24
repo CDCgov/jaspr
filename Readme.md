@@ -40,7 +40,7 @@ For deployment to the production environment, follow the established strategy de
 
 Use the published JASPR container image from Docker Hub without checking out source code.
 
-Set the published image reference:
+JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows. Supported workflows include high content imaging-based neutralization test (HINT) (Gubareva et al., 2019), Infected Cell Population (ICP) (Gubareva et al., 2019), and Focus Reduction Neutralization Test (FRNT) (Suthar et al., 2020).
 
 ```bash
 export FULL_IMAGE=docker.io/cdcgov/jaspr:latest
@@ -90,40 +90,6 @@ https://localhost:8443
 Using `8080` and `8443` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
 
 If the browser shows "Your connection isn't private" for `https://localhost:8443`, open `Advanced` and choose `Proceed to localhost`.
-
-#### Friendly Hostname on the Same Machine
-
-Add this line to your hosts file:
-
-```text
-127.0.0.1 localhost-jaspr
-```
-
-Then browse to:
-
-```text
-http://localhost-jaspr
-https://localhost-jaspr
-```
-
-If the browser shows "Your connection isn't private" for the HTTPS option, open `Advanced` and choose `Proceed to localhost`.
-
-#### Access from Another Machine
-
-Map a DNS name or hosts-file entry to the server IP, then browse to that host name over HTTP.
-
-Example client hosts entry:
-
-```text
-192.168.1.50 localhost-jaspr
-```
-
-Then browse to:
-
-```text
-http://localhost-jaspr
-https://localhost-jaspr
-```
 
 #### Stop the Container
 
