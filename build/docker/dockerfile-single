@@ -3,7 +3,8 @@ FROM continuumio/miniconda3:latest
 
 # System packages we need in the single container
 RUN apt-get -y update && \
-    apt-get -y install nginx redis-server supervisor curl && \
+    apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends nginx redis-server supervisor curl && \
     rm -rf /var/lib/apt/lists/*
 
 # --- App build (copy what dockerfile-jaspr already does) ---
@@ -17,7 +18,28 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
 ADD requirements.txt .
 ADD ./build /build
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
-    conda install -c conda-forge --file requirements.txt
+        conda install -c conda-forge --file requirements.txt && \
+        pip install --upgrade \
+            setuptools>=78.1.1 \
+            wheel>=0.46.2 \
+            urllib3>=2.6.3 \
+            pillow>=12.1.1 \
+            tornado>=6.5.5 \
+            cryptography>=46.0.5 \
+            jaraco.context>=6.1.0 \
+            Brotli>=1.2.0 && \
+        conda clean -afy
+
+# Also patch vulnerable Python tooling in the base conda environment.
+RUN /opt/conda/bin/pip install --upgrade \
+            setuptools>=78.1.1 \
+            wheel>=0.46.2 \
+            urllib3>=2.6.3 \
+            pillow>=12.1.1 \
+            tornado>=6.5.5 \
+            cryptography>=46.0.5 \
+            jaraco.context>=6.1.0 \
+            Brotli>=1.2.0
 
 # Bundle example datasets/assets for in-container download routes.
 RUN mkdir -p /var/JASPR/example_data

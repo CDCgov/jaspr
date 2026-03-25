@@ -13,4 +13,3 @@ selenium
 uwsgi
 firefox
 geckodriver
-nodejs
