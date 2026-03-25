@@ -13,38 +13,15 @@ from bokeh.layouts import column as widgetbox
 from bokeh.models import ColumnDataSource, Whisker
 from bokeh.models.glyphs import Line
 
-from bokeh.models import TickFormatter, Label, AdaptiveTicker, FixedTicker, \
-        LogTickFormatter
+from bokeh.models import Label, AdaptiveTicker, FixedTicker, \
+    LogTickFormatter, FuncTickFormatter
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
 from bokeh.plotting import figure
-from bokeh.util.compiler import TypeScript
 
 from jaspr.model import JasprModel
 from jaspr import app
 from outlet import FunctionRegistry
 import pprint
-
-
-TS_CODE = """
-import {TickFormatter} from "models/formatters/tick_formatter"
-
-export class AntigenicFormatter extends TickFormatter {
-    doFormat(ticks: string[] | number[]) {
-        let formatted = []
-        for (let tick of ticks) {
-            let val = 1000000 * Number(tick)
-            let titer = String(val.toFixed())
-            formatted.push(titer)
-        }
-    return formatted
-    }
-}
-"""
-
-
-class AntigenicFormatter(TickFormatter):
-
-    __implementation__ = TypeScript(TS_CODE)
 
 
 class JasprChart(object):
@@ -112,7 +89,10 @@ class JasprChart(object):
                 1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
-            p.xaxis.formatter = AntigenicFormatter()
+            p.xaxis.formatter = FuncTickFormatter(code="""
+                const val = 1000000 * Number(tick)
+                return String(Math.round(val))
+            """)
             #p.xaxis.formatter = LogTickFormatter()
             #p.xaxis.minor_tick_line_color = None
             p.x_range.flipped = True
