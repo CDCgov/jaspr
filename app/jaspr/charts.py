@@ -14,8 +14,8 @@ from bokeh.models import ColumnDataSource, Whisker
 from bokeh.models.glyphs import Line
 
 from bokeh.models import Label, AdaptiveTicker, FixedTicker, \
-    LogTickFormatter, FuncTickFormatter
-from bokeh.models.widgets import DataTable, DateFormatter, TableColumn, Div
+    LogTickFormatter, CustomJSTickFormatter, DataTable, DateFormatter, \
+    TableColumn, Div
 from bokeh.plotting import figure
 
 from jaspr.model import JasprModel
@@ -89,7 +89,7 @@ class JasprChart(object):
                 1/40960, 1/163840, 1/655360]))
             #p.xaxis.ticker = AdaptiveTicker(mantissas=[1/5], base=2,
             #        min_interval=1/32, max_interval=1/4, desired_num_ticks=8)
-            p.xaxis.formatter = FuncTickFormatter(code="""
+            p.xaxis.formatter = CustomJSTickFormatter(code="""
                 const val = 1000000 * Number(tick)
                 return String(Math.round(val))
             """)
