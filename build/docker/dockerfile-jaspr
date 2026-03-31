@@ -29,8 +29,7 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
     conda install python=3.9 && \
-    pip install "async-timeout==3.0.1" && \
-    pip install flask-session
+    pip install --upgrade "async-timeout>=4.0.3" "flask-session>=0.8.0"
 
 # flask-debugtoolbar - removed from above 3/29/2022, prevented app from building
 
@@ -44,26 +43,26 @@ ADD ./build /build
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
         conda install -c conda-forge --file requirements.txt && \
         pip install --upgrade \
-            setuptools>=78.1.1 \
-            wheel>=0.46.2 \
-            urllib3>=2.6.3 \
-            pillow>=12.1.1 \
-            tornado>=6.5.5 \
-            cryptography>=46.0.5 \
-            jaraco.context>=6.1.0 \
-            Brotli>=1.2.0 && \
+            "setuptools>=78.1.1" \
+            "wheel>=0.46.2" \
+            "urllib3>=2.6.3" \
+            "pillow>=12.1.1" \
+            "tornado>=6.5.5" \
+            "cryptography>=46.0.5" \
+            "jaraco.context>=6.1.0" \
+            "Brotli>=1.2.0" && \
         conda clean -afy
 
 # Also patch vulnerable Python tooling in the base conda environment.
 RUN /opt/conda/bin/pip install --upgrade \
-            setuptools>=78.1.1 \
-            wheel>=0.46.2 \
-            urllib3>=2.6.3 \
-            pillow>=12.1.1 \
-            tornado>=6.5.5 \
-            cryptography>=46.0.5 \
-            jaraco.context>=6.1.0 \
-            Brotli>=1.2.0
+            "setuptools>=78.1.1" \
+            "wheel>=0.46.2" \
+            "urllib3>=2.6.3" \
+            "pillow>=12.1.1" \
+            "tornado>=6.5.5" \
+            "cryptography>=46.0.5" \
+            "jaraco.context>=6.1.0" \
+            "Brotli>=1.2.0"
 
 VOLUME /app
 WORKDIR /app
