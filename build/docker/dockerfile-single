@@ -11,7 +11,7 @@ RUN apt-get -y update && \
 COPY environment.yml .
 RUN conda env create -f environment.yml
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
-    conda install python=3.9 && \
+    conda install python=3.11 && \
     pip install --upgrade "async-timeout>=4.0.3" "flask-session>=0.8.0"
 
 ADD requirements.txt .
