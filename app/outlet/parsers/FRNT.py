@@ -591,6 +591,8 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
                 for v_index, virus in enumerate(self.viruses):
+                    if X >= data_count:
+                        break
                 # find the plate and position of a sample
                     # plate_offset, position_offset = divmod(v_index, v_count)
                     # pprint.pprint(divmod(v_index, v_count))
@@ -659,6 +661,12 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
                     if X == (data_count):
                         break
                     # pprint.pprint("done...")                
+
+                if X >= data_count:
+                    break
+
+            if X >= data_count:
+                break
 
         return experiments
 
@@ -802,6 +810,8 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
             for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
                 for v_index, virus in enumerate(self.viruses):
+                    if X >= data_count:
+                        break
 
                     row = data[X]
                     StandardError = error[X]
@@ -848,6 +858,12 @@ class FRNT_SVV_Cx5(FRNT_VSS_Cx5):
                     if X == (data_count):
                         break
                     # pprint.pprint("done...")                
+
+                if X >= data_count:
+                    break
+
+            if X >= data_count:
+                break
 
         return experiments
 
@@ -1190,6 +1206,8 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
             for s_index, (titer, serum) in enumerate(
                 zip(self.starting_titers, self.sera)):
                 for v_index, virus in enumerate(self.viruses):
+                    if X >= data_count:
+                        break
                 # find the plate and position of a sample
                     # plate_offset, position_offset = divmod(v_index, v_count)
                     # pprint.pprint(divmod(v_index, v_count))
@@ -1254,5 +1272,11 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
                     if X == (data_count):
                         break
                     # pprint.pprint("done...")                
+
+                if X >= data_count:
+                    break
+
+            if X >= data_count:
+                break
 
         return experiments

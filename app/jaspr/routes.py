@@ -76,9 +76,32 @@ def _first_result_record(jm):
     try:
         exp = jm.experiment_list[0]
         sample = jm.sample_list[0]
-        return jm.experiments[exp]['results'][jm.curr_function][sample]
+        report_function = _resolve_report_function(jm)
+        if report_function is None:
+            return {}
+        return jm.experiments[exp]['results'][report_function][sample]
     except (KeyError, IndexError, TypeError):
         return {}
+
+
+def _resolve_report_function(jm):
+    """Resolve function key to use for report generation.
+
+    Prefer the currently selected fit function when results exist; otherwise
+    fall back to the first available precomputed result function.
+    """
+    if not jm.experiment_list:
+        return None
+
+    first_exp = jm.experiment_list[0]
+    results = jm.experiments.get(first_exp, {}).get('results', {})
+    if not isinstance(results, dict) or not results:
+        return None
+
+    if jm.curr_function in results:
+        return jm.curr_function
+
+    return next(iter(results.keys()), None)
 
 
 def _available_report_links(jm):
@@ -659,6 +682,10 @@ def reportOther():
     if specific_guard is not None:
         return specific_guard
 
+    report_function = _resolve_report_function(jm)
+    if report_function is None:
+        return render_template('report.html', report_links=[], no_reports_message='No report exports are available.')
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -680,13 +707,13 @@ def reportOther():
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer'])
+            rowAdd.append(jm.experiments[experiment]['results'][report_function][sample]['titer'])
             rowAdd.append('')
             #rowAdd.append(10000/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']))
             try:
-                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][jm.curr_function][sample]['cc'])))
+                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][report_function][sample]['Vmax'])/float(jm.experiments[experiment]['results'][report_function][sample]['cc'])))
             except ZeroDivisionError:
-                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax'])))
+                rowAdd.append('{:.1f}'.format(float(jm.experiments[experiment]['results'][report_function][sample]['Vmax'])))
         rowList.append(rowAdd)
 
     df = pd.DataFrame(rowList, columns = headerList)
@@ -714,6 +741,10 @@ def reportTiter():
     if specific_guard is not None:
         return specific_guard
 
+    report_function = _resolve_report_function(jm)
+    if report_function is None:
+        return render_template('report.html', report_links=[], no_reports_message='No report exports are available.')
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -727,7 +758,7 @@ def reportTiter():
         rowAdd = []
         rowAdd.append(experiment)
         for sample in jm.sample_list:
-            viral_sample = (jm.experiments[experiment]['results'][jm.curr_function][sample])
+            viral_sample = (jm.experiments[experiment]['results'][report_function][sample])
             ERROR = "Regression Failed"
             titer = 'titer'
             rowAdd.append(viral_sample.get(titer, ERROR))
@@ -758,6 +789,10 @@ def reportICP():
     if specific_guard is not None:
         return specific_guard
 
+    report_function = _resolve_report_function(jm)
+    if report_function is None:
+        return render_template('report.html', report_links=[], no_reports_message='No report exports are available.')
+
     output=BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -776,7 +811,7 @@ def reportICP():
             pprint.pprint("sample:")
             pprint.pprint(sample)
             pprint.pprint (jm.experiments[experiment]['results'])
-            rowAdd.append(jm.experiments[experiment]['results'][jm.curr_function][sample]['ICP1000'])
+            rowAdd.append(jm.experiments[experiment]['results'][report_function][sample]['ICP1000'])
 
         rowList.append(rowAdd)
 
@@ -802,6 +837,10 @@ def reportFRNTresults():
     specific_guard = _guard_specific_report_href(jm, '/reportFRNTResultAnalysis')
     if specific_guard is not None:
         return specific_guard
+
+    report_function = _resolve_report_function(jm)
+    if report_function is None:
+        return render_template('report.html', report_links=[], no_reports_message='No report exports are available.')
 
     pprint.pprint("The JASPR Model:")
     pprint.pprint(jm.experiments)
@@ -847,10 +886,10 @@ def reportFRNTresults():
         # rowAdd.append(experiment)
         rowList.append(rowAdd)
         for sample in jm.sample_list:
-            rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['ec50']])
-            rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['h']])
-            rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['Vmax']])
-            rowAdd.append([jm.experiments[experiment]['results'][jm.curr_function][sample]['titer']])
+            rowAdd.append([jm.experiments[experiment]['results'][report_function][sample]['ec50']])
+            rowAdd.append([jm.experiments[experiment]['results'][report_function][sample]['h']])
+            rowAdd.append([jm.experiments[experiment]['results'][report_function][sample]['Vmax']])
+            rowAdd.append([jm.experiments[experiment]['results'][report_function][sample]['titer']])
  
     pooled_CUIDs = pd.DataFrame(jm.experiments[experiment]['pooled_sera'])
     pooled_CUIDs = pooled_CUIDs.T
