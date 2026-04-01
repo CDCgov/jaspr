@@ -167,7 +167,8 @@ class JasprChart(object):
         return p
 
     def _get_chart_component(self):
-        return json_item(self._create_chart())
+        figure_obj = self._create_chart()
+        return json_item(figure_obj, target_id='graph-target')
 
     def _get_table_component(self):
         """Render current sample data as a Bootstrap-styled HTML table."""
