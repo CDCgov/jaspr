@@ -351,6 +351,12 @@ def upload():
     try:
         settings = ParserRegistry.plugins[selected_parser](keyfile, datafile)()
     except Exception as exc:
+        app.logger.exception(
+            'Upload parser exception for parser %s (datafile=%s, keyfile=%s)',
+            selected_parser,
+            data_upload.filename if data_upload else 'None',
+            key_upload.filename if key_upload else 'None'
+        )
         if _is_parser_data_compatibility_error(exc):
             app.logger.warning(
                 'Parser/data incompatibility during upload for parser %s: %s',
