@@ -113,13 +113,13 @@ class JasprChart(object):
             whisker.lower_head.line_width=2
             p.add_layout(whisker)  
 
-            p.scatter(x='x_values', y=y_series, size=10,
+            p.circle(x='x_values', y=y_series, size=10,
                 source=source)
                             
 # # ## Add error bars /\ /\ /\
 
         else:
-            p.scatter(x='x_values', y=y_series, size=10,
+            p.circle(x='x_values', y=y_series, size=10,
                 source=source)
 
         # could loop over plugins collection to get names and descriptions
