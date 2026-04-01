@@ -4,7 +4,8 @@ FROM continuumio/miniconda3:latest
 # System packages we need in the single container
 RUN apt-get -y update && \
     apt-get -y upgrade && \
-    apt-get -y install --no-install-recommends nginx redis-server supervisor curl && \
+    apt-get -y install --no-install-recommends nginx supervisor curl && \
+    apt-get -y purge --auto-remove tar && \
     rm -rf /var/lib/apt/lists/*
 
 # --- App build (copy what dockerfile-jaspr already does) ---
@@ -19,8 +20,11 @@ ADD ./build /build
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
         conda install -c conda-forge --file requirements.txt && \
         pip install --upgrade \
+            "pip>=26.0" \
             "setuptools>=78.1.1" \
             "wheel>=0.46.2" \
+            "requests>=2.33.0" \
+            "pygments>=2.20.0" \
             "urllib3>=2.6.3" \
             "pillow>=12.1.1" \
             "tornado>=6.5.5" \
@@ -31,8 +35,11 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
 
 # Also patch vulnerable Python tooling in the base conda environment.
 RUN /opt/conda/bin/pip install --upgrade \
+            "pip>=26.0" \
             "setuptools>=78.1.1" \
             "wheel>=0.46.2" \
+            "requests>=2.33.0" \
+            "pygments>=2.20.0" \
             "urllib3>=2.6.3" \
             "pillow>=12.1.1" \
             "tornado>=6.5.5" \
