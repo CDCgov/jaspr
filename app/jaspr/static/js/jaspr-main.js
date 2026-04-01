@@ -46,13 +46,7 @@ var loadGraph = function() {
         $('#graph-target').empty();
         console.log('Received graph data:', data.graph);
         if (data.graph && typeof Bokeh !== 'undefined' && Bokeh.embed && Bokeh.embed.embed_item) {
-          data.graph.target_id = 'graph-target';
-          const targetEl = document.getElementById('graph-target');
-          Bokeh.embed.embed_item(data.graph, targetEl)
-            .catch(function(err) {
-              console.error('Bokeh embed error:', err);
-              $('#graph-target').html('<div class="alert alert-danger">Graph render error: ' + err + '</div>');
-            });
+          Bokeh.embed.embed_item(data.graph, 'graph-target');
         } else {
           console.error('Missing Bokeh or graph data');
           $('#graph-target').html('<div class="alert alert-danger">Bokeh not loaded.</div>');
