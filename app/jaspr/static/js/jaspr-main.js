@@ -46,7 +46,7 @@ var loadGraph = function() {
         $('#graph-target').empty();
         console.log('Received graph data:', data.graph);
         if (data.graph && typeof Bokeh !== 'undefined' && Bokeh.embed && Bokeh.embed.embed_item) {
-          Bokeh.embed.embed_item(data.graph, 'graph-target');
+          Bokeh.embed.embed_item(data.graph);
         } else {
           console.error('Missing Bokeh or graph data');
           $('#graph-target').html('<div class="alert alert-danger">Bokeh not loaded.</div>');
