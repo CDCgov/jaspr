@@ -78,7 +78,7 @@ RUN /opt/conda/bin/pip install --upgrade \
 # || true prevents build failure if either package is already absent or
 # has a dependent package that cannot be removed cleanly.
 RUN apt-get update -qq && \
-    apt-get purge -y \
+    apt-get purge -y --auto-remove \
         libelf1 libelf-dev libdw1 libdw-dev elfutils \
         libldap-2.5-0 libldap-common 2>/dev/null || true && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
