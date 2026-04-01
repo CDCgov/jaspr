@@ -4,7 +4,7 @@ FROM quay.io/condaforge/miniforge3:latest
 # System packages we need in the single container
 RUN apt-get -y update && \
     apt-get -y upgrade && \
-    apt-get -y install --no-install-recommends nginx supervisor curl && \
+    apt-get -y install --no-install-recommends nginx supervisor curl libx11-6 && \
     rm -rf /var/lib/apt/lists/*
 
 # --- App build (copy what dockerfile-jaspr already does) ---
