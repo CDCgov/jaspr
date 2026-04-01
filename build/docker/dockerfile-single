@@ -46,19 +46,6 @@ RUN /opt/conda/bin/pip install --upgrade \
             "jaraco.context>=6.1.0" \
             "Brotli>=1.2.0"
 
-# Remove Debian packages with unfixed CVEs that are not required at runtime.
-# elfutils (CVE-2025-1352/1365/1371/1372/1376/1377, CVE-2024-25260): ELF debug utils,
-#   only a build-time transitive dep; not needed by nginx/uwsgi/flask at runtime.
-# libldap (CVE-2026-22185): OpenLDAP client library pulled in via SASL;
-#   JASPR does not use LDAP authentication.
-# || true prevents build failure if either package is already absent or
-# has a dependent package that cannot be removed cleanly.
-RUN apt-get update -qq && \
-    apt-get purge -y --auto-remove \
-        libelf1 libelf-dev libdw1 libdw-dev elfutils \
-        libldap-2.5-0 libldap-common 2>/dev/null || true && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Bundle example datasets/assets for in-container download routes.
 RUN mkdir -p /var/JASPR/example_data
 COPY example_data/ /var/JASPR/example_data/
