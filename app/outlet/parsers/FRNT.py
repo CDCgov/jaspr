@@ -135,7 +135,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
 
             seraReplicates = pd.DataFrame(seraReplicates)
 
-            AllReplicates = AllReplicates.append(seraReplicates)
+            AllReplicates = pd.concat([AllReplicates, seraReplicates], ignore_index=True)
             seraList = pd.DataFrame(AllReplicates)
 
             sReplicate = sReplicate + 1
@@ -145,7 +145,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         
         seraList.reset_index(inplace=True)
         # pprint.pprint(seraList)
-        seraList = seraList.drop('index', 1)
+        seraList = seraList.drop('index', axis=1)
         # seraList['index'] = 0
         seraList.set_index('0')
         # pprint.pprint(seraList)
@@ -318,11 +318,11 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             # print("Plate", RAWdata.loc[X][0])
             Temp_plate = VSS.get_group(RAWdata.loc[X][0])
             # print("Temp_plate=", Temp_plate)
-            Temp_plate = Temp_plate.drop('Plate', 1)
-            Temp_plate = Temp_plate.drop('Well', 1)
-            Temp_plate = Temp_plate.drop('Row', 1)
-            Temp_plate = Temp_plate.drop('Column', 1)
-            Temp_plate = Temp_plate.drop('SpotTotalAreaCh2', 1)
+            Temp_plate = Temp_plate.drop('Plate', axis=1)
+            Temp_plate = Temp_plate.drop('Well', axis=1)
+            Temp_plate = Temp_plate.drop('Row', axis=1)
+            Temp_plate = Temp_plate.drop('Column', axis=1)
+            Temp_plate = Temp_plate.drop('SpotTotalAreaCh2', axis=1)
             # print("Temp_plate before numpy=", Temp_plate)
             Temp_plate = Temp_plate.to_numpy()
             # print("Temp_plate after numpy=", Temp_plate)
