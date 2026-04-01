@@ -1,5 +1,5 @@
-# Start from the same base as your current jaspr image
-FROM continuumio/miniconda3:latest
+# Start from Miniforge base (Minimal Ubuntu) to avoid Debian tar CVE lineage.
+FROM quay.io/condaforge/miniforge3:latest
 
 # System packages we need in the single container
 RUN apt-get -y update && \
