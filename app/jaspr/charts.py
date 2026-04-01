@@ -179,12 +179,13 @@ class JasprChart(object):
             for text in chart_labels[::-1]:
                 label = Label(x=10, y=offset*16, y_offset=375,
                         x_units='screen', y_units='screen',
-                        text=text, render_mode='css',
+                        text=text,
                         background_fill_color='white',
                         background_fill_alpha=0.7)
                 p.add_layout(label)
                 offset += 1
-            return p
+
+        return p
 
     def _get_chart_component(self):
         return components(self._create_chart())

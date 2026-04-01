@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_session import Session
 # from flask_debugtoolbar import DebugToolbarExtension
+from bokeh.resources import INLINE
 from openpyxl import Workbook
 import redis
 import os
@@ -37,6 +38,15 @@ for f in files:
 
 Session(app)
 # toolbar = DebugToolbarExtension(app)
+
+
+@app.context_processor
+def inject_bokeh_resources():
+    """Keep browser BokehJS/CSS version aligned with installed Python bokeh."""
+    return {
+        'bokeh_js_resources': INLINE.render_js(),
+        'bokeh_css_resources': INLINE.render_css(),
+    }
 
 #put these at the end (per Flask Documentation)
 import jaspr.routes
