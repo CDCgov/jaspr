@@ -42,24 +42,13 @@ var loadGraph = function() {
     dataType: 'json',
     url: '/drawWidgetHTML',
     success: function(data) {
-      try {
-        $('#graph-target').empty();
-        console.log('Received graph data:', data.graph);
-        if (data.graph && typeof Bokeh !== 'undefined' && Bokeh.embed && Bokeh.embed.embed_item) {
-          Bokeh.embed.embed_item(data.graph);
-        } else {
-          console.error('Missing Bokeh or graph data');
-          $('#graph-target').html('<div class="alert alert-danger">Bokeh not loaded.</div>');
-        }
-        $('#table-target').html(data.t_html || '');
-      } catch(e) {
-        console.error('Graph error:', e);
-        $('#graph-target').html('<div class="alert alert-danger">Error: ' + e.message + '</div>');
-      }
+      $('#graph-target').empty();
+      Bokeh.embed.embed_item(data.graph, 'graph-target');
+      $('#table-target').html(data.t_html);
     },
-    error: function(xhr, status, err) {
-      $('#graph-target').html('<div class="alert alert-danger">Load failed: ' + err + '</div>');
-      $('#table-target').html('<div class="alert alert-danger">Load failed.</div>');
+    error: function() {
+      $('#graph-target').html('<div class="alert alert-danger">Graph failed to load.</div>');
+      $('#table-target').html('<div class="alert alert-danger">Table failed to load.</div>');
     }
   });
 };
