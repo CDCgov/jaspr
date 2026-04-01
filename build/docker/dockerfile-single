@@ -5,6 +5,7 @@ FROM quay.io/condaforge/miniforge3:latest
 RUN apt-get -y update && \
     apt-get -y upgrade && \
     apt-get -y install --no-install-recommends nginx supervisor curl libx11-6 && \
+    apt-get -y remove --allow-remove-essential git wget && \
     rm -rf /var/lib/apt/lists/*
 
 # --- App build (copy what dockerfile-jaspr already does) ---
