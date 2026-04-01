@@ -1,9 +1,4 @@
 $(function() {
-  //TODO: move to main.js or something like that
-  //this isn't good for all pages, but put it here to get started
-  $(".dataGraph").html("<div>loading graph.</div>");
-  $(".dataTable").html("<div>loading table.</div>");
-  $(".FRNTdataGraph").html("<div>loading FRNT graph.</div>");
   loadGraph();
 });
 
@@ -40,23 +35,20 @@ var ChangeExperiment = function(selectedItem) {
 
 
 var loadGraph = function() {
-  $(".dataGraph").html("loading graph...");
-  $(".dataTable").html("loading table...");
-  $(".FRNTdataGraph").html("loading graph...");
+  $('#graph-target').empty().html('<div>loading graph...</div>');
+  $('#table-target').empty().html('<div>loading table...</div>');
 
   $.ajax({
     dataType: 'json',
     url: '/drawWidgetHTML',
     success: function(data) {
-      $(".dataGraph").replaceWith('<span class="dataGraph">' + data.g_div +
-        '</span>');
-      $(".dataTable").replaceWith('<span class="dataTable">' + data.t_div +
-        '</span>');
-      $(".FRNTdataGraph").replaceWith('<span class="FRNTdataGraph">' + data.FRNT_div +
-        '</span>');
-      $(data.g_script).appendTo(".dataGraph");
-      $(data.t_script).appendTo(".dataTable");
-      $(data.FRNT_script).appendTo(".FRNTdataGraph");
+      $('#graph-target').empty();
+      Bokeh.embed.embed_item(data.graph, 'graph-target');
+      $('#table-target').html(data.t_html);
+    },
+    error: function() {
+      $('#graph-target').html('<div class="alert alert-danger">Graph failed to load.</div>');
+      $('#table-target').html('<div class="alert alert-danger">Table failed to load.</div>');
     }
   });
 };
