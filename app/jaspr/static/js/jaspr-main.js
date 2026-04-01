@@ -2,6 +2,9 @@ $(function() {
   loadGraph();
 });
 
+let activeGraphRequest = null;
+let graphRequestSeq = 0;
+
 var ChangeSample = function(sampleName) {
   $.ajax({
     type: 'POST',
@@ -35,20 +38,29 @@ var ChangeExperiment = function(selectedItem) {
 
 
 var loadGraph = function() {
+  graphRequestSeq += 1;
+  const requestId = graphRequestSeq;
+
+  if (activeGraphRequest && activeGraphRequest.readyState !== 4) {
+    activeGraphRequest.abort();
+  }
+
   $('#graph-target').empty().html('<div>loading graph...</div>');
   $('#table-target').empty().html('<div>loading table...</div>');
 
-  $.ajax({
+  activeGraphRequest = $.ajax({
     dataType: 'json',
     url: '/drawWidgetHTML',
     success: function(data) {
+      if (requestId !== graphRequestSeq) {
+        return;
+      }
       try {
         $('#graph-target').empty();
         console.log('Received graph data:', data.graph);
         if (data.graph && typeof Bokeh !== 'undefined' && Bokeh.embed && Bokeh.embed.embed_item) {
           data.graph.target_id = 'graph-target';
-          const targetEl = document.getElementById('graph-target');
-          Bokeh.embed.embed_item(data.graph, targetEl)
+          Bokeh.embed.embed_item(data.graph, 'graph-target')
             .catch(function(err) {
               console.error('Bokeh embed error:', err);
               $('#graph-target').html('<div class="alert alert-danger">Graph render error: ' + err + '</div>');
@@ -64,6 +76,9 @@ var loadGraph = function() {
       }
     },
     error: function(xhr, status, err) {
+      if (status === 'abort' || requestId !== graphRequestSeq) {
+        return;
+      }
       $('#graph-target').html('<div class="alert alert-danger">Load failed: ' + err + '</div>');
       $('#table-target').html('<div class="alert alert-danger">Load failed.</div>');
     }
