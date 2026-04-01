@@ -4,20 +4,24 @@
 """Charting functionality for Jaspr"""
 
 from math import log2
-from fractions import Fraction
+from pickle import TRUE
 import numpy as np
 import pandas as pd
 
-from bokeh.embed import json_item
+from bokeh.embed import components
+from bokeh.layouts import column as widgetbox
 from bokeh.models import ColumnDataSource, Whisker
 from bokeh.models.glyphs import Line
+
 from bokeh.models import Label, AdaptiveTicker, FixedTicker, \
-    LogTickFormatter, CustomJSTickFormatter
+    LogTickFormatter, CustomJSTickFormatter, DataTable, DateFormatter, \
+    TableColumn, Div
 from bokeh.plotting import figure
 
 from jaspr.model import JasprModel
 from jaspr import app
 from outlet import FunctionRegistry
+import pprint
 
 
 class JasprChart(object):
@@ -60,6 +64,8 @@ class JasprChart(object):
             y_error_value = source.data['y_error']
             y_sum = np.add(y_axis_value, y_error_value)
             y_max = np.amax(y_sum) + 5
+            pprint.pprint('y_max:')
+            pprint.pprint(y_max)
 
             p = figure(
                 x_axis_label=self.m.x_axis_label,
@@ -67,6 +73,7 @@ class JasprChart(object):
                 x_axis_type=self.m.x_axis_type,
                 y_range=(-5, y_max),
                 title=f'{self.m.curr_experiment}: {self.m.curr_sample}')
+            print(p.title)
 
         else:    
             p = figure(
@@ -74,6 +81,7 @@ class JasprChart(object):
                 y_axis_label=self.m.y_axis_label,
                 x_axis_type=self.m.x_axis_type,
                 title=f'{self.m.curr_experiment}: {self.m.curr_sample}')
+            print(p.title)
 
         # change from base 10 to base 2
         if self.m.x_axis_type == 'log':
@@ -103,6 +111,17 @@ class JasprChart(object):
             y_sum = np.add(y_axis_value, y_error_value)
             y_sub = np.subtract(y_axis_value, y_error_value)
             
+            pprint.pprint("y_axis_value...")
+            pprint.pprint(y_axis_value) 
+            pprint.pprint("y_error_value...")
+            pprint.pprint(y_error_value) 
+            pprint.pprint("y_sum...")
+            pprint.pprint(y_sum) 
+            pprint.pprint("y_sub...")
+            pprint.pprint(y_sub) 
+            pprint.pprint("x_axis_value...")
+            pprint.pprint(x_axis_value) 
+
             source_error = ColumnDataSource(dict(base=x_axis_value, upper=y_sum, lower=y_sub))
 
             whisker = Whisker(dimension="height", source=source_error, base='base', \
@@ -135,6 +154,8 @@ class JasprChart(object):
             pd.set_option("display.precision", 10)
 
             y_rounded = np.around(y, decimals=0)
+            print(y_rounded)
+            pprint.pprint(y_rounded)
             pd.to_numeric(x)
             pd.to_numeric(y_rounded)    
             yx = pd.DataFrame({'y':y_rounded, 'x':x})
@@ -167,33 +188,35 @@ class JasprChart(object):
         return p
 
     def _get_chart_component(self):
-        return json_item(self._create_chart())
+        return components(self._create_chart())
 
     def _get_table_component(self):
-        """Render current sample data as a Bootstrap-styled HTML table."""
-        sample_data = dict(
-            self.m.experiments[self.m.curr_experiment]['data'][self.m.curr_sample]
-        )
-        sample_data['x_values'] = [
-            str(Fraction(str(a))) for a in sample_data['x_values']
-        ]
-        if 'x_fit' in sample_data:
-            sample_data['x_fit'] = [
-                str(Fraction(str(a))) for a in sample_data['x_fit']
-            ]
-        df = pd.DataFrame(sample_data)
-        title = f'<strong>{self.m.curr_experiment}: {self.m.curr_sample}</strong>'
-        return title + df.to_html(
-            classes='table table-sm table-striped table-bordered',
-            index=False,
-            border=0,
-        )
+        """Create HTML and Javascript components that will display a table
+           for the current experiment and sample of a model
+
+            Returns:
+                HTML string and JavaScript string
+
+        """
+        source = self.m.curr_datasource_fraction
+
+        bcols = [TableColumn(field=c, title=c) for c in source.column_names]
+
+        #Todo: pull out to its own function and make more robust
+        #change the column format to date for any field called "date"
+        for col in bcols:
+            if col.field =="date":
+                col.formatter = DateFormatter()
+
+        data_table = DataTable(source=source, columns=bcols, height=580)
+        title = Div(text=f'<strong>{self.m.curr_experiment}: {self.m.curr_sample}</strong>')
+        return components(widgetbox(title, data_table))
 
     def __call__(self):
-        return {
-            'graph': self._get_chart_component(),
-            't_html': self._get_table_component(),
-        }
+        values = {}
+        values['g_script'], values['g_div'] = self._get_chart_component()
+        values['t_script'], values['t_div'] = self._get_table_component()
+        return values
 
 
 # # Add FRNT Charting Functionality \/ \/ \/ -------------------
