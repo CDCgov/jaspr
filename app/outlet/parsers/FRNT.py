@@ -50,7 +50,7 @@ class FRNTBase(object):
     
     def _get_viruses(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Viruses')
-        return [f"{row[0]} {row['Strain']}"
+        return [f"{row.iloc[0]} {row['Strain']}"
                 for index, row in df.iterrows()], \
                 df.to_dict('index')
 
@@ -111,7 +111,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
     def _get_sera(self, keyfile):
         df = pd.read_excel(keyfile, sheet_name='Sera')
         
-        seraNames = [f"{row[0]} {row['CUID']}" 
+        seraNames = [f"{row.iloc[0]} {row['CUID']}" 
                     for index, row in df.iterrows()]
         seraLabels = seraNames
 
@@ -316,7 +316,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         while X <= (N-1):
 
             # print("Plate", RAWdata.loc[X][0])
-            Temp_plate = VSS.get_group(RAWdata.loc[X][0])
+            Temp_plate = VSS.get_group(RAWdata.iloc[X, 0])
             # print("Temp_plate=", Temp_plate)
             Temp_plate = Temp_plate.drop('Plate', axis=1)
             Temp_plate = Temp_plate.drop('Well', axis=1)
@@ -327,7 +327,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
             Temp_plate = Temp_plate.to_numpy()
             # print("Temp_plate after numpy=", Temp_plate)
             
-            Plate_name = RAWdata.loc[X][0]
+            Plate_name = RAWdata.iloc[X, 0]
             # pprint.pprint("Plate_name:")
             # pprint.pprint(Plate_name)
             # print(type(Plate_name))
@@ -916,7 +916,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         while X <= (N-1):
 
             # print("Plate", RAWdata.loc[X][0])
-            Temp_plate = VSS.get_group(RAWdata.loc[X][0])
+            Temp_plate = VSS.get_group(RAWdata.iloc[X, 0])
             # print("Temp_plate=", Temp_plate)
             Temp_plate = Temp_plate.drop('Well', axis=1)
             Temp_plate = Temp_plate.drop('Well ID', axis=1)
@@ -929,7 +929,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
             Temp_plate = Temp_plate.to_numpy()
             # print("Temp_plate after numpy=", Temp_plate)
             
-            Plate_name = RAWdata.loc[X][0]
+            Plate_name = RAWdata.iloc[X, 0]
             # pprint.pprint("Plate_name:")
             # pprint.pprint(Plate_name)
             # print(type(Plate_name))
