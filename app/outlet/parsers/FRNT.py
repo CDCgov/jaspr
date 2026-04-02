@@ -285,7 +285,7 @@ class FRNT_VSS_Cx5(FRNTBase, ParserRegistry):
         #     pprint.pprint("df:")
             # pprint.pprint(df)
 
-        VSS = df.groupby(["Plate"], as_index=False)
+        VSS = df.groupby("Plate", as_index=False)
 
         RAWdata = pd.DataFrame(VSS.groups.keys())
         N = len(RAWdata)
@@ -890,7 +890,7 @@ class FRNT_Cytation7(FRNT_VSS_Cx5):
         #     pprint.pprint("df sorted:")
         #     pprint.pprint(df)
 
-        VSS = df.groupby(["Plate ID"], as_index=False)
+        VSS = df.groupby("Plate ID", as_index=False)
 
         RAWdata = pd.DataFrame(VSS.groups.keys())
 
