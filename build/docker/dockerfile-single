@@ -1,86 +1,115 @@
-# Start from Miniforge base (Minimal Ubuntu) to avoid Debian tar CVE lineage.
-FROM quay.io/condaforge/miniforge3:latest
+# syntax=docker/dockerfile:1.6
+#
+# JASPR single-container image, rebuilt for portability across
+# Docker, Podman, and Singularity (Apptainer).
+#
+# Design constraints:
+#   * Non-root runtime (UID/GID 1000, named "jaspr").
+#   * Listens on a non-privileged port (8080) so it works under unprivileged
+#     Singularity / rootless Podman without CAP_NET_BIND_SERVICE.
+#   * No nginx, no supervisor, no embedded redis: a single uWSGI process
+#     speaks HTTP directly.  TLS is expected to be terminated upstream
+#     (host nginx, ingress, reverse-proxy, etc.) when needed.
+#   * No dynamic install or bootstrap at launch.  The jaspr package is
+#     pip-installed at build time; the entrypoint exec()s uWSGI directly.
+#   * Writes only to /tmp at runtime.  /tmp is the one path that is
+#     reliably writable under Singularity, rootless Podman, and Docker
+#     without explicit volume configuration.
+#   * Image filesystem is treated as read-only at runtime so the same
+#     image runs unchanged under "singularity run" (read-only overlay)
+#     and "podman run --read-only".
+#
+# ---------------------------------------------------------------------------
+# Stage 1: build wheels.  Compile uWSGI (the only package without a
+# pre-built manylinux wheel) here so the runtime image stays slim.
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim-bookworm AS builder
 
-# System packages we need in the single container
-RUN apt-get -y update && \
-    apt-get -y upgrade && \
-    apt-get -y install --no-install-recommends nginx supervisor curl libx11-6 && \
-    apt-get -y remove --allow-remove-essential git wget && \
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libpcre3-dev \
+        libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# --- App build (copy what dockerfile-jaspr already does) ---
-COPY environment.yml .
-RUN conda env create -f environment.yml
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
-    conda install python=3.11 && \
-    pip install --upgrade "async-timeout>=4.0.3" "flask-session>=0.8.0"
+# Upgrade build tooling first so wheel builds use patched setuptools/wheel.
+RUN pip install --upgrade \
+        "pip>=26.0" \
+        "setuptools>=78.1.1" \
+        "wheel>=0.46.2"
 
-ADD requirements.txt .
-ADD ./build /build
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
-        conda install -c conda-forge --file requirements.txt && \
-        pip install --upgrade \
-            "pip>=26.0" \
-            "setuptools>=78.1.1" \
-            "wheel>=0.46.2" \
-            "requests>=2.33.0" \
-            "pygments>=2.20.0" \
-            "urllib3>=2.6.3" \
-            "pillow>=12.1.1" \
-            "tornado>=6.5.5" \
-            "cryptography>=46.0.5" \
-            "jaraco.context>=6.1.0" \
-            "Brotli>=1.2.0" && \
-        conda clean -afy
+COPY build/docker/requirements-pip.txt /tmp/requirements-pip.txt
+RUN pip wheel --wheel-dir=/wheels -r /tmp/requirements-pip.txt
 
-# Also patch vulnerable Python tooling in the base conda environment.
-RUN /opt/conda/bin/pip install --upgrade \
-            "pip>=26.0" \
-            "setuptools>=78.1.1" \
-            "wheel>=0.46.2" \
-            "requests>=2.33.0" \
-            "pygments>=2.20.0" \
-            "urllib3>=2.6.3" \
-            "pillow>=12.1.1" \
-            "tornado>=6.5.5" \
-            "cryptography>=46.0.5" \
-            "jaraco.context>=6.1.0" \
-            "Brotli>=1.2.0"
+# Build a wheel for the jaspr package itself so the runtime image does not
+# need a compiler or the source tree on PYTHONPATH.
+COPY app/ /src/app/
+RUN pip wheel --wheel-dir=/wheels --no-deps /src/app
 
-# Bundle example datasets/assets for in-container download routes.
-RUN mkdir -p /var/JASPR/example_data
-COPY example_data/ /var/JASPR/example_data/
+# ---------------------------------------------------------------------------
+# Stage 2: runtime image.  Only runtime libraries, the wheels we built,
+# and the application data.
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim-bookworm
 
-# App runtime location (matches existing image)
-COPY app/ /app/
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    HOME=/tmp \
+    JASPR_HTTP_PORT=8080 \
+    FLASK_APP=jaspr
+
+# Runtime libraries:
+#   libpcre3   - required by the uWSGI binary for routing/internal regex
+#   libexpat1  - common transitive dep for openpyxl/xml-handling code
+#   tini       - small init providing PID-1 signal handling
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpcre3 \
+        libexpat1 \
+        tini && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create an unprivileged service account.  Singularity will normally run
+# as the *invoking* user (host UID), but having a real entry in /etc/passwd
+# helps Docker/Podman and avoids "I have no name!" prompts when the host
+# UID happens to match 1000.
+RUN groupadd --system --gid 1000 jaspr && \
+    useradd  --system --uid 1000 --gid 1000 \
+             --home-dir /home/jaspr --create-home --shell /bin/false jaspr
+
+# Install pre-built wheels.  Re-pin pip/setuptools/wheel in the runtime
+# stage to satisfy CVE-driven lower-bound requirements.
+COPY --from=builder /wheels /wheels
+RUN pip install --upgrade \
+        "pip>=26.0" \
+        "setuptools>=78.1.1" \
+        "wheel>=0.46.2" && \
+    pip install --no-index --find-links=/wheels /wheels/*.whl && \
+    rm -rf /wheels
+
+# Static application assets (uwsgi config + example data).
+COPY app/app.ini       /app/app.ini
+COPY example_data/     /var/JASPR/example_data/
+
+# Make app/data world-readable so the image works regardless of which UID
+# Singularity / rootless Podman ends up running as.
+RUN chmod -R a+rX /app /var/JASPR /home/jaspr
+
 WORKDIR /app
+USER 1000:1000
+EXPOSE 8080
 
-# --- Nginx config + setup script (copied from your nginx image layout) ---
-# These config paths are the ones used by your nginx Dockerfile today:
-#   site.conf -> /etc/nginx/conf.d/site.conf
-#   healthcheck.conf -> /etc/nginx/conf.d/healthcheck.conf
-#   setup.sh -> /root/setup.sh
-# (see nginx Dockerfile snippet) :contentReference[oaicite:2]{index=2}
-COPY build/docker/nginx/site.conf /etc/nginx/conf.d/site.conf
-COPY build/docker/nginx/healthcheck.conf /etc/nginx/conf.d/healthcheck.conf
-COPY build/docker/nginx/setup.sh /root/setup.sh
-RUN chmod 0700 /root/setup.sh
+# Healthcheck honored by Docker/Podman (Singularity ignores it).
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/ping', timeout=3).status==200 else 1)" || exit 1
 
-# Copy localhost cert inputs used by setup.sh (localhost.conf content exists) :contentReference[oaicite:3]{index=3}
-COPY build/docker/nginx/localhost.conf /root/localhost.conf
-RUN mkdir -p /etc/ssl && \
-    openssl req -batch -x509 -nodes -days 30 -newkey rsa:2048 \
-      -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt \
-      -config /root/localhost.conf
-
-RUN mkdir -p /var/log/uwsgi && \
-    touch /var/log/uwsgi/uwsgi.log && \
-    chmod 644 /var/log/uwsgi/uwsgi.log
-
-# Supervisor config + entrypoint
-COPY build/docker/single/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY build/docker/single/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-EXPOSE 80 443
-CMD ["/entrypoint.sh"]
+# tini provides PID-1 signal handling identical across Docker/Podman/Singularity.
+ENTRYPOINT ["/usr/bin/tini", "--", "uwsgi", "--ini", "/app/app.ini"]

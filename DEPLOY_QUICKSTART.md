@@ -1,65 +1,141 @@
-JASPR Container Image Quickstart
+# JASPR Container Image Quickstart
 
-Goal
-Pull a published JASPR image and run it locally with either Docker or Podman.
+The JASPR single-container image is designed to run unchanged under
+**Docker**, **Podman** (rootful or rootless), and **Singularity / Apptainer**.
 
-Published image
+It is built to satisfy the constraints of restricted environments such as a
+Cloudera Data Platform client node:
+
+- runs as a non-root user (UID/GID `1000`)
+- listens on a non-privileged port (`8080`)
+- writes only to `/tmp` at runtime
+- performs no dynamic install or bootstrap on launch
+- exec()s `uwsgi` directly with a fixed config baked into the image
+
+TLS, when needed, is expected to be terminated upstream (host nginx, ingress,
+load balancer, etc.).  The image itself only speaks HTTP.
+
+## Published image
+
 ```bash
 export FULL_IMAGE=docker.io/cdcgov/jaspr:single
 ```
 
-Pull and run with Docker
+## Docker
+
 ```bash
 docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 8080:80 $FULL_IMAGE
+docker run -d --name jaspr \
+    --read-only --tmpfs /tmp:rw,size=512m,mode=1777 \
+    --user 1000:1000 \
+    --cap-drop=ALL --security-opt=no-new-privileges \
+    -p 8080:8080 \
+    $FULL_IMAGE
 ```
 
-Pull and run with Podman
+Then open <http://localhost:8080>.
+
+## Podman (rootless or rootful)
+
 ```bash
 podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 $FULL_IMAGE
+podman run -d --name jaspr \
+    --read-only --tmpfs /tmp:rw,size=512m,mode=1777 \
+    --user 1000:1000 \
+    --cap-drop=ALL --security-opt=no-new-privileges \
+    -p 8080:8080 \
+    $FULL_IMAGE
 ```
 
-Browser access
-- Open http://localhost:8080
-- Using 8080 avoids privileged-port issues.
+Or via compose:
 
-Optional easiest localhost mode (both HTTP and HTTPS)
 ```bash
-docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman-compose -f podman-compose-single.yml up -d
 ```
 
-Then open either:
-- http://localhost
-- https://localhost
+## Singularity / Apptainer
 
-If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
+Singularity always runs as the **invoking** user (your host UID/GID), the
+image filesystem is mounted **read-only**, and only a small set of paths
+(`/tmp`, `/var/tmp`, `$HOME`, `/proc`, `/sys`, `/dev`) are writable.  The
+JASPR image is built so this just works.
 
-Friendly hostname on the same machine
-1. Add this hosts-file entry:
-   127.0.0.1 localhost-jaspr
-2. Open one of:
-   http://localhost-jaspr:8080
-   https://localhost-jaspr
+### One-time: convert the OCI image to a SIF
 
-If the browser shows "Your connection isn't private" for the HTTPS option, open `Advanced` and choose `Proceed to localhost`.
+If you have access to the OCI image (Docker Hub, registry, or local podman),
+build a SIF on a machine where Singularity is available:
 
-Access from another machine
-1. Map a DNS name or hosts-file entry to the server IP.
-2. Browse to that name over HTTP.
+```bash
+# from a registry
+singularity build jaspr.sif docker://cdcgov/jaspr:single
 
-Example client hosts entry
-```text
-192.168.1.50 localhost-jaspr
+# from a local podman/docker image (export first)
+podman save -o jaspr-oci.tar cdcgov/jaspr:single
+singularity build jaspr.sif docker-archive://jaspr-oci.tar
 ```
 
-Stop and remove
+### Run
+
+```bash
+singularity run \
+    --containall \
+    --writable-tmpfs \
+    --pwd /app \
+    jaspr.sif
+```
+
+Flag notes:
+
+- `--containall` isolates the container from host bind mounts you don't
+  need (recommended on shared CDP nodes).
+- `--writable-tmpfs` provides a writable `/tmp` overlay since the rest of
+  the image stays read-only.
+- `--pwd /app` ensures the working directory is the app dir so relative
+  resource lookups (none today, but safer) behave consistently.
+
+If your site's Singularity install does not allow `--writable-tmpfs`,
+bind-mount a host writable directory onto `/tmp` instead:
+
+```bash
+mkdir -p $HOME/jaspr-tmp
+singularity run \
+    --containall \
+    --bind $HOME/jaspr-tmp:/tmp \
+    --pwd /app \
+    jaspr.sif
+```
+
+The container always listens on `0.0.0.0:8080` inside the namespace.  Under
+Singularity that is the same as `127.0.0.1:8080` on the host, so you can
+reach it directly without port publishing:
+
+```bash
+curl http://127.0.0.1:8080/ping
+```
+
+To bind to a different host port, run inside an SSH tunnel or use a
+front-end reverse proxy on the host.
+
+## Stop / clean up
+
 ```bash
 docker stop jaspr && docker rm jaspr
 podman stop jaspr && podman rm jaspr
+# Singularity:  Ctrl-C in the foreground, or `singularity instance stop jaspr`
+# if started with `singularity instance start`.
 ```
 
-Hosts file locations
-- Windows: C:/Windows/System32/drivers/etc/hosts
-- Linux and macOS: /etc/hosts
+## Troubleshooting
+
+- **`bind: permission denied` on port 80/443** — expected; this image only
+  uses 8080.  Republish to a different host port if needed (`-p 9090:8080`).
+- **`Read-only file system` writing under `/var/log` or `/etc`** — the
+  image is read-only by design; the app should never write outside `/tmp`.
+  If you see this, it is a bug; please report.
+- **`I have no name!` shell prompt under Singularity** — cosmetic; the
+  container runs as your host UID which has no entry in the container's
+  `/etc/passwd`.  The app does not depend on the username.
+- **Stuck on `Redis connection refused`** — should not happen anymore;
+  set `REDIS_HOST=` (empty) or simply omit the variable to skip Redis
+  entirely.  Filesystem sessions under `/tmp/flask_session` are used in
+  that case.

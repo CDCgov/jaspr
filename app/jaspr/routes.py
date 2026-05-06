@@ -858,8 +858,6 @@ def reportFRNTresults():
     #         pprint.pprint(jm.experiments[experiment])
 
     # pprint.pprint(os.getcwd())
-    os.chdir('../tmp')
-    # pprint.pprint(os.getcwd())
     filename = glob.glob('/tmp/*xlsx')
     # pprint.pprint(filename)
     filename = max(filename, key=os.path.getctime)

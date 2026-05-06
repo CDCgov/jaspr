@@ -1,31 +1,54 @@
-version: '3.3'
+# JASPR single-container compose file.
+#
+# Designed to behave identically under Docker Compose, Podman Compose, and
+# (with `singularity run`) Singularity / Apptainer.  See DEPLOY_QUICKSTART.md
+# for engine-specific run commands.
+#
+# Notes:
+#   * The container runs as UID/GID 1000 (the "jaspr" user baked into the
+#     image).  No root, no privilege escalation.
+#   * Listens on 8080 inside the container - a non-privileged port that
+#     rootless Podman and unprivileged Singularity can bind without
+#     CAP_NET_BIND_SERVICE.
+#   * The image filesystem is treated as read-only at runtime; only /tmp is
+#     writable.  Mount additional volumes only if you need to persist
+#     session/upload data across restarts.
+#   * No nginx, no embedded redis, no supervisor.  TLS is expected to be
+#     terminated upstream (host nginx, ingress, etc.) when needed.
+
+version: "3.8"
 
 services:
-  jaspr_single:
-    container_name: jaspr_single
+  jaspr:
+    container_name: jaspr
+    image: cdcgov/jaspr:single
     build:
       context: .
       dockerfile: build/docker/dockerfile-single
-    # .env is optional for single-container deploys.
-    # If variables are not provided, localhost-friendly defaults are used.
-    # Cloud environments can still override these via .env or shell env vars.
+    # Drop all Linux capabilities; the app needs none of them.
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    # tmpfs gives a writable /tmp without persisting it on the host.
+    tmpfs:
+      - /tmp:rw,size=512m,mode=1777
+    user: "1000:1000"
     environment:
-      - FLASK_APP=jaspr
-      - FLASK_DEBUG=True
-      - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
-      # single-container redis lives inside the same container
-      - REDIS_HOST=127.0.0.1
-      # nginx setup.sh uses these
-      - SSL_CERTIFICATE=${SSL_CERTIFICATE:-localhost}
-      - DEPLOYMENT_DNS="${DEPLOYMENT_DNS:-localhost}"
-    image: cdcflu/jaspr:single
-    tty: true
-    volumes:
-      # Credential/cert mounts default to local run/ paths for localhost use.
-      - "${CREDENTIALS_PATH:-./run/nginx/credentials}:/credentials"
-      - "${LETSENCRYPT_CONFIG_PATH:-./run/nginx/letsencrypt/config}:/etc/letsencrypt"
-      - "${LETSENCRYPT_DATA_PATH:-./run/nginx/letsencrypt/data}:/data/letsencrypt"
+      # REDIS_HOST is intentionally unset.  When unset, the app skips Redis
+      # entirely and uses filesystem sessions under /tmp/flask_session.
+      # Set REDIS_HOST=redis (and add a redis service) only if you want
+      # session persistence across container restarts.
     ports:
-      - "${JASPR_HTTP_PORT:-80}:80"
-      - "${JASPR_HTTPS_PORT:-443}:443"
+      # host:container.  Override JASPR_HTTP_PORT to publish on a different
+      # host port (the container always listens on 8080 internally).
+      - "${JASPR_HTTP_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/ping', timeout=3).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
