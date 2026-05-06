@@ -1,0 +1,26 @@
+# Pip-installed runtime dependencies for the slim, non-root JASPR image.
+# Kept separate from the top-level requirements.txt (which is conda-flavored).
+flask
+flask-session
+async-timeout>=4.0.3
+bokeh>=3.6
+pandas>=2.2
+xlrd
+xlsxwriter
+openpyxl
+markdown
+scipy
+redis
+uwsgi>=2.0.23
+
+# Security-pinned transitive / tooling dependencies.
+# Quoted equivalents in shell are NOT used here (this is a pip requirements file),
+# but we keep the same lower-bound pins as in the conda Dockerfile lineage.
+urllib3>=2.6.3
+pillow>=12.1.1
+tornado>=6.5.5
+cryptography>=46.0.5
+requests>=2.33.0
+pygments>=2.20.0
+jaraco.context>=6.1.0
+Brotli>=1.2.0
