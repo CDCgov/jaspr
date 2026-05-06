@@ -3,9 +3,6 @@
 # python imports
 import copy
 from random import sample
-from re import X
-from tkinter import Y
-from tracemalloc import stop
 import pandas as pd
 import math
 import numpy as np
