@@ -258,7 +258,7 @@ def _collect_slide_files(slides_dir):
     slide_files = []
     for root, _, files in os.walk(slides_dir):
         for file_name in files:
-            if not file_name.lower().endswith(('.ppt', '.pptx')):
+            if not file_name.lower().endswith('.pdf'):
                 continue
             abs_path = os.path.join(root, file_name)
             rel_path = os.path.relpath(abs_path, slides_dir).replace('\\', '/')
@@ -517,7 +517,7 @@ def download_example_data_bundle(test_type):
 
 @app.route('/downloadSlides')
 def download_slides():
-    """Render a page listing downloadable supplementary PowerPoint files."""
+    """Render a page listing downloadable supplementary slide PDFs."""
     _, slides_dir = _resolve_slides_dir()
     if not slides_dir:
         return redirect('/error502', code=302)
@@ -547,7 +547,7 @@ def download_slides():
               <div class="col-12">
                 <div class="card h-100">
                   <div class="card-body">
-                    <h4 class="card-title mb-3">PowerPoint Slides</h4>
+                    <h4 class="card-title mb-3">Supplementary Slides</h4>
                     <ul class="mb-0">
                       {% for slide in slide_files %}
                       <li>
@@ -585,7 +585,7 @@ def download_slide_file(slide_relpath):
     if not os.path.isfile(candidate_path):
         return redirect('/error502', code=302)
 
-    if not candidate_path.lower().endswith(('.ppt', '.pptx')):
+    if not candidate_path.lower().endswith('.pdf'):
         return redirect('/error502', code=302)
 
     response = make_response(send_file(
