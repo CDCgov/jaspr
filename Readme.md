@@ -42,54 +42,49 @@ Use the published JASPR container image from Docker Hub without checking out sou
 
 JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows. Supported workflows include high content imaging-based neutralization test (HINT) (Gubareva et al., 2019), Infected Cell Population (ICP) (Gubareva et al., 2019), and Focus Reduction Neutralization Test (FRNT) (Suthar et al., 2020).
 
-```bash
-export FULL_IMAGE=docker.io/cdcgov/jaspr:latest
-```
-
-#### Pull and Run on Another Machine
+#### Quick Start
 
 Run with Docker:
 
 ```bash
-docker pull $FULL_IMAGE
-docker run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+docker pull docker.io/cdcgov/jaspr:1.0
+docker run -d --name jaspr \
+    --read-only --tmpfs /tmp:rw,size=512m,mode=1777 \
+    --user 1000:1000 \
+    --cap-drop=ALL --security-opt=no-new-privileges \
+    -p 8080:8080 \
+    docker.io/cdcgov/jaspr:1.0
 ```
 
 Run with Podman:
 
 ```bash
-podman pull $FULL_IMAGE
-podman run -d --name jaspr -p 80:80 -p 443:443 $FULL_IMAGE
+podman pull docker.io/cdcgov/jaspr:1.0
+podman run -d --name jaspr \
+    --read-only --tmpfs /tmp:rw,size=512m,mode=1777 \
+    --user 1000:1000 \
+    --cap-drop=ALL --security-opt=no-new-privileges \
+    -p 8080:8080 \
+    docker.io/cdcgov/jaspr:1.0
 ```
 
-Then open either:
-
-```text
-http://localhost
-https://localhost
-```
-
-If the browser shows "Your connection isn't private" for `https://localhost`, open `Advanced` and choose `Proceed to localhost`.
-
-#### Optional High-Port Mode
-
-If your runtime/user is not allowed to bind to standard web ports, use high ports instead:
-
-```bash
-docker run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
-podman run -d --name jaspr -p 8080:80 -p 8443:443 $FULL_IMAGE
-```
-
-Then open either:
+Then open:
 
 ```text
 http://localhost:8080
-https://localhost:8443
 ```
 
-Using `8080` and `8443` avoids privileged-port issues that are common with rootless Podman and some locked-down Docker environments.
+#### Security & Design Notes
 
-If the browser shows "Your connection isn't private" for `https://localhost:8443`, open `Advanced` and choose `Proceed to localhost`.
+The JASPR container is built for security and portability:
+
+- **Non-root user** — Runs as UID/GID `1000` by design
+- **Unprivileged port** — Listens on port `8080` only (no privileged ports)
+- **Read-only filesystem** — Image is read-only; only `/tmp` is writable
+- **No capabilities** — All Linux capabilities are dropped
+- **TLS termination upstream** — Use a reverse proxy (nginx, ingress, etc.) for HTTPS
+
+**Important:** Do not use `-p 80:80`, `-p 443:443`, or other privileged port mappings. The app only speaks HTTP on port `8080`.
 
 #### Stop the Container
 
@@ -97,6 +92,37 @@ If the browser shows "Your connection isn't private" for `https://localhost:8443
 docker stop jaspr && docker rm jaspr
 podman stop jaspr && podman rm jaspr
 ```
+
+#### Using a Reverse Proxy (nginx)
+
+To expose JASPR over HTTPS with a domain name, use a reverse proxy on the host:
+
+```nginx
+upstream jaspr_backend {
+    server 127.0.0.1:8080;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name jaspr.example.com;
+
+    ssl_certificate /etc/ssl/certs/jaspr.crt;
+    ssl_certificate_key /etc/ssl/private/jaspr.key;
+
+    location / {
+        proxy_pass http://jaspr_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### Full Documentation
+
+- [DEPLOY_QUICKSTART.md](DEPLOY_QUICKSTART.md) — Container deployment and troubleshooting
+
 
 ### Branch Strategy Notice
 

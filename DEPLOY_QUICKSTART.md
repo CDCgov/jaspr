@@ -35,6 +35,8 @@ docker run -d --name jaspr \
 
 Then open <http://localhost:8080>.
 
+**Note:** The app only listens on port `8080` (unprivileged port). Do not use `-p 80:80` or `-p 443:443`; TLS must be terminated upstream.
+
 ## Podman (rootless or rootful)
 
 ```bash
@@ -47,7 +49,9 @@ podman run -d --name jaspr \
     $FULL_IMAGE
 ```
 
-Or via compose:
+Then open <http://localhost:8080>.
+
+**Note:** The app only listens on port `8080` (unprivileged port). Do not use `-p 80:80` or `-p 443:443`; TLS must be terminated upstream.
 
 ```bash
 podman-compose -f podman-compose-single.yml up -d

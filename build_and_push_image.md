@@ -17,14 +17,24 @@ cd /path/to/jaspr
 
 ## 2. Set image values
 
+Set these environment variables in your shell session. They will be used in all subsequent steps:
+
 ```bash
 export IMAGE_REGISTRY=docker.io
 export IMAGE_USER=cdcgov
 export IMAGE_NAME=jaspr
-export VERSION=2.0
+export VERSION=1.0
 export IMAGE_PRIMARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:$VERSION
 export IMAGE_SECONDARY=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:single
 export IMAGE_LATEST=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
+```
+
+Verify they are set correctly:
+
+```bash
+echo "PRIMARY: $IMAGE_PRIMARY"
+echo "SECONDARY: $IMAGE_SECONDARY"
+echo "LATEST: $IMAGE_LATEST"
 ```
 
 ## 3. Log in to Docker Hub
@@ -32,6 +42,8 @@ export IMAGE_LATEST=$IMAGE_REGISTRY/$IMAGE_USER/$IMAGE_NAME:latest
 ```bash
 podman login docker.io
 ```
+
+**Important:** Keep the same shell session open for all remaining steps (4-6) so the environment variables from step 2 remain set.
 
 ## 4. Build the image
 
@@ -48,16 +60,14 @@ podman build \
 ## 5. Tag
 
 ```bash
-podman tag $IMAGE_PRIMARY $IMAGE_SECONDARY
-podman tag $IMAGE_PRIMARY $IMAGE_LATEST
+podman tag docker.io/cdcgov/jaspr:1.0 docker.io/cdcgov/jaspr:latest
 ```
 
 ## 6. Push
 
 ```bash
-podman push $IMAGE_PRIMARY
-podman push $IMAGE_SECONDARY
-podman push $IMAGE_LATEST
+podman push docker.io/cdcgov/jaspr:1.0
+podman push docker.io/cdcgov/jaspr:latest
 ```
 
 ## 7. Optional local sanity-run
