@@ -17,3 +17,7 @@ app/supervisord.log
 app/supervisord.pid
 =======
 >>>>>>> FLULIMS-5583
+
+# SSL credentials - never commit sensitive keys
+run/nginx/credentials/ssl/*
+!run/nginx/credentials/ssl/.gitkeep
