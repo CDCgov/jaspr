@@ -15,6 +15,15 @@ app/dump.rdb
 app/supervisord.log
 app/supervisord.pid
 
-# SSL credentials - never commit sensitive keys
+# SSL credentials and private keys - never commit sensitive keys
 run/nginx/credentials/ssl/*
 !run/nginx/credentials/ssl/.gitkeep
+*.key
+*.pem
+*.key.old
+*.p12
+*.pfx
+
+# Build artifacts that may contain secrets
+all_files.txt
+DockerBuild/buildAIFResearch
