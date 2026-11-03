@@ -86,7 +86,6 @@ server {
 ## Documentation
 
 - [DEPLOY_QUICKSTART.md](DEPLOY_QUICKSTART.md) — Container deployment, troubleshooting, and Singularity/Apptainer instructions
-- [build_and_push_image.md](build_and_push_image.md) — Building and publishing the Docker image
 
 ## Contributing
 
