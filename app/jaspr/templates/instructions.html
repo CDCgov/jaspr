@@ -1,0 +1,47 @@
+{% extends "jaspr_layout.html" %}
+
+{% block body %}
+<div class="row mb-3">
+	<div class="col-12">
+		<h1>Instructions & Guides</h1>
+	</div>
+</div>
+
+<div class="row mb-3">
+	<div class="col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<h2 class="card-title mb-3">Step-by-Step Instruction Guides</h2>
+				<p class="card-text mb-3">
+					Download comprehensive guides to walk through analysis workflows with mock datasets. 
+					Each guide includes step-by-step instructions and parameter explanations to help you learn JASPR analysis.
+				</p>
+				{% if instruction_files %}
+				<div class="list-group">
+					{% for guide in instruction_files %}
+					<a href="{{ guide.url }}" class="list-group-item list-group-item-action" {% if guide.filename.endswith('.html') %}target="_blank"{% endif %}>
+						<h3 class="mb-1">{{ guide.display_name }}</h3>
+						<p class="mb-0 text-muted">
+							{% if guide.filename.endswith('.html') %}
+								HTML Guide • Click to open in new window • Print to PDF with Ctrl+P
+							{% else %}
+								PDF Guide • Click to download
+							{% endif %}
+						</p>
+					</a>
+					{% endfor %}
+				</div>
+				{% else %}
+				<div class="alert alert-info" role="alert">
+					Instruction guides are being prepared. Please check back soon!
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block pagescript %}
+<!-- No page-level javascript required -->
+{% endblock %}
