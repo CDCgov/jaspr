@@ -7,10 +7,17 @@ from openpyxl import Workbook
 import redis
 import os
 import glob
+import secrets
 
 
 app = Flask(__name__)
-app.secret_key = b'HoleyMoleyRocky'
+
+# Load secret key from environment or generate a secure random key.
+# DO NOT hardcode secrets in source code.
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
+if not app.secret_key:
+    # Generate a secure random key for this session if not provided
+    app.secret_key = secrets.token_hex(32)
 app.config['TESTING'] = True
 
 # Session storage:
@@ -51,7 +58,8 @@ if not _use_redis:
 
 #allow intercepts without stopping while debugging
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.debug=True
+# Only enable debug mode if explicitly set in environment (NEVER in production)
+app.debug = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
 
 # Best-effort cleanup of any stray chart png temp files.  Wrapped in
 # try/except so a read-only or non-existent path never breaks startup.

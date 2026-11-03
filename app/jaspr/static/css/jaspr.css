@@ -16,6 +16,8 @@ body {
 
 .menubar {
   min-height: 35px;
+  background-color: #005eaa;
+  color: white;
 }
 
 .align-right {
@@ -27,7 +29,7 @@ body {
 }
 
 .selector {
-  background-color: #f5f5f5;
+  background-color: #f1f8e9;
 }
 
 .footer {
@@ -35,6 +37,7 @@ body {
   text-align: center;
   font-weight: bold;
   color: white;
+  background-color: #005eaa;
 }
 
 input[type="file"] {

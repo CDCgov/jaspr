@@ -37,10 +37,9 @@ services:
     user: "1000:1000"
     environment:
       - PYTHONUNBUFFERED=1
-      # REDIS_HOST is intentionally unset.  When unset, the app skips Redis
-      # entirely and uses filesystem sessions under /tmp/flask_session.
-      # Set REDIS_HOST=redis (and add a redis service) only if you want
-      # session persistence across container restarts.
+      # Disabled Redis due to JSON serialization issues with pandas Timestamps
+      # in HINT/ICP parser data. Filesystem sessions work well enough for now.
+      # - REDIS_HOST=redis
     ports:
       # host:container.  Override JASPR_HTTP_PORT to publish on a different
       # host port (the container always listens on 8080 internally).
@@ -52,3 +51,19 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    container_name: jaspr-redis
+    image: redis:7-alpine
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,size=128m,mode=1777
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3

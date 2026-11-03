@@ -1,18 +1,20 @@
 {% extends "jaspr_layout.html" %}
 
 {% block body %}
+<h1>JASPR Curve Fitting Tool</h1>
+
 <div class="row mb-3">
 	<div class="col-12">
 		<div class="card h-100">
 			<div class="card-body">
-				<h4 class="card-title mb-3">About JASPR</h4>
+				<h2 class="card-title mb-3">About JASPR</h2>
 				<p class="card-text">
 					JASPR is a curve-fitting and report-generation application for antigenic assay analysis used in viral surveillance workflows.
 					Supported workflows include high content imaging-based neutralization test (HINT)
 					(<a href="#references">Gubareva et al., 2019</a>),
 					Infected Cell Population (ICP)
 					(<a href="#references">Gubareva et al., 2019</a>),
-					and Focus Reduction Neutralization Test (FRNT)
+					the and Focus Reduction Neutralization Test (FRNT)
 					(<a href="#references">Suthar et al., 2020</a>).
 				</p>
 				<p class="card-text">
@@ -21,7 +23,7 @@
 					Optional setting adjustments can be made on the <strong>Settings</strong> page when fit tuning is desired.
 				</p>
 				<p class="card-text mb-0">
-					New users can download bundled sample files from the <a href="#example-data">Example Data</a> section to get started.
+					New users can download bundled sample files from the <a href="#example-data">Mock Data</a> section to get started.
 				</p>
 			</div>
 		</div>
@@ -32,7 +34,7 @@
 	<div class="col-12">
 		<div class="card h-100">
 			<div class="card-body">
-				<h4 class="card-title mb-3">Instructions for Use</h4>
+				<h2 class="card-title mb-3">Instructions for Use</h2>
 				<ol class="mb-3">
 					<li>Open <strong>Load Data</strong>, select the parser for your assay/instrument, upload the data file and key file, then click <strong>Submit</strong>.</li>
 					<li>Open <strong>Analysis</strong> to review curves and tables for the loaded data.
@@ -57,9 +59,9 @@
 					Optional: Use <strong>Settings</strong> to adjust fit visibility, blank correction, axis scale, and fitting function, then click <strong>Execute</strong> to apply updates and re-check Analysis/Report outputs.
 				</p>
 
-				<h5>
+				<h3>
 					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#parserNotes" aria-expanded="false" aria-controls="parserNotes">Parser Notes</button>
-				</h5>
+				</h3>
 				<div class="collapse" id="parserNotes">
 				<ul class="mb-0">
 					<li>
@@ -224,21 +226,9 @@
 	<div class="col-lg-4">
 		<div class="card h-100" id="example-data">
 			<div class="card-body d-flex flex-column">
-				<h4 class="card-title">Example Data</h4>
-				<p class="card-text">Download bundled example datasets for parser validation and training runs. When uploading your experimental data for analysis, match the data structure and file names used in the example files.</p>
-				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadExampleData">Download Example Data</a>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row mb-3">
-	<div class="col-lg-6">
-		<div class="card h-100">
-			<div class="card-body d-flex flex-column">
-				<h4 class="card-title">Supplementary Information</h4>
-				<p class="card-text">Slide presentations include illustrations of sample plate layouts and logistic fit modifications that differentiate the ICP vs. antigenic testing analysis.</p>
-				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadSlides">Download Slide Presentations</a>
+				<h4 class="card-title">Mock Data</h4>
+				<p class="card-text">Download bundled mock datasets for parser validation and training runs. When uploading your experimental data for analysis, match the data structure and file names used in the mock data files.</p>
+				<a class="btn btn-primary mt-auto" style="max-width: 500px; width: 100%;" href="/downloadExampleData">Download Mock Data</a>
 			</div>
 		</div>
 	</div>

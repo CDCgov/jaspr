@@ -27,7 +27,7 @@ pprint.pprint = _noop_pprint
 
 # flask imports
 from flask import Flask, render_template, render_template_string, request, \
-    jsonify, redirect, make_response, send_from_directory, send_file, session
+    jsonify, redirect, make_response, send_from_directory, send_file, session, url_for
 from jinja2.exceptions import TemplateNotFound
 
 # local imports
@@ -346,7 +346,7 @@ def upload():
     # /\ /\ Capture Key File Name /\ /\ #        
 
     jm = JasprModel()
-    selected_parser = jm.curr_parser
+    selected_parser = request.form.get('parser', '') or jm.curr_parser
 
     try:
         settings = ParserRegistry.plugins[selected_parser](keyfile, datafile)()
@@ -595,6 +595,7 @@ def download_slide_file(slide_relpath):
     ))
     response.headers['cache-control'] = 'no-cache'
     return response
+
 
 @app.route('/error502')
 def error502():

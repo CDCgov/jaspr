@@ -36,6 +36,7 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate jaspr_env && \
 # Copy the current directory contents into the container at /build
 ADD requirements.txt .
 ADD ./build /build
+COPY example_data/ /var/JASPR/example_data/
 #WORKDIR /build
 
 # create a new env, and install dependencies

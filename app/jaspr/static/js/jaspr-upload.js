@@ -1,5 +1,15 @@
 $(function() {
 
+  // Handle parser selection dropdown changes
+  $('#parser').on('change', function() {
+    var selected_parser = $(this).val();
+    if (selected_parser) {
+      $.post("/updateConfigSetting", {
+        curr_parser: selected_parser
+      });
+    }
+  });
+
   // selection on a bootstrap dropdown list
   $('.dropdown-menu').click(function(e) {
     $("#dropdownMenuButton").text(e.target.innerText)

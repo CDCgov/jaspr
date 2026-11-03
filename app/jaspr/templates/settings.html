@@ -6,49 +6,85 @@
 	<div class="col-3">
 	</div>
 	<div class="col-9">
+		<h1>Settings</h1>
+
 		<form action=''>
-			<input type="checkbox" id="showCurve" {% if show_fit %}Checked{% endif %}>Show Curve Fit</input>
+			<fieldset>
+				<legend>Curve Display</legend>
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="showCurve" {% if show_fit %}Checked{% endif %}>
+					<label class="form-check-label" for="showCurve">Show Curve Fit</label>
+				</div>
+
+				<br />
+
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="blankCorrection" {% if blank_correction %}Checked{% endif %}>
+					<label class="form-check-label" for="blankCorrection">Blank Correction</label>
+				</div>
+			</fieldset>
 
             <br /><br />
 
-			<input type="checkbox" id="blankCorrection" {% if blank_correction %}Checked{% endif %}>Blank Correction</input>
-
-            <br /><br />
-
-			<div id="axisScaleSelect" class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary {% if x_axis_type == 'log' %}active{% endif %}">
-					<input type="radio" name="axisScale" id="log" autocomplete="off" {% if x_axis_type == 'log' %}Checked{%endif%}>
-                        Log Scale
-					</input>
-				</label>
-				<label class="btn btn-secondary {% if x_axis_type == 'linear' %}active{% endif %}">
-					<input type="radio" name="axisScale" id="linear" autocomplete="off" {% if x_axis_type=='linear' %}Checked{%endif%}>
-                        Linear Scale
-					</input>
-				</label>
-			</div>
+			<fieldset>
+				<legend>Axis Scale</legend>
+				<div class="form-check">
+					<input type="radio" class="form-check-input" name="axisScale" value="log" id="log" {% if x_axis_type == 'log' %}Checked{%endif%}>
+					<label class="form-check-label" for="log">Log Scale</label>
+				</div>
+				<div class="form-check">
+					<input type="radio" class="form-check-input" name="axisScale" value="linear" id="linear" {% if x_axis_type=='linear' %}Checked{%endif%}>
+					<label class="form-check-label" for="linear">Linear Scale</label>
+				</div>
+			</fieldset>
             
             <br /><br />
 
-			<div class="dropdown">
-				<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					{{ curr_function }}
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			<fieldset>
+				<legend>Fitting Function</legend>
+				<label for="function-select">Select function:</label>
+				<select id="function-select" class="form-control" style="width: auto;">
+					<option value="">{{ curr_function }}</option>
 					{% for fn in function_list %}
-                        <a class="dropdown-item" href="#">{{fn}}</a>
+                        <option value="{{fn}}">{{fn}}</option>
                     {%endfor%}
-				</div>
+				</select>
+			</fieldset>
+
+			<br />
+
+			<button type="button" class="btn btn-primary" onClick="GetPing();">Check Connection (Ping)</button>
+			<div id="pingResult" role="status" aria-live="polite" aria-label="Ping result">
+				<span id="pingValue"></span>
 			</div>
-			<br>
-			<button type="button" class="btn" onClick="GetPing();">ping</button><br>
-			<span id="pingTitle" style="display: None">ping value:</span>&nbsp;
-			<span id="pingValue"></span>
 		</form>
 		<div>
-			<a href="/analysis" class="btn btn-primary">Execute</a>
+			<a href="/analysis" class="btn btn-primary">Execute Analysis</a>
 		</div>
 	</div>
 </div>
+
+<style>
+fieldset {
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+legend {
+  padding: 0 8px;
+  font-weight: bold;
+  color: #005eaa;
+}
+
+.form-check {
+  margin-bottom: 12px;
+}
+
+.form-check-input {
+  margin-right: 8px;
+}
+</style>
+
 {%endblock%}
-</body>

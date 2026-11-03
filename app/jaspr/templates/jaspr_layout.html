@@ -5,9 +5,9 @@
 
   <body>
 
-    <main class='site-content'>
+    {% include "nav.html" %}
 
-	  {% include "nav.html" %}
+    <main id="main-content" class='site-content'>
 
       {% block body %}Body Code Here{% endblock %}
 

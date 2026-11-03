@@ -13,16 +13,17 @@
   <div class="row">
     <div class="col-3"></div>
     <div class="col-6">
-      <div class="dropdown">
-       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-         {{ curr_parser or ' -- Select a parser -- ' }}
-       </button>
-       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-         {% for parser in parser_list %}
-           <a class="dropdown-item" href="#">{{ parser }}</a>
-         {% endfor %}
-       </div>
-      </div>
+      <label for="parser" style="display: block; margin-bottom: 8px; font-weight: bold;">
+        Parser
+        <span aria-hidden="true">*</span>
+        <span class="sr-only">required</span>
+      </label>
+      <select id="parser" name="parser" class="form-control" required style="display: block;">
+        <option value="">-- Select a parser --</option>
+        {% for parser in parser_list %}
+          <option value="{{ parser }}"{% if curr_parser == parser %} selected{% endif %}>{{ parser }}</option>
+        {% endfor %}
+      </select>
     </div>
   </div>
 
@@ -30,45 +31,76 @@
 
   <div class="row">
     <div class="col-1"></div>
-    <div class="col-2 align-right">Data file</div>
+    <div class="col-2 align-right">
+      <label for="datafile">
+        Data file
+        <span aria-hidden="true">*</span>
+        <span class="sr-only">required</span>
+      </label>
+    </div>
     <div class="col-6">
       <div class="input-group">
-        <label class="input-group-btn">
+        <label for="datafile" class="input-group-btn">
           <span class="btn btn-primary">
-            Browse&hellip; <input name ='datafile' type="file" multiple>
+            Browse&hellip;
           </span>
+          <input id="datafile" 
+                 name="datafile" 
+                 type="file" 
+                 multiple
+                 required
+                 aria-describedby="datafile-help">
         </label>
-        <input type="text" class="form-control" readonly>
+        <input id="datafile-name" 
+               type="text" 
+               class="form-control" 
+               readonly
+               aria-label="Selected data file"
+               aria-live="polite">
       </div>
+      <small id="datafile-help" style="display: block; margin-top: 4px; color: #555555;">
+      </small>
     </div>
   </div>
 
   <div class="row">
     <div class="col-1"></div>
-    <div class="col-2 align-right">Key file</div>
+    <div class="col-2 align-right">
+      <label for="keyfile">
+        Key file
+        <span aria-hidden="true">*</span>
+        <span class="sr-only">required</span>
+      </label>
+    </div>
     <div class="col-6">
       <div class="input-group">
-        <label class="input-group-btn">
+        <label for="keyfile" class="input-group-btn">
           <span class="btn btn-primary">
-            Browse&hellip; <input name ='keyfile' type="file" multiple>
+            Browse&hellip;
           </span>
+          <input id="keyfile" 
+                 name="keyfile" 
+                 type="file" 
+                 multiple
+                 required
+                 aria-describedby="keyfile-help">
         </label>
-        <input type="text" class="form-control" readonly>
+        <input id="keyfile-name" 
+               type="text" 
+               class="form-control" 
+               readonly
+               aria-label="Selected key file"
+               aria-live="polite">
       </div>
+      <small id="keyfile-help" style="display: block; margin-top: 4px; color: #555555;">
+      </small>
     </div>
   </div>
 
   <div class="row">
     <div class="col-3"></div>
     <div class="col-6">
-      <input class="btn" type="submit" />
-    </div>
-  </div>
-
-  <div class="row mt-2">
-    <div class="col-3"></div>
-    <div class="col-6">
-      <span class="btn btn-outline-secondary invisible">Load Example Anscombe Dataset</span>
+      <button class="btn btn-primary" type="submit">Submit files</button>
     </div>
   </div>
 
@@ -83,5 +115,19 @@
 
 <br />
 <br />
+
+<style>
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+</style>
 
 {%endblock%}
