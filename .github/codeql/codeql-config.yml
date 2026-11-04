@@ -1,0 +1,12 @@
+name: CodeQL Configuration
+
+queries:
+  - uses: security-and-quality
+
+paths-ignore:
+  # Bootstrap is a third-party library with false positive CodeQL alerts
+  # The carousel component selector validation is safe and produces false positives
+  # See: https://github.com/twbs/bootstrap/issues (various CodeQL false positives)
+  - app/jaspr/static/bootstrap
+
+disable-default-queries: false
