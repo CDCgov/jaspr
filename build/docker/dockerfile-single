@@ -30,6 +30,7 @@ ENV PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         build-essential \
         libpcre3-dev \
@@ -71,6 +72,7 @@ ENV PIP_NO_CACHE_DIR=1 \
 #   libexpat1  - common transitive dep for openpyxl/xml-handling code
 #   tini       - small init providing PID-1 signal handling
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         libpcre3 \
         libexpat1 \
