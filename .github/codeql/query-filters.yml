@@ -1,0 +1,22 @@
+# CodeQL Query Filters for suppressing known false positives
+#
+# This file tells CodeQL which specific alerts to suppress based on:
+# - query: The CodeQL query rule
+# - path: File path pattern
+# - justification: Why the alert is suppressed
+
+- query: "js/xss-through-dom"
+  path: "app/jaspr/static/bootstrap/js/bootstrap.js"
+  justification: |
+    False positive: Bootstrap carousel component validates selector
+    before DOM lookup using Util.getSelectorFromElement() and 
+    hasClass() checks. The selector is internal and safe.
+    See: https://github.com/twbs/bootstrap/issues (carousel false positives)
+
+- query: "js/xss-through-dom"
+  path: "app/jaspr/static/bootstrap/js/bootstrap.bundle.js"
+  justification: |
+    False positive: Bootstrap carousel component validates selector
+    before DOM lookup using Util.getSelectorFromElement() and 
+    hasClass() checks. The selector is internal and safe.
+    See: https://github.com/twbs/bootstrap/issues (carousel false positives)
