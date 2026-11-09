@@ -12,6 +12,12 @@ Cloudera Data Platform client node:
 - performs no dynamic install or bootstrap on launch
 - exec()s `uwsgi` directly with a fixed config baked into the image
 
+The current build uses Chainguard Python 3.15.2 with Expat 2.10.0 and
+targeted upstream Python security backports. It has no shell, pip, setuptools,
+or compiler. Security regression checks run before the entrypoint execs
+the tini/uWSGI process. See [build and security verification](build_and_push_image.md)
+before publishing or changing the pinned base images.
+
 TLS, when needed, is expected to be terminated upstream (host nginx, ingress,
 load balancer, etc.).  The image itself only speaks HTTP.
 

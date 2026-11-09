@@ -22,5 +22,5 @@ jaspr = [
 ]
 
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools>=78.1.1"]
 build-backend = "setuptools.build_meta"

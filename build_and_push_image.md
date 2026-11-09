@@ -3,7 +3,7 @@
 These steps build the portable, non-root JASPR image and publish it to
 Docker Hub repository `cdcgov/jaspr` under two tags:
 
-- `single`
+- `1.0`
 - `latest`
 
 The image is the same one consumed by `DEPLOY_QUICKSTART.md` and is
@@ -47,6 +47,7 @@ podman login docker.io
 
 ```bash
 podman build \
+    --pull=always --no-cache --format docker \
     -f build/docker/dockerfile-single \
     --label org.opencontainers.image.source="https://github.com/cdcent/jaspr" \
     --label org.opencontainers.image.url="https://hub.docker.com/r/cdcgov/jaspr" \
@@ -55,17 +56,67 @@ podman build \
     .
 ```
 
+### Verify security before tagging or pushing
+
+The image uses digest-pinned Chainguard Python build/runtime images
+(Python 3.15.2, Expat 2.10.0), rather than Debian Bookworm. Pip, setuptools,
+wheel, compilers, and the source tree are excluded from the final image.
+It contains no shell or package manager.
+
+Run the same security regression checks that run during the build and before
+application startup:
+
+```bash
+podman run --rm --entrypoint python "$IMAGE_PRIMARY" /app/verify-image.py
+```
+
+Scan the actual image locally, not just the Dockerfile:
+
+```bash
+podman save --format docker-archive -o jaspr-image.tar "$IMAGE_PRIMARY"
+podman run --rm -v "$PWD:/scan:ro" docker.io/aquasec/trivy:latest \
+    image --input /scan/jaspr-image.tar --scanners vuln --exit-code 1
+podman run --rm -v "$PWD:/scan:ro" docker.io/anchore/grype:latest \
+    docker-archive:/scan/jaspr-image.tar --fail-on low
+rm jaspr-image.tar
+```
+
+Scanner results can differ. Do not ignore new findings or assume a successful
+build guarantees a clean scan. Grype's generic upstream-version matches can
+still report locally backported fixes; review them against the table below.
+
+| Advisory | Remediation / applicability in this image |
+| --- | --- |
+| CVE-2026-115506, CVE-2026-118370, CVE-2026-117610 | Both system Expat and Python's XML parser use fixed Expat 2.10.0. |
+| CVE-2025-47273 | Runtime pip and setuptools, including the flagged pip BOM, are absent. Build tooling and the application build backend require patched setuptools. |
+| CVE-2026-116566 | Official CPython 3.15 socket backport; null bytes in host/port are rejected by a rebuilt native socket module. |
+| CVE-2026-103995 | Official CPython HTTP framing fix and whitespace compatibility correction; unchecked-hash bytecode is removed so Python loads the patched source. |
+| CVE-2026-84243 | Not applicable to the configured runtime: only C.utf8 is installed and a C messages locale is enforced at startup. The underlying glibc package is not claimed to be patched. |
+| CVE-2026-119586 | Not applicable: this affects the SQLite CLI's `.recover` command; the image has the SQLite library but no CLI. |
+
+The backports are in `build/docker/backport-python.sh` and are tied to the
+CPython source revision of the pinned base images. Update the builder/runtime
+digests together, reassess the backports, and rerun regression checks and both
+scanners when changing bases. `--pull=always` does not advance a pinned digest.
+Do not install extra locales, enable a non-C message locale, or add the SQLite
+CLI without reassessing the corresponding findings. Startup rejects those
+changes.
+
+Dependabot's manifest checks do not replace final-image scans. Re-scan published
+images by digest as advisory databases change. Publishing is a separate step;
+the checks above do not push anything to Docker Hub.
+
 ## 5. Tag
 
 ```bash
-podman tag docker.io/cdcgov/jaspr:1.0 docker.io/cdcgov/jaspr:latest
+podman tag "$IMAGE_PRIMARY" "$IMAGE_LATEST"
 ```
 
 ## 6. Push
 
 ```bash
-podman push docker.io/cdcgov/jaspr:1.0
-podman push docker.io/cdcgov/jaspr:latest
+podman push "$IMAGE_PRIMARY"
+podman push "$IMAGE_LATEST"
 ```
 
 ## 7. Optional local sanity-run

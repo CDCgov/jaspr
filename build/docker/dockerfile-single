@@ -20,42 +20,48 @@
 #     and "podman run --read-only".
 #
 # ---------------------------------------------------------------------------
-# Stage 1: build wheels.  Compile uWSGI (the only package without a
-# pre-built manylinux wheel) here so the runtime image stays slim.
+# Stage 1: install into a virtual environment. Compile uWSGI here so
+# the runtime image contains no compiler or Python package installer.
 # ---------------------------------------------------------------------------
-FROM python:3.11-slim-bookworm AS builder
+FROM cgr.dev/chainguard/python:latest-dev@sha256:64f414bffa25ca9ff518f35975ad153a921b2e4850c4a84c31a96885fdb86a02 AS builder
+
+USER root
 
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        libpcre3-dev \
-        libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache tini
+
+COPY build/docker/backport-python.sh /tmp/backport-python.sh
+RUN sh /tmp/backport-python.sh
 
 # Upgrade build tooling first so wheel builds use patched setuptools/wheel.
-RUN pip install --upgrade \
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/python -m pip install --upgrade \
         "pip>=26.0" \
         "setuptools>=78.1.1" \
         "wheel>=0.46.2"
 
 COPY build/docker/requirements-pip.txt /tmp/requirements-pip.txt
-RUN pip wheel --wheel-dir=/wheels -r /tmp/requirements-pip.txt
+RUN /opt/venv/bin/python -m pip install -r /tmp/requirements-pip.txt
 
-# Build a wheel for the jaspr package itself so the runtime image does not
-# need a compiler or the source tree on PYTHONPATH.
+# Install the application without retaining the source tree at runtime.
 COPY app/ /src/app/
-RUN pip wheel --wheel-dir=/wheels --no-deps /src/app
+RUN /opt/venv/bin/python -m pip install --no-deps /src/app && \
+    /opt/venv/bin/python -m pip check && \
+    /opt/venv/bin/python -m pip uninstall -y pip setuptools wheel
+
+RUN addgroup -S -g 1000 jaspr && \
+    adduser -S -D -u 1000 -G jaspr -h /home/jaspr -s /bin/false jaspr
 
 # ---------------------------------------------------------------------------
-# Stage 2: runtime image.  Only runtime libraries, the wheels we built,
+# Stage 2: runtime image. Only runtime libraries, the installed application,
 # and the application data.
 # ---------------------------------------------------------------------------
-FROM python:3.11-slim-bookworm
+FROM cgr.dev/chainguard/python:latest@sha256:f3e5face39b0acd813fae456df27b33bf6a6bffba5d201d15f6498138cb8fd96
+
+USER root
 
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -65,45 +71,30 @@ ENV PIP_NO_CACHE_DIR=1 \
     LC_ALL=C.UTF-8 \
     HOME=/tmp \
     JASPR_HTTP_PORT=8080 \
-    FLASK_APP=jaspr
-
-# Runtime libraries:
-#   libpcre3   - required by the uWSGI binary for routing/internal regex
-#   libexpat1  - common transitive dep for openpyxl/xml-handling code
-#   tini       - small init providing PID-1 signal handling
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-        libpcre3 \
-        libexpat1 \
-        tini && \
-    rm -rf /var/lib/apt/lists/*
+    FLASK_APP=jaspr \
+    PATH=/opt/venv/bin:/usr/bin:/bin
 
 # Create an unprivileged service account.  Singularity will normally run
 # as the *invoking* user (host UID), but having a real entry in /etc/passwd
 # helps Docker/Podman and avoids "I have no name!" prompts when the host
 # UID happens to match 1000.
-RUN groupadd --system --gid 1000 jaspr && \
-    useradd  --system --uid 1000 --gid 1000 \
-             --home-dir /home/jaspr --create-home --shell /bin/false jaspr
-
-# Install pre-built wheels.  Re-pin pip/setuptools/wheel in the runtime
-# stage to satisfy CVE-driven lower-bound requirements.
-COPY --from=builder /wheels /wheels
-RUN pip install --upgrade \
-        "pip>=26.0" \
-        "setuptools>=78.1.1" \
-        "wheel>=0.46.2" && \
-    pip install --no-index --find-links=/wheels /wheels/*.whl && \
-    rm -rf /wheels
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+COPY --from=builder /home/jaspr /home/jaspr
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /usr/bin/tini /usr/bin/tini
+COPY --from=builder /patched/lib/ /usr/lib/
+RUN ["python", "-c", "from pathlib import Path\nfor path in Path('/usr/lib/python3.15/http/__pycache__').glob('client.cpython-315*.pyc'):\n    path.unlink()\nfor path in Path('/usr/share/python-wheels').glob('*.whl'):\n    path.unlink()"]
 
 # Static application assets (uwsgi config + example data).
 COPY app/app.ini       /app/app.ini
 COPY example_data/     /var/JASPR/example_data/
+COPY build/docker/verify-image.py /app/verify-image.py
 
 # Make app/data world-readable so the image works regardless of which UID
 # Singularity / rootless Podman ends up running as.
-RUN chmod -R a+rX /app /var/JASPR /home/jaspr
+RUN ["python", "-c", "import os\nfor root in ('/app', '/var/JASPR', '/home/jaspr', '/opt/venv'):\n    for directory, subdirs, files in os.walk(root):\n        os.chmod(directory, os.stat(directory).st_mode | 0o555)\n        for name in files:\n            path = os.path.join(directory, name)\n            if not os.path.islink(path):\n                os.chmod(path, os.stat(path).st_mode | 0o444)"]
+RUN ["python", "/app/verify-image.py"]
 
 WORKDIR /app
 USER 1000:1000
@@ -111,7 +102,8 @@ EXPOSE 8080
 
 # Healthcheck honored by Docker/Podman (Singularity ignores it).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/ping', timeout=3).status==200 else 1)" || exit 1
+    CMD ["python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/ping', timeout=3).status==200 else 1)"]
 
-# tini provides PID-1 signal handling identical across Docker/Podman/Singularity.
-ENTRYPOINT ["/usr/bin/tini", "--", "uwsgi", "--ini", "/app/app.ini"]
+# Verify security invariants, then exec tini for PID-1 signal handling.
+ENTRYPOINT ["python", "/app/verify-image.py", "--launch"]
+CMD []
