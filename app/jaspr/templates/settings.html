@@ -1,90 +1,58 @@
 {% extends "jaspr_layout.html" %}
-{% set txtTitle="Welcome to JASPR!" %}
 {% block body %}
-<script src={{ url_for('static', filename='js/jaspr-settings.js') }}></script>
-<div class="row">
-	<div class="col-3">
-	</div>
-	<div class="col-9">
-		<h1>Settings</h1>
-
-		<form action=''>
-			<fieldset>
-				<legend>Curve Display</legend>
-				<div class="form-check">
-					<input type="checkbox" class="form-check-input" id="showCurve" {% if show_fit %}Checked{% endif %}>
-					<label class="form-check-label" for="showCurve">Show Curve Fit</label>
-				</div>
-
-				<br />
-
-				<div class="form-check">
-					<input type="checkbox" class="form-check-input" id="blankCorrection" {% if blank_correction %}Checked{% endif %}>
-					<label class="form-check-label" for="blankCorrection">Blank Correction</label>
-				</div>
-			</fieldset>
-
-            <br /><br />
-
-			<fieldset>
-				<legend>Axis Scale</legend>
-				<div class="form-check">
-					<input type="radio" class="form-check-input" name="axisScale" value="log" id="log" {% if x_axis_type == 'log' %}Checked{%endif%}>
-					<label class="form-check-label" for="log">Log Scale</label>
-				</div>
-				<div class="form-check">
-					<input type="radio" class="form-check-input" name="axisScale" value="linear" id="linear" {% if x_axis_type=='linear' %}Checked{%endif%}>
-					<label class="form-check-label" for="linear">Linear Scale</label>
-				</div>
-			</fieldset>
-            
-            <br /><br />
-
-			<fieldset>
-				<legend>Fitting Function</legend>
-				<label for="function-select">Select function:</label>
-				<select id="function-select" class="form-control" style="width: auto;">
-					<option value="">{{ curr_function }}</option>
-					{% for fn in function_list %}
-                        <option value="{{fn}}">{{fn}}</option>
-                    {%endfor%}
-				</select>
-			</fieldset>
-
-			<br />
-
-			<button type="button" class="btn btn-primary" onClick="GetPing();">Check Connection (Ping)</button>
-			<div id="pingResult" role="status" aria-live="polite" aria-label="Ping result">
-				<span id="pingValue"></span>
+<div class="container settings-page py-3">
+	<h1 class="h3 mb-2">Settings</h1>
+	<p class="text-muted mb-3">
+		Update applies these settings to loaded data, or saves them for the next analysis.
+		New uploads otherwise use the defaults listed in Parser Notes.
+	</p>
+	{% if request.args.get('updated') %}
+	<div class="alert alert-success py-2" role="status">Settings saved for the next analysis.</div>
+	{% endif %}
+	{% if settings_error %}
+	<div class="alert alert-danger py-2" role="alert">{{ settings_error }}</div>
+	{% endif %}
+	<form method="post" action="{{ url_for('settings') }}">
+		<div class="row">
+			<div class="col-md-4">
+				<fieldset>
+					<legend>Curve Display</legend>
+					<div class="form-check">
+						<input type="checkbox" class="form-check-input" name="show_fit" value="true" id="showCurve" {% if show_fit %}checked{% endif %}>
+						<label class="form-check-label" for="showCurve">Show Curve Fit</label>
+					</div>
+					<div class="form-check">
+						<input type="checkbox" class="form-check-input" name="blank_correction" value="true" id="blankCorrection" {% if blank_correction %}checked{% endif %}>
+						<label class="form-check-label" for="blankCorrection">Blank Correction</label>
+					</div>
+				</fieldset>
 			</div>
-		</form>
-		<div>
-			<a href="/analysis" class="btn btn-primary">Execute Analysis</a>
+			<div class="col-md-3">
+				<fieldset>
+					<legend>Axis Scale</legend>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" name="x_axis_type" value="log" id="log" {% if x_axis_type == 'log' %}checked{% endif %} required>
+						<label class="form-check-label" for="log">Log Scale</label>
+					</div>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" name="x_axis_type" value="linear" id="linear" {% if x_axis_type == 'linear' %}checked{% endif %}>
+						<label class="form-check-label" for="linear">Linear Scale</label>
+					</div>
+				</fieldset>
+			</div>
+			<div class="col-md-5">
+				<fieldset>
+					<legend>Fitting Function</legend>
+					<label class="sr-only" for="function-select">Select function</label>
+					<select id="function-select" name="curr_function" class="form-control form-control-sm" required>
+						{% for fn in function_list %}
+						<option value="{{ fn }}" {% if fn == curr_function %}selected{% endif %}>{{ fn }}</option>
+						{% endfor %}
+					</select>
+				</fieldset>
+			</div>
 		</div>
-	</div>
+		<button type="submit" class="btn btn-primary">Update</button>
+	</form>
 </div>
-
-<style>
-fieldset {
-  border: 1px solid #ccc;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 4px;
-}
-
-legend {
-  padding: 0 8px;
-  font-weight: bold;
-  color: #005eaa;
-}
-
-.form-check {
-  margin-bottom: 12px;
-}
-
-.form-check-input {
-  margin-right: 8px;
-}
-</style>
-
-{%endblock%}
+{% endblock %}

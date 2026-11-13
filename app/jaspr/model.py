@@ -170,8 +170,9 @@ class JasprModel(object):
         else:
             # load existing session data
             for k, v in session.items():
-                if k in ('experiments', ):
+                if k == '_pending_settings':
+                    continue
+                elif k in ('experiments', ):
                     setattr(self, k, json.loads(v))
                 else:
                     setattr(self, k, v)
-

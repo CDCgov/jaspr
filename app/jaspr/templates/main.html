@@ -56,7 +56,7 @@
 					<li>Click <strong>Reset Session</strong> before uploading the next dataset to clear current data and selections.</li>
 				</ol>
 				<p class="mb-3">
-					Optional: Use <strong>Settings</strong> to adjust fit visibility, blank correction, axis scale, and fitting function, then click <strong>Execute</strong> to apply updates and re-check Analysis/Report outputs.
+					Optional: Use <strong>Settings</strong> to adjust fit visibility, blank correction, axis scale, and fitting function, then click <strong>Update</strong> to refresh Analysis.
 				</p>
 
 				<h3>
@@ -118,6 +118,18 @@
 						</div>
 					</li>
 				</ul>
+				<div class="d-flex flex-column align-items-start" style="gap: 10px;">
+					<img
+						src="{{ url_for('static', filename='images/instructions/plate_layouts_1.jpg') }}"
+						alt="Plate layouts, part 1"
+						class="img-fluid"
+					/>
+					<img
+						src="{{ url_for('static', filename='images/instructions/plate_layouts_2.jpg') }}"
+						alt="Plate layouts, part 2"
+						class="img-fluid"
+					/>
+				</div>
 				</div>
 				<h5 class="mt-3">
 					<button class="btn btn-link p-0 font-weight-bold" type="button" data-toggle="collapse" data-target="#updatingSettings" aria-expanded="false" aria-controls="updatingSettings">Updating Settings</button>
@@ -134,7 +146,8 @@
 					onerror="this.style.display='none'"
 				/>
 				<p class="mb-2">
-					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Execute</strong> to apply changes and refresh Analysis and Report outputs.
+					Use the <strong>Settings</strong> page to tune fit behavior, then click <strong>Update</strong> to save all controls together and refresh loaded Analysis data.
+					If no data is loaded, settings are saved for the next analysis. New uploads otherwise apply the parser defaults listed above; settings saved before a load explicitly override those defaults for that next analysis only.
 				</p>
 				<h6 class="mb-2">Setting Controls</h6>
 				<ul class="mb-2">
@@ -142,7 +155,7 @@
 					<li><strong>Blank Correction:</strong> Uses blank/background correction (y_corrected) instead of raw y_values when computing fits and derived labels.</li>
 					<li><strong>Axis Scale:</strong> Switches concentration axis between <strong>Log</strong> and <strong>Linear</strong>; this affects fit/plot x-series used in charts.</li>
 					<li><strong>Fit Function:</strong> Selects the curve model used to compute result labels (for example titer, IC50, ec50, or ICP1000).</li>
-					<li><strong>Execute:</strong> Applies all setting changes to the active session and returns to Analysis for immediate review.</li>
+					<li><strong>Update:</strong> Applies all setting changes together and returns to Analysis when data is loaded; otherwise saves them for the next analysis. Reset Session clears saved settings.</li>
 				</ul>
 				<h6 class="mb-2">How Curve Fitting Works (Math/Statistics Translation)</h6>
 				<p class="mb-2">

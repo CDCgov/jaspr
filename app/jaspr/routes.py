@@ -369,7 +369,10 @@ def upload():
             ), 400
         raise
 
-    jm = JasprModel().set_defaults(settings)
+    pending_settings = session.pop('_pending_settings', {})
+    jm = JasprModel()
+    jm.curr_parser = selected_parser
+    jm.set_defaults({**settings, **pending_settings})
 
     _set_analysis_session_ready()
 
@@ -399,7 +402,8 @@ def upload_file():
 def load_anscombe_data():
     """Reset the session to the built-in Anscombe dataset."""
     jm = JasprModel()
-    jm.set_defaults()
+    pending_settings = session.pop('_pending_settings', {})
+    jm.set_defaults({**ParserRegistry.plugins['anscombe']()(), **pending_settings})
     _set_analysis_session_ready()
     return redirect('/analysis', code=302)
 
@@ -614,10 +618,36 @@ def favicon_32():
     """Serve 32px favicon fallback for browser icon selection."""
     return send_from_directory(app.static_folder, 'favicon_32.png')
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def settings():
-    """render the settings page"""
+    """Save settings together, then refresh loaded data or retain them for a load."""
     jm = JasprModel()
+    if request.method == 'POST':
+        axis_type = request.form.get('x_axis_type')
+        function = request.form.get('curr_function')
+        if axis_type not in ('linear', 'log') or function not in jm.function_list:
+            app.logger.warning('Invalid settings submission: axis=%r, function=%r', axis_type, function)
+            return render_template(
+                'settings.html',
+                settings_error='Choose a valid axis scale and fitting function.',
+                **jm.context,
+            ), 400
+
+        updated_settings = {
+            'show_fit': request.form.get('show_fit') == 'true',
+            'blank_correction': request.form.get('blank_correction') == 'true',
+            'x_axis_type': axis_type,
+            'curr_function': function,
+        }
+        for key, value in updated_settings.items():
+            setattr(jm, key, value)
+        jm.update_session()
+        if session.get('analysis_ready', False):
+            return redirect(url_for('analysis'), code=303)
+
+        session['_pending_settings'] = updated_settings
+        return redirect(url_for('settings', updated=1), code=303)
+
     return render_template('settings.html', **jm.context)
 
 
