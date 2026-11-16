@@ -23,7 +23,7 @@
 # Stage 1: install into a virtual environment. Compile uWSGI here so
 # the runtime image contains no compiler or Python package installer.
 # ---------------------------------------------------------------------------
-FROM cgr.dev/chainguard/python:latest-dev@sha256:3bc6fcecef7578a7c3eb97fc53ba7259fa3fe11008493e80145910cb2e0d51b9 AS builder
+FROM cgr.dev/chainguard/python:latest-dev@sha256:e0df0ab3cb72380c82f8c5513538152e822a6d8994252663060adea9fdc450c2 AS builder
 
 USER root
 
@@ -59,7 +59,7 @@ RUN addgroup -S -g 1000 jaspr && \
 # Stage 2: runtime image. Only runtime libraries, the installed application,
 # and the application data.
 # ---------------------------------------------------------------------------
-FROM cgr.dev/chainguard/python:latest@sha256:872a42d369a6d9efba17ff4ccf4c0ec103b9e511e5f77793b0f558b933e40929
+FROM cgr.dev/chainguard/python:latest@sha256:b969ffa5d847b5acd28bd18b12d5b6631cb69c8289f03b309e19b68608724dc6
 
 USER root
 

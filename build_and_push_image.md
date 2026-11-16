@@ -89,15 +89,17 @@ still report locally backported fixes; review them against the table below.
 | --- | --- |
 | CVE-2026-115506, CVE-2026-118370, CVE-2026-117610 | Both system Expat and Python's XML parser use fixed Expat 2.10.0. |
 | CVE-2025-47273 | Runtime pip and setuptools, including the flagged pip BOM, are absent. Build tooling and the application build backend require patched setuptools. |
-| CVE-2026-116566 | Official CPython 3.15 socket backport; null bytes in host/port are rejected by a rebuilt native socket module. |
+| CVE-2026-116566, GHSA-q27h-3599-9x7j | The pinned Python APKs are at the fixed version `3.15.2_git20261113-r0`; runtime checks confirm null bytes in host/port are rejected. Both identifiers describe the same issue. |
 | CVE-2026-103995 | Official CPython HTTP framing fix and whitespace compatibility correction; unchecked-hash bytecode is removed so Python loads the patched source. |
 | CVE-2026-84243 | Not applicable to the configured runtime: only C.utf8 is installed and a C messages locale is enforced at startup. The underlying glibc package is not claimed to be patched. |
 | CVE-2026-119586 | Not applicable: this affects the SQLite CLI's `.recover` command; the image has the SQLite library but no CLI. |
 
-The backports are in `build/docker/backport-python.sh` and are tied to the
-CPython source revision of the pinned base images. Update the builder/runtime
-digests together, reassess the backports, and rerun regression checks and both
-scanners when changing bases. `--pull=always` does not advance a pinned digest.
+The HTTP backport is in `build/docker/backport-python.sh` and is tied to the
+CPython source revision of the pinned base images. The APK version does not
+reflect this local patch, so scanners can still report CVE-2026-103995 without
+a package-level fixed version. Update the builder/runtime digests together,
+reassess the backport, and rerun regression checks and both scanners when
+changing bases. `--pull=always` does not advance a pinned digest.
 Do not install extra locales, enable a non-C message locale, or add the SQLite
 CLI without reassessing the corresponding findings. Startup rejects those
 changes.
