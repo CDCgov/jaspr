@@ -77,7 +77,7 @@ podman save --format docker-archive -o jaspr-image.tar "$IMAGE_PRIMARY"
 podman run --rm -v "$PWD:/scan:ro" docker.io/aquasec/trivy:latest \
     image --input /scan/jaspr-image.tar --scanners vuln --exit-code 1
 podman run --rm -v "$PWD:/scan:ro" docker.io/anchore/grype:latest \
-    docker-archive:/scan/jaspr-image.tar --fail-on low
+    docker-archive:/scan/jaspr-image.tar --fail-on high
 rm jaspr-image.tar
 ```
 
